@@ -114,7 +114,7 @@ public class ChatRoomFragment extends BaseFragment implements OnItemChildClickLi
             Object object = adapter.getItem(position);
             if (object instanceof RecordMsg) {
                 RecordMsg msg = (RecordMsg) object;
-                if (context instanceof BaseClassActivity) {
+                if (context instanceof BaseClassActivity_bak) {
                     fetchRecordList(EduApplication.getAppId(), msg.getRoomUuid(), nextId,
                             new EduCallback<RecordRes.RecordDetail>() {
                                 @Override
@@ -180,9 +180,9 @@ public class ChatRoomFragment extends BaseFragment implements OnItemChildClickLi
         }
         String text = edit_send_msg.getText().toString();
         if (KeyEvent.KEYCODE_ENTER == keyCode && KeyEvent.ACTION_DOWN == event.getAction() && text.trim().length() > 0) {
-            if (context instanceof BaseClassActivity) {
+            if (context instanceof BaseClassActivity_bak) {
                 edit_send_msg.setText("");
-                BaseClassActivity activity = (BaseClassActivity) getActivity();
+                BaseClassActivity_bak activity = (BaseClassActivity_bak) getActivity();
                 activity.getLocalUserInfo(new EduCallback<EduUserInfo>() {
                     @Override
                     public void onSuccess(@Nullable EduUserInfo userInfo) {

@@ -193,7 +193,7 @@ internal class EduRoomImpl(
         if (getCurRoomType() == RoomType.LARGE_CLASS) {
             AgoraLog.logMsg("LargeClass force not autoPublish", LogLevel.WARN.value)
             //TODO separate Large class and middle class logic here
-//            options.closeAutoPublish()
+            options.closeAutoPublish()
         }
         mediaOptions = options.mediaOptions
         /**根据classroomType和用户传的角色值转化出一个角色字符串来和后端交互*/

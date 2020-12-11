@@ -41,7 +41,7 @@ public class UserListFragment extends BaseFragment implements OnItemChildClickLi
 
     @Override
     protected void initData() {
-        if (context instanceof BaseClassActivity || context instanceof BaseClassActivity_bak) {
+        if (context instanceof BaseClassActivity_bak) {
             adapter = new UserListAdapter();
             adapter.setOnItemChildClickListener(this);
         }
@@ -103,14 +103,14 @@ public class UserListFragment extends BaseFragment implements OnItemChildClickLi
 
     @Override
     public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-        if (context instanceof BaseClassActivity) {
+        if (context instanceof BaseClassActivity_bak) {
             boolean isSelected = view.isSelected();
             switch (view.getId()) {
                 case R.id.iv_btn_mute_audio:
-                    ((BaseClassActivity) context).muteLocalAudio(isSelected);
+                    ((BaseClassActivity_bak) context).muteLocalAudio(isSelected);
                     break;
                 case R.id.iv_btn_mute_video:
-                    ((BaseClassActivity) context).muteLocalVideo(isSelected);
+                    ((BaseClassActivity_bak) context).muteLocalVideo(isSelected);
                     break;
                 default:
                     break;

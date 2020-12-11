@@ -32,8 +32,9 @@ import io.agora.education.api.statistics.AgoraError;
 import io.agora.education.api.user.data.EduUserRole;
 import io.agora.education.base.BaseActivity;
 import io.agora.education.classroom.BaseClassActivity;
+import io.agora.education.classroom.BaseClassActivity_bak;
 import io.agora.education.classroom.BreakoutClassActivity;
-import io.agora.education.classroom.IntermediateClassActivity;
+import io.agora.education.classroom.MediumClassActivity;
 import io.agora.education.classroom.LargeClassActivity;
 import io.agora.education.classroom.OneToOneClassActivity;
 import io.agora.education.classroom.SmallClassActivity;
@@ -81,11 +82,6 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void initView() {
         new PolicyDialog().show(getSupportFragmentManager(), null);
-        if (BuildConfig.DEBUG) {
-            et_room_name.setText("xianing9");
-            et_room_name.setSelection(et_room_name.length());
-            et_your_name.setText("a");
-        }
     }
 
     @Override
@@ -284,9 +280,9 @@ public class MainActivity extends BaseActivity {
         } else if (roomType == RoomType.BREAKOUT_CLASS.getValue()) {
             intent.setClass(this, BreakoutClassActivity.class);
         } else if (roomType == RoomType.INTERMEDIATE_CLASS.getValue()) {
-            intent.setClass(this, IntermediateClassActivity.class);
+            intent.setClass(this, MediumClassActivity.class);
         }
-        intent.putExtra(BaseClassActivity.ROOMENTRY, roomEntry);
+        intent.putExtra(BaseClassActivity_bak.ROOMENTRY, roomEntry);
         return intent;
     }
 

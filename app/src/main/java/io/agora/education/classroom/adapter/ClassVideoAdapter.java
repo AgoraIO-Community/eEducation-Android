@@ -87,10 +87,7 @@ public class ClassVideoAdapter extends BaseQuickAdapter<EduStreamInfo, ClassVide
     protected void convert(@NonNull ViewHolder viewHolder, EduStreamInfo item) {
         viewHolder.convert(item);
         Activity a = ((Activity) viewHolder.view.getContext());
-        if (a instanceof BaseClassActivity) {
-            BaseClassActivity activity = (BaseClassActivity) a;
-            activity.renderStream(activity.getMainEduRoom(), item, viewHolder.view.getVideoLayout());
-        } else {
+        if (a instanceof BaseClassActivity_bak) {
             BaseClassActivity_bak activity = (BaseClassActivity_bak) a;
             activity.renderStream(activity.getMainEduRoom(), item, viewHolder.view.getVideoLayout());
         }

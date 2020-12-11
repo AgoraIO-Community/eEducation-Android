@@ -18,6 +18,7 @@ import butterknife.OnClick;
 import io.agora.education.R;
 import io.agora.education.api.statistics.NetworkQuality;
 import io.agora.education.classroom.BaseClassActivity;
+import io.agora.education.classroom.BaseClassActivity_bak;
 import io.agora.rtc.Constants;
 
 import static io.agora.education.api.statistics.NetworkQuality.*;
@@ -107,13 +108,13 @@ public class TitleView extends ConstraintLayout {
     @OnClick({R.id.iv_close, R.id.iv_uploadLog})
     public void onClock(View view) {
         Context context = getContext();
-        if (context instanceof BaseClassActivity) {
+        if (context instanceof BaseClassActivity_bak) {
             switch (view.getId()) {
                 case R.id.iv_close:
-                    ((BaseClassActivity) context).showLeaveDialog();
+                    ((BaseClassActivity_bak) context).showLeaveDialog();
                     break;
                 case R.id.iv_uploadLog:
-                    ((BaseClassActivity) context).uploadLog();
+                    ((BaseClassActivity_bak) context).uploadLog();
                     break;
                 default:
                     break;

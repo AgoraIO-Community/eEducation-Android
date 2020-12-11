@@ -80,8 +80,8 @@ import static io.agora.education.classroom.bean.group.RoomGroupInfo.INTERACTOUTG
 import static io.agora.education.classroom.bean.group.RoomGroupInfo.STUDENTS;
 import static io.agora.education.classroom.bean.group.RoomGroupInfo.USERUUID;
 
-public class IntermediateClassActivity extends BaseClassActivity_bak implements TabLayout.OnTabSelectedListener {
-    private static final String TAG = IntermediateClassActivity.class.getSimpleName();
+public class MediumClassActivity extends BaseClassActivity_bak implements TabLayout.OnTabSelectedListener {
+    private static final String TAG = MediumClassActivity.class.getSimpleName();
 
     @BindView(R.id.layout_video_teacher)
     FrameLayout layoutVideoTeacher;
@@ -113,13 +113,13 @@ public class IntermediateClassActivity extends BaseClassActivity_bak implements 
 
     @Override
     protected int getLayoutResId() {
-        return R.layout.activity_intermediate_class;
+        return R.layout.activity_medium_class;
     }
 
     @Override
     protected void initData() {
         super.initData();
-        joinRoom(getMainEduRoom(), roomEntry.getUserName(), roomEntry.getUserUuid(), true, true, true,
+        joinRoom(getMainEduRoom(), roomEntry.getUserName(), roomEntry.getUserUuid(), true, false, true,
                 new EduCallback<EduStudent>() {
                     @Override
                     public void onSuccess(@org.jetbrains.annotations.Nullable EduStudent res) {
@@ -129,6 +129,7 @@ public class IntermediateClassActivity extends BaseClassActivity_bak implements 
                             whiteboardFragment.disableDeviceInputs(true);
                             whiteboardFragment.setWritable(false);
                         });
+                        initTitleTimeState();
                         /*初始化举手连麦组件*/
                         agoraEduCoVideoView.init(getMainEduRoom());
                         initParseBoardInfo(getMainEduRoom());
@@ -460,68 +461,66 @@ public class IntermediateClassActivity extends BaseClassActivity_bak implements 
             }
             /*打开pk,肯定有一个组整体上台*/
             List<String> stageMemberIdsOne = stageGroups.get(0).getMembers();
-            List<String> stageMemberIdsTwo = new ArrayList<>();
-            if (stageGroups.size() > 1) {
-                stageMemberIdsTwo = stageGroups.get(1).getMembers();
-            }
-            /**测试代码*/
-            List<EduStreamInfo> curFullStreams = new ArrayList<>();
-            if (roomGroupInfo.getAllStudent() != null) {
-                for (GroupMemberInfo memberInfo : roomGroupInfo.getAllStudent()) {
-                    EduBaseUserInfo baseUserInfo = new EduBaseUserInfo(memberInfo.getUuid(),
-                            memberInfo.getUserName(), EduUserRole.STUDENT);
-                    EduStreamInfo streamInfo = new EduStreamInfo(memberInfo.getUuid().concat("000"),
-                            "stream-".concat(memberInfo.getUserName()), VideoSourceType.CAMERA,
-                            true, true, baseUserInfo);
-                    curFullStreams.add(streamInfo);
-                }
-            }
-            stageStreamInfosOne.clear();
-            stageStreamInfosTwo.clear();
-            if (curFullStreams != null && curFullStreams.size() > 0) {
-                for (EduStreamInfo stream : curFullStreams) {
-                    String userUuid = stream.getPublisher().getUserUuid();
-                    if (stageMemberIdsOne.contains(userUuid)) {
-                        StageStreamInfo stageStream = new StageStreamInfo(stream,
-                                roomGroupInfo.getStudentReward(userUuid));
-                        stageStreamInfosOne.add(stageStream);
-                    } else if (stageMemberIdsTwo.contains(userUuid)) {
-                        StageStreamInfo stageStream = new StageStreamInfo(stream,
-                                roomGroupInfo.getStudentReward(userUuid));
-                        stageStreamInfosTwo.add(stageStream);
-                    }
-                }
-                notifyStageVideoListOne();
-                notifyStageVideoListTwo();
-            }
-//            getCurFullStream(new EduCallback<List<EduStreamInfo>>() {
-//                @Override
-//                public void onSuccess(@Nullable List<EduStreamInfo> curFullStreams) {
-//                    if (curFullStreams != null && curFullStreams.size() > 0) {
-//                        for (EduStreamInfo stream : curFullStreams) {
-//                            String userUuid = stream.getPublisher().getUserUuid();
-//                            if (stageMemberIdsOne.contains(userUuid)) {
-//                                StageStreamInfo stageStream = new StageStreamInfo(stream,
-//                                        roomGroupInfo.getScoreByUuid(userUuid));
-//                                stageStreamInfosOne.add(stageStream);
-//                            } else if (stageMemberIdsTwo.contains(userUuid)) {
-//                                StageStreamInfo stageStream = new StageStreamInfo(stream,
-//                                        roomGroupInfo.getScoreByUuid(userUuid));
-//                                stageStreamInfosTwo.add(stageStream);
-//                            }
-//                        }
-//                        notifyStageVideoListOne();
-//                        notifyStageVideoListTwo();
+            final List<String> stageMemberIdsTwo = stageGroups.size() > 1 ?
+                    stageGroups.get(1).getMembers() : new ArrayList<>();
+//            /**测试代码*/
+//            List<EduStreamInfo> curFullStreams = new ArrayList<>();
+//            if (roomGroupInfo.getAllStudent() != null) {
+//                for (GroupMemberInfo memberInfo : roomGroupInfo.getAllStudent()) {
+//                    EduBaseUserInfo baseUserInfo = new EduBaseUserInfo(memberInfo.getUuid(),
+//                            memberInfo.getUserName(), EduUserRole.STUDENT);
+//                    EduStreamInfo streamInfo = new EduStreamInfo(memberInfo.getUuid().concat("000"),
+//                            "stream-".concat(memberInfo.getUserName()), VideoSourceType.CAMERA,
+//                            true, true, baseUserInfo);
+//                    curFullStreams.add(streamInfo);
+//                }
+//            }
+//            stageStreamInfosOne.clear();
+//            stageStreamInfosTwo.clear();
+//            if (curFullStreams != null && curFullStreams.size() > 0) {
+//                for (EduStreamInfo stream : curFullStreams) {
+//                    String userUuid = stream.getPublisher().getUserUuid();
+//                    if (stageMemberIdsOne.contains(userUuid)) {
+//                        StageStreamInfo stageStream = new StageStreamInfo(stream,
+//                                roomGroupInfo.getStudentReward(userUuid));
+//                        stageStreamInfosOne.add(stageStream);
+//                    } else if (stageMemberIdsTwo.contains(userUuid)) {
+//                        StageStreamInfo stageStream = new StageStreamInfo(stream,
+//                                roomGroupInfo.getStudentReward(userUuid));
+//                        stageStreamInfosTwo.add(stageStream);
 //                    }
 //                }
-//
-//                @Override
-//                public void onFailure(@NotNull EduError error) {
-//
-//                }
-//            });
+//                notifyStageVideoListOne();
+//                notifyStageVideoListTwo();
+//            }
+            getCurFullStream(new EduCallback<List<EduStreamInfo>>() {
+                @Override
+                public void onSuccess(@Nullable List<EduStreamInfo> curFullStreams) {
+                    if (curFullStreams != null && curFullStreams.size() > 0) {
+                        for (EduStreamInfo stream : curFullStreams) {
+                            String userUuid = stream.getPublisher().getUserUuid();
+                            if (stageMemberIdsOne.contains(userUuid)) {
+                                StageStreamInfo stageStream = new StageStreamInfo(stream,
+                                        roomGroupInfo.getStudentReward(userUuid));
+                                stageStreamInfosOne.add(stageStream);
+                            } else if (stageMemberIdsTwo.contains(userUuid)) {
+                                StageStreamInfo stageStream = new StageStreamInfo(stream,
+                                        roomGroupInfo.getStudentReward(userUuid));
+                                stageStreamInfosTwo.add(stageStream);
+                            }
+                        }
+                        notifyStageVideoListOne();
+                        notifyStageVideoListTwo();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NotNull EduError error) {
+
+                }
+            });
         } else {
-            List<EduStreamInfo> curFullStreams = new ArrayList<>();
+            List<EduStreamInfo> curStageStreams = new ArrayList<>();
             if (roomGroupInfo.getAllStudent() != null) {
                 for (GroupMemberInfo memberInfo : roomGroupInfo.getAllStudent()) {
                     if (memberInfo.getOnStage() || memberInfo.getEnableVideo() || memberInfo.getEnableAudio()) {
@@ -531,14 +530,14 @@ public class IntermediateClassActivity extends BaseClassActivity_bak implements 
                         EduStreamInfo streamInfo = new EduStreamInfo(memberInfo.getStreamUuid() == null ? "0" : memberInfo.getStreamUuid()
                                 , memberInfo.getStreamName(),
                                 VideoSourceType.CAMERA, memberInfo.getEnableVideo(), memberInfo.getEnableAudio(), baseUserInfo);
-                        curFullStreams.add(streamInfo);
+                        curStageStreams.add(streamInfo);
                     }
                 }
             }
             stageStreamInfosOne.clear();
             stageStreamInfosTwo.clear();
-            if (curFullStreams != null && curFullStreams.size() > 0) {
-                for (EduStreamInfo stream : curFullStreams) {
+            if (curStageStreams != null && curStageStreams.size() > 0) {
+                for (EduStreamInfo stream : curStageStreams) {
                     String userUuid = stream.getPublisher().getUserUuid();
                     StageStreamInfo stageStream = new StageStreamInfo(stream,
                             roomGroupInfo.getStudentReward(userUuid));

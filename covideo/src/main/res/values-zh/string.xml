@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="there_is_no_teacher_disable_covideo">老师不在线，无法举手</string>
+    <string name="covideo_accept_interactive">老师接受了你的连麦申请！</string>
+    <string name="covideo_reject_interactive">老师拒绝了你的连麦申请！</string>
+    <string name="covideo_abort_interactive">老师终止了你的连麦！</string>
+</resources>

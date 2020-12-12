@@ -457,14 +457,12 @@ internal open class EduUserImpl(
             val surfaceView = RtcEngine.CreateRendererView(appContext)
             surfaceView.tag = stream.streamUuid
             surfaceView.setZOrderMediaOverlay(true)
-//            surfaceView.setZOrderOnTop(true)
             val layoutParams = ViewGroup.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
             surfaceView.layoutParams = layoutParams
             var uid: Int = ((stream.streamUuid.toLong()) and 0xffffffffL).toInt()
             if (stream.publisher.userUuid == this.userInfo.userUuid) {
                 uid = 0
             }
-//            val uid: Int = stream.streamUuid.toInt()
             videoCanvas = VideoCanvas(surfaceView, config.renderMode.value, channelId, uid)
             viewGroup.addView(surfaceView)
             surfaceViewList.add(surfaceView)

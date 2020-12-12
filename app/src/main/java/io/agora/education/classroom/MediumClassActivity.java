@@ -534,14 +534,34 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
         } else {
             List<EduStreamInfo> curStageStreams = new ArrayList<>();
             if (roomGroupInfo.getAllStudent() != null) {
-                for (GroupMemberInfo memberInfo : roomGroupInfo.getAllStudent()) {
-                    if (memberInfo.getOnStage() || memberInfo.getEnableVideo() || memberInfo.getEnableAudio()) {
-                        memberInfo.onStage();
-                        EduBaseUserInfo baseUserInfo = new EduBaseUserInfo(memberInfo.getUuid(),
-                                memberInfo.getUserName(), EduUserRole.STUDENT);
-                        EduStreamInfo streamInfo = new EduStreamInfo(memberInfo.getStreamUuid() == null ? "0" : memberInfo.getStreamUuid()
-                                , memberInfo.getStreamName(),
-                                VideoSourceType.CAMERA, memberInfo.getEnableVideo(), memberInfo.getEnableAudio(), baseUserInfo);
+                for (GroupMemberInfo element : roomGroupInfo.getAllStudent()) {
+                    if (element.getOnStage()) {
+                        EduBaseUserInfo baseUserInfo = new EduBaseUserInfo(element.getUuid(),
+                                element.getUserName(), EduUserRole.STUDENT);
+                        /*发现streamUuid为空，则去本地流缓存中遍历，补齐数据*/
+                        if (element.getStreamUuid() == null) {
+                            getCurFullStream(new EduCallback<List<EduStreamInfo>>() {
+                                @Override
+                                public void onSuccess(@Nullable List<EduStreamInfo> streams) {
+                                    if (streams != null) {
+                                        for (EduStreamInfo streamInfo : streams) {
+                                            if (streamInfo.getPublisher().getUserUuid()
+                                                    .equals(element.getUuid())) {
+                                                element.setStreamUuid(streamInfo.getStreamUuid());
+                                                element.setStreamName(streamInfo.getStreamName());
+                                            }
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(@NotNull EduError error) {
+                                }
+                            });
+                        }
+                        EduStreamInfo streamInfo = new EduStreamInfo(element.getStreamUuid(),
+                                element.getStreamName(),
+                                VideoSourceType.CAMERA, element.getEnableVideo(), element.getEnableAudio(), baseUserInfo);
                         curStageStreams.add(streamInfo);
                     }
                 }
@@ -596,6 +616,21 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
         });
     }
 
+
+    /**
+     * 用户上台
+     */
+    private void memberOnStage(List<EduStreamEvent> streamEvents) {
+        for (GroupMemberInfo memberInfo : roomGroupInfo.getAllStudent()) {
+            for (EduStreamEvent streamEvent : streamEvents) {
+                EduStreamInfo streamInfo = streamEvent.getModifiedStream();
+                if (memberInfo.getUuid().equals(streamInfo.getPublisher().getUserUuid())) {
+                    memberInfo.onStage();
+                }
+            }
+        }
+    }
+
     /**
      * 用户下台
      */
@@ -605,10 +640,6 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                 EduStreamInfo streamInfo = streamEvent.getModifiedStream();
                 if (memberInfo.getUuid().equals(streamInfo.getPublisher().getUserUuid())) {
                     memberInfo.offStage();
-                    memberInfo.setEnableAudio(false);
-                    memberInfo.setEnableVideo(false);
-                    streamInfo.setHasAudio(false);
-                    streamInfo.setHasVideo(false);
                 }
             }
         }
@@ -710,6 +741,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     public void onRemoteStreamsAdded(@NotNull List<EduStreamEvent> streamEvents, @NotNull EduRoom classRoom) {
         if (classRoom.equals(getMainEduRoom())) {
             super.onRemoteStreamsAdded(streamEvents, classRoom);
+            memberOnStage(streamEvents);
             boolean needUpdateStudentList = false;
             for (EduStreamEvent streamEvent : streamEvents) {
                 EduStreamInfo streamInfo = streamEvent.getModifiedStream();
@@ -746,6 +778,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     public void onRemoteStreamUpdated(@NotNull List<EduStreamEvent> streamEvents, @NotNull EduRoom classRoom) {
         if (classRoom.equals(getMainEduRoom())) {
             super.onRemoteStreamUpdated(streamEvents, classRoom);
+            memberOnStage(streamEvents);
             boolean needUpdateStudentList = false;
             for (EduStreamEvent streamEvent : streamEvents) {
                 EduStreamInfo streamInfo = streamEvent.getModifiedStream();
@@ -875,6 +908,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     @Override
     public void onLocalStreamAdded(@NotNull EduStreamEvent streamEvent) {
         super.onLocalStreamAdded(streamEvent);
+        memberOnStage(Collections.singletonList(streamEvent));
         updateLocalStreamInfo(streamEvent);
         notifyStageVideoList();
     }
@@ -882,6 +916,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     @Override
     public void onLocalStreamUpdated(@NotNull EduStreamEvent streamEvent) {
         super.onLocalStreamUpdated(streamEvent);
+        memberOnStage(Collections.singletonList(streamEvent));
         updateLocalStreamInfo(streamEvent);
         notifyStageVideoList();
     }

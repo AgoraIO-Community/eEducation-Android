@@ -104,7 +104,7 @@ class AgoraEduCoVideoView : LinearLayout {
         })
     }
 
-    fun init(eduRoom: EduRoom, processUuid: String) {
+    fun init(eduRoom: EduRoom, processUuid: String?) {
         if (!initialized) {
             session = StudentCoVideoHelper(context, eduRoom, processUuid)
             /*检查老师是否打开举手开关*/
@@ -324,6 +324,10 @@ class AgoraEduCoVideoView : LinearLayout {
 
     fun isAutoCoVideo(): Boolean {
         return session.autoCoVideo
+    }
+
+    fun updateProcessUuid(processUuid: String) {
+        session.processUuid = processUuid
     }
 
     fun destroy() {

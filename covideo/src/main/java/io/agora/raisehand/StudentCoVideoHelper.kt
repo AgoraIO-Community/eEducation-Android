@@ -20,7 +20,7 @@ import io.agora.raisehand.CoVideoState.DisCoVideo
 internal class StudentCoVideoHelper(
         context: Context,
         eduRoom: EduRoom,
-        processUuid: String) :
+        processUuid: String?) :
         StudentCoVideoSession(context, eduRoom, processUuid) {
 
     init {
@@ -83,7 +83,8 @@ internal class StudentCoVideoHelper(
                         if (it.role == EduUserRole.TEACHER) {
                             val payload = mutableMapOf<String, Any>(Pair(BusinessType.BUSINESS,
                                     BusinessType.RAISEHAND))
-                            val config = EduActionConfig(processUuid, AgoraActionType.AgoraActionTypeApply,
+                            val config = EduActionConfig(processUuid
+                                    ?: "", AgoraActionType.AgoraActionTypeApply,
                                     it.userUuid, "", 4, payload)
                             getLocalUser(object : EduCallback<EduUser> {
                                 override fun onSuccess(res: EduUser?) {
@@ -134,7 +135,8 @@ internal class StudentCoVideoHelper(
                         if (it.role == EduUserRole.TEACHER) {
                             val payload = mutableMapOf<String, Any>(Pair(BusinessType.BUSINESS,
                                     BusinessType.RAISEHAND))
-                            val config = EduActionConfig(processUuid, AgoraActionType.AgoraActionTypeCancel,
+                            val config = EduActionConfig(processUuid
+                                    ?: "", AgoraActionType.AgoraActionTypeCancel,
                                     it.userUuid, null, 4, payload)
                             getLocalUser(object : EduCallback<EduUser> {
                                 override fun onSuccess(res: EduUser?) {

@@ -143,9 +143,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                         initTitleTimeState();
                         String processUuid = parseAgoraActionConfig(getMainEduRoom());
                         /*初始化举手连麦组件*/
-                        if (!TextUtils.isEmpty(processUuid)) {
-                            agoraEduCoVideoView.init(getMainEduRoom(), processUuid);
-                        }
+                        agoraEduCoVideoView.init(getMainEduRoom(), processUuid);
                         initParseBoardInfo(getMainEduRoom());
                         /*获取班级的roomProperties中可能存在的分组信息*/
                         syncRoomGroupProperty(getMainEduRoom().getRoomProperties());
@@ -712,7 +710,6 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     public void onRemoteStreamsAdded(@NotNull List<EduStreamEvent> streamEvents, @NotNull EduRoom classRoom) {
         if (classRoom.equals(getMainEduRoom())) {
             super.onRemoteStreamsAdded(streamEvents, classRoom);
-            notifyStageVideoList();
             boolean needUpdateStudentList = false;
             for (EduStreamEvent streamEvent : streamEvents) {
                 EduStreamInfo streamInfo = streamEvent.getModifiedStream();
@@ -726,6 +723,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
             if (needUpdateStudentList) {
                 studentListFragment.updateStudentList(roomGroupInfo.getAllStudent());
             }
+            notifyStageVideoList();
         }
     }
 
@@ -758,10 +756,10 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                     needUpdateStudentList = updateMemberInfoList(streamInfo, userInfo);
                 }
             }
-            notifyStageVideoList();
             if (needUpdateStudentList) {
                 studentListFragment.updateStudentList(roomGroupInfo.getAllStudent());
             }
+            notifyStageVideoList();
         }
     }
 
@@ -832,6 +830,8 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                     case SWITCHCOVIDEO:
                     case SWITCHAUTOCOVIDEO:
                         /*同步举手开关的状态至coVideoView*/
+                        String processUuid = parseAgoraActionConfig(getMainEduRoom());
+                        agoraEduCoVideoView.updateProcessUuid(processUuid);
                         agoraEduCoVideoView.syncCoVideoSwitchState(roomProperties);
                         break;
                     case STUDENTLISTCHANGED:

@@ -11,7 +11,7 @@ import kotlin.random.Random
 internal abstract class StudentCoVideoSession(
         context: Context,
         eduRoom: EduRoom,
-        val processUuid: String
+        var processUuid: String?
 ) {
     var context: WeakReference<Context> = WeakReference(context)
     var eduRoom: WeakReference<EduRoom> = WeakReference(eduRoom)

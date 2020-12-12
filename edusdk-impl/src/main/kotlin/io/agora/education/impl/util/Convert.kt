@@ -1,9 +1,7 @@
 package io.agora.education.impl.util
 
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import io.agora.education.api.message.EduActionMessage
-import io.agora.education.api.message.EduActionType
+import io.agora.education.api.message.AgoraActionType
+import io.agora.education.api.message.EduFromUserInfo
 import io.agora.education.api.room.EduRoom
 import io.agora.education.api.room.data.*
 import io.agora.education.api.statistics.ConnectionState
@@ -14,7 +12,6 @@ import io.agora.education.api.user.data.EduLocalUserInfo
 import io.agora.education.api.user.data.EduUserInfo
 import io.agora.education.api.user.data.EduUserRole
 import io.agora.education.impl.cmd.bean.*
-import io.agora.education.impl.cmd.bean.CMDActionMsgRes
 import io.agora.education.impl.role.data.EduUserRoleStr
 import io.agora.education.impl.room.data.response.*
 import io.agora.education.impl.stream.EduStreamInfoImpl
@@ -145,6 +142,15 @@ internal object Convert {
     fun convertUserInfo(eduUserRes: EduFromUserRes, roomType: RoomType): EduUserInfo {
         val role = convertUserRole(eduUserRes.role, roomType)
         return EduUserInfoImpl(eduUserRes.userUuid, eduUserRes.userName, role, false, null)
+    }
+
+    fun convertFromUserInfo(eduUserRes: EduFromUserRes, roomType: RoomType): EduFromUserInfo {
+        val role = convertUserRole(eduUserRes.role, roomType)
+        return EduFromUserInfo(eduUserRes.userUuid, eduUserRes.userName, role)
+    }
+
+    fun convertFromUserInfo(localUserInfo: EduLocalUserInfo): EduFromUserInfo {
+        return EduFromUserInfo(localUserInfo.userUuid, localUserInfo.userName, localUserInfo.role)
     }
 
     /**根据返回的用户和stream列表提取出stream列表*/
@@ -326,33 +332,33 @@ internal object Convert {
         return pos
     }
 
-    fun convertActionMsgType(value: Int): EduActionType {
+    fun convertActionMsgType(value: Int): AgoraActionType {
         return when (value) {
-            EduActionType.EduActionTypeApply.value -> {
-                EduActionType.EduActionTypeApply
+            AgoraActionType.AgoraActionTypeApply.value -> {
+                AgoraActionType.AgoraActionTypeApply
             }
-            EduActionType.EduActionTypeInvitation.value -> {
-                EduActionType.EduActionTypeApply
+            AgoraActionType.AgoraActionTypeInvitation.value -> {
+                AgoraActionType.AgoraActionTypeApply
             }
-            EduActionType.EduActionTypeAccept.value -> {
-                EduActionType.EduActionTypeApply
+            AgoraActionType.AgoraActionTypeAccept.value -> {
+                AgoraActionType.AgoraActionTypeApply
             }
-            EduActionType.EduActionTypeReject.value -> {
-                EduActionType.EduActionTypeApply
+            AgoraActionType.AgoraActionTypeReject.value -> {
+                AgoraActionType.AgoraActionTypeApply
             }
             else -> {
-                EduActionType.EduActionTypeReject
+                AgoraActionType.AgoraActionTypeReject
             }
         }
     }
 
-    fun convertEduActionMsg(text: String): EduActionMessage {
-        val cmdResponseBody = Gson().fromJson<CMDResponseBody<CMDActionMsgRes>>(text, object :
-                TypeToken<CMDResponseBody<CMDActionMsgRes>>() {}.type)
-        val msg = cmdResponseBody.data
-        return EduActionMessage(msg.processUuid, convertActionMsgType(msg.action), msg.timeout,
-                msg.fromUser, convertEduRoomInfo(msg.fromRoom), msg.payload)
-    }
+//    fun convertEduActionMsg(text: String): EduActionMessage {
+//        val cmdResponseBody = Gson().fromJson<CMDResponseBody<CMDActionMsgRes>>(text, object :
+//                TypeToken<CMDResponseBody<CMDActionMsgRes>>() {}.type)
+//        val msg = cmdResponseBody.data
+//        return EduActionMessage(msg.processUuid, convertActionMsgType(msg.action), msg.timeout,
+//                msg.fromUser, convertEduRoomInfo(msg.fromRoom), msg.payload)
+//    }
 
     fun convertEduRoomInfo(roomInfoRes: EduSnapshotRoomInfoRes): EduRoomInfo {
         return EduRoomInfo(roomInfoRes.roomUuid, roomInfoRes.roomName)

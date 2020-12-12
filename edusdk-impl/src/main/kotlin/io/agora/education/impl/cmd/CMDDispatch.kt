@@ -106,7 +106,7 @@ internal class CMDDispatch(private val eduRoom: EduRoom) {
                 AgoraLog.i("$TAG->Receive channel chat message")
                 val eduMsg = CMDUtil.buildEduMsg(text, eduRoom) as EduChatMsg
                 AgoraLog.i("$TAG->Build eduChatMsg1:${Gson().toJson(eduMsg)}")
-                if (eduMsg.fromUser == (eduRoom as EduRoomImpl).getCurLocalUserInfo()) {
+                if (eduMsg.fromUser.userUuid == (eduRoom as EduRoomImpl).getCurLocalUserInfo().userUuid) {
                     AgoraLog.i("$TAG->In channel msg sent by localUser，auto shield1")
                 } else {
                     AgoraLog.i("$TAG->In channel msg sent by remoteUser，callback to upper layer1")
@@ -118,7 +118,7 @@ internal class CMDDispatch(private val eduRoom: EduRoom) {
                 AgoraLog.i("$TAG->Receive channel custom message")
                 val eduMsg = CMDUtil.buildEduMsg(text, eduRoom)
                 AgoraLog.i("$TAG->Build eduMsg2:${Gson().toJson(eduMsg)}")
-                if (eduMsg.fromUser == (eduRoom as EduRoomImpl).getCurLocalUserInfo()) {
+                if (eduMsg.fromUser.userUuid == (eduRoom as EduRoomImpl).getCurLocalUserInfo().userUuid) {
                     AgoraLog.i("$TAG->In channel msg sent by localUser，auto shield2")
                 } else {
                     AgoraLog.i("$TAG->In channel msg sent by remoteUser，callback to upper layer2")
@@ -382,15 +382,15 @@ internal class CMDDispatch(private val eduRoom: EduRoom) {
                 TypeToken<CMDResponseBody<Any>>() {}.type)
         when (cmdResponseBody.cmd) {
             CMDId.PeerMsgReceived.value -> {
-                /**点对点的聊天消息*/
+                /**点对点消息*/
                 val eduMsg = CMDUtil.buildEduMsg(text, eduRoom) as EduChatMsg
                 cmdCallbackManager.onUserChatMessageReceived(eduMsg, listener)
             }
-            CMDId.ActionMsgReceived.value -> {
-                /**邀请申请动作消息*/
-                val actionMsg = Convert.convertEduActionMsg(text)
-                cmdCallbackManager.onUserActionMessageReceived(actionMsg, listener)
-            }
+//            CMDId.ActionMsgReceived.value -> {
+//                /**邀请申请动作消息*/
+//                val actionMsg = Convert.convertEduActionMsg(text)
+//                cmdCallbackManager.onUserActionMessageReceived(actionMsg, listener)
+//            }
             CMDId.PeerCustomMsgReceived.value -> {
                 /**点对点的自定义消息(可以是用户自定义的信令)*/
                 val eduMsg = CMDUtil.buildEduMsg(text, eduRoom)

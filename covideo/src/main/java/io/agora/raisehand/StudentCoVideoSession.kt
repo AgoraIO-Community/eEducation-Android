@@ -10,14 +10,13 @@ import kotlin.random.Random
 
 internal abstract class StudentCoVideoSession(
         context: Context,
-        eduRoom: EduRoom
+        eduRoom: EduRoom,
+        val processUuid: String
 ) {
     var context: WeakReference<Context> = WeakReference(context)
     var eduRoom: WeakReference<EduRoom> = WeakReference(eduRoom)
     var curCoVideoState = CoVideoState.DisCoVideo
         protected set
-    var processUuid: String = Random.nextLong().toString()
-        private set
 
     /*是否允许举手
     * 1:允许  0:不允许*/
@@ -40,7 +39,7 @@ internal abstract class StudentCoVideoSession(
     abstract fun isAllowCoVideo(callback: EduCallback<Unit>)
 
     protected fun refreshProcessUuid() {
-        processUuid = Random.nextLong().toString()
+//        processUuid = Random.nextInt().toString()
     }
 
     fun isApplying(): Boolean {

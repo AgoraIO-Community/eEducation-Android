@@ -6,20 +6,22 @@ import io.agora.education.api.EduCallback
 import io.agora.education.api.base.EduError
 import io.agora.education.api.base.EduError.Companion.customMsgError
 import io.agora.education.api.base.EduError.Companion.internalError
-import io.agora.education.api.message.EduActionType
+import io.agora.education.api.message.AgoraActionType
 import io.agora.education.api.room.EduRoom
 import io.agora.education.api.user.EduUser
 import io.agora.education.api.user.data.EduActionConfig
 import io.agora.education.api.user.data.EduUserInfo
 import io.agora.education.api.user.data.EduUserRole
+import io.agora.raisehand.AgoraActionConfig.Companion.PROCESSES
 import io.agora.raisehand.CoVideoState.Applying
 import io.agora.raisehand.CoVideoState.CoVideoing
 import io.agora.raisehand.CoVideoState.DisCoVideo
 
 internal class StudentCoVideoHelper(
         context: Context,
-        eduRoom: EduRoom) :
-        StudentCoVideoSession(context, eduRoom) {
+        eduRoom: EduRoom,
+        processUuid: String) :
+        StudentCoVideoSession(context, eduRoom, processUuid) {
 
     init {
         val properties = eduRoom.roomProperties
@@ -81,7 +83,7 @@ internal class StudentCoVideoHelper(
                         if (it.role == EduUserRole.TEACHER) {
                             val payload = mutableMapOf<String, Any>(Pair(BusinessType.BUSINESS,
                                     BusinessType.RAISEHAND))
-                            val config = EduActionConfig(processUuid, EduActionType.EduActionTypeApply,
+                            val config = EduActionConfig(processUuid, AgoraActionType.AgoraActionTypeApply,
                                     it.userUuid, "", 4, payload)
                             getLocalUser(object : EduCallback<EduUser> {
                                 override fun onSuccess(res: EduUser?) {
@@ -120,21 +122,19 @@ internal class StudentCoVideoHelper(
         })
     }
 
-    /**老师处理前主动取消*/
     override fun cancelCoVideo(callback: EduCallback<Unit>) {
-        if (curCoVideoState != Applying) {
-            callback.onFailure(customMsgError("can not cancel,because current CoVideoState is not Applying!"))
-            return
-        }
+//        if (curCoVideoState != Applying) {
+//            callback.onFailure(customMsgError("can not cancel,because current CoVideoState is not Applying!"))
+//            return
+//        }
         eduRoom.get()?.getFullUserList(object : EduCallback<MutableList<EduUserInfo>> {
             override fun onSuccess(res: MutableList<EduUserInfo>?) {
                 if (res != null) {
                     res.forEach {
                         if (it.role == EduUserRole.TEACHER) {
-                            /*老师处理前主动取消*/
                             val payload = mutableMapOf<String, Any>(Pair(BusinessType.BUSINESS,
                                     BusinessType.RAISEHAND))
-                            val config = EduActionConfig(processUuid, EduActionType.EduActionTypeCancel,
+                            val config = EduActionConfig(processUuid, AgoraActionType.AgoraActionTypeCancel,
                                     it.userUuid, null, 4, payload)
                             getLocalUser(object : EduCallback<EduUser> {
                                 override fun onSuccess(res: EduUser?) {
@@ -143,12 +143,12 @@ internal class StudentCoVideoHelper(
                                             override fun onSuccess(res: Unit?) {
                                                 curCoVideoState = DisCoVideo
                                                 callback.onSuccess(Unit)
-                                                refreshProcessUuid()
+//                                                refreshProcessUuid()
                                             }
 
                                             override fun onFailure(error: EduError) {
                                                 callback.onFailure(error)
-                                                refreshProcessUuid()
+//                                                refreshProcessUuid()
                                             }
                                         })
                                     } else {

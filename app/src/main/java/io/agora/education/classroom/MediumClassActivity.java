@@ -1,5 +1,6 @@
 package io.agora.education.classroom;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -28,7 +30,7 @@ import butterknife.BindView;
 import io.agora.education.R;
 import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
-import io.agora.education.api.message.EduActionMessage;
+import io.agora.education.api.message.AgoraActionMessage;
 import io.agora.education.api.message.EduChatMsg;
 import io.agora.education.api.message.EduMsg;
 import io.agora.education.api.message.GroupMemberInfoMessage;
@@ -38,10 +40,12 @@ import io.agora.education.api.statistics.ConnectionState;
 import io.agora.education.api.statistics.NetworkQuality;
 import io.agora.education.api.stream.data.EduStreamEvent;
 import io.agora.education.api.stream.data.EduStreamInfo;
+import io.agora.education.api.stream.data.LocalStreamInitOptions;
 import io.agora.education.api.stream.data.VideoSourceType;
 import io.agora.education.api.user.EduStudent;
 import io.agora.education.api.user.EduUser;
 import io.agora.education.api.user.data.EduBaseUserInfo;
+import io.agora.education.api.user.data.EduLocalUserInfo;
 import io.agora.education.api.user.data.EduUserEvent;
 import io.agora.education.api.user.data.EduUserInfo;
 import io.agora.education.api.user.data.EduUserLeftType;
@@ -59,6 +63,9 @@ import io.agora.education.classroom.bean.group.StageStreamInfo;
 import io.agora.education.classroom.fragment.StudentGroupListFragment;
 import io.agora.education.classroom.fragment.StudentListFragment;
 import io.agora.education.classroom.widget.RtcVideoView;
+import io.agora.education.impl.cmd.bean.AgoraActionMsgRes;
+import io.agora.raisehand.AgoraActionConfig;
+import io.agora.raisehand.AgoraEduCoVideoListener;
 import io.agora.raisehand.AgoraEduCoVideoView;
 import kotlin.Unit;
 
@@ -79,8 +86,10 @@ import static io.agora.education.classroom.bean.group.RoomGroupInfo.GROUPUUID;
 import static io.agora.education.classroom.bean.group.RoomGroupInfo.INTERACTOUTGROUPS;
 import static io.agora.education.classroom.bean.group.RoomGroupInfo.STUDENTS;
 import static io.agora.education.classroom.bean.group.RoomGroupInfo.USERUUID;
+import static io.agora.raisehand.AgoraActionConfig.PROCESSES;
 
-public class MediumClassActivity extends BaseClassActivity_bak implements TabLayout.OnTabSelectedListener {
+public class MediumClassActivity extends BaseClassActivity_bak implements TabLayout.OnTabSelectedListener,
+        AgoraEduCoVideoListener {
     private static final String TAG = MediumClassActivity.class.getSimpleName();
 
     @BindView(R.id.layout_video_teacher)
@@ -106,6 +115,8 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     private List<StageStreamInfo> stageStreamInfosOne = new ArrayList<>();
     private List<StageStreamInfo> stageStreamInfosTwo = new ArrayList<>();
 
+    private AgoraActionConfig agoraActionConfig;
+
     @Override
     protected int getClassType() {
         return Room.Type.INTERMEDIATE;
@@ -130,8 +141,11 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                             whiteboardFragment.setWritable(false);
                         });
                         initTitleTimeState();
+                        String processUuid = parseAgoraActionConfig(getMainEduRoom());
                         /*初始化举手连麦组件*/
-                        agoraEduCoVideoView.init(getMainEduRoom());
+                        if (!TextUtils.isEmpty(processUuid)) {
+                            agoraEduCoVideoView.init(getMainEduRoom(), processUuid);
+                        }
                         initParseBoardInfo(getMainEduRoom());
                         /*获取班级的roomProperties中可能存在的分组信息*/
                         syncRoomGroupProperty(getMainEduRoom().getRoomProperties());
@@ -543,8 +557,8 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                             roomGroupInfo.getStudentReward(userUuid));
                     stageStreamInfosOne.add(stageStream);
                 }
-                notifyStageVideoListOne();
             }
+            notifyStageVideoListOne();
         }
     }
 
@@ -582,6 +596,49 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
             public void onFailure(@NotNull EduError error) {
             }
         });
+    }
+
+    /**
+     * 用户下台
+     */
+    private void memberOffStage(List<EduStreamEvent> streamEvents) {
+        for (GroupMemberInfo memberInfo : roomGroupInfo.getAllStudent()) {
+            for (EduStreamEvent streamEvent : streamEvents) {
+                EduStreamInfo streamInfo = streamEvent.getModifiedStream();
+                if (memberInfo.getUuid().equals(streamInfo.getPublisher().getUserUuid())) {
+                    memberInfo.offStage();
+                    memberInfo.setEnableAudio(false);
+                    memberInfo.setEnableVideo(false);
+                    streamInfo.setHasAudio(false);
+                    streamInfo.setHasVideo(false);
+                }
+            }
+        }
+    }
+
+    private String parseAgoraActionConfig(EduRoom eduRoom) {
+        Map<String, Object> map = null;
+        for (Map.Entry<String, Object> entry : eduRoom.getRoomProperties().entrySet()) {
+            if (entry.getKey().equals(PROCESSES)) {
+                map = (Map<String, Object>) entry.getValue();
+                break;
+            }
+        }
+        if (map != null) {
+            String processUuid = null;
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                processUuid = entry.getKey();
+                break;
+            }
+            if (TextUtils.isEmpty(processUuid)) {
+                return null;
+            }
+            String json = new Gson().toJson(map.get(processUuid));
+            agoraActionConfig = new Gson().fromJson(json, AgoraActionConfig.class);
+            agoraActionConfig.processUuid = processUuid;
+            return agoraActionConfig.processUuid;
+        }
+        return null;
     }
 
     @Override
@@ -655,6 +712,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     public void onRemoteStreamsAdded(@NotNull List<EduStreamEvent> streamEvents, @NotNull EduRoom classRoom) {
         if (classRoom.equals(getMainEduRoom())) {
             super.onRemoteStreamsAdded(streamEvents, classRoom);
+            notifyStageVideoList();
             boolean needUpdateStudentList = false;
             for (EduStreamEvent streamEvent : streamEvents) {
                 EduStreamInfo streamInfo = streamEvent.getModifiedStream();
@@ -665,7 +723,6 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                     needUpdateStudentList = updateMemberInfoList(streamInfo, userInfo);
                 }
             }
-            notifyStageVideoList();
             if (needUpdateStudentList) {
                 studentListFragment.updateStudentList(roomGroupInfo.getAllStudent());
             }
@@ -712,6 +769,8 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     public void onRemoteStreamsRemoved(@NotNull List<EduStreamEvent> streamEvents, @NotNull EduRoom classRoom) {
         if (classRoom.equals(getMainEduRoom())) {
             super.onRemoteStreamsRemoved(streamEvents, classRoom);
+            memberOffStage(streamEvents);
+            notifyStageVideoList();
             boolean needUpdateStudentList = false;
             for (EduStreamEvent streamEvent : streamEvents) {
                 EduStreamInfo streamInfo = streamEvent.getModifiedStream();
@@ -722,7 +781,6 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                     needUpdateStudentList = updateMemberInfoList(streamInfo, userInfo);
                 }
             }
-            notifyStageVideoList();
             if (needUpdateStudentList) {
                 studentListFragment.updateStudentList(roomGroupInfo.getAllStudent());
             }
@@ -739,8 +797,9 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
         if (classRoom.equals(getMainEduRoom())) {
             Log.e(TAG, "收到大房间的roomProperty改变的数据");
             initParseBoardInfo(getMainEduRoom());
-            /*处理分组信息*/
             Map<String, Object> roomProperties = classRoom.getRoomProperties();
+            parseRecordMsg(roomProperties);
+            /*处理分组信息*/
             syncRoomGroupProperty(roomProperties);
             if (cause != null && !cause.isEmpty()) {
                 int causeType = (int) Float.parseFloat(cause.get(CMD).toString());
@@ -833,15 +892,30 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
         /**本地流被移除，被强制下台
          * 1:同步状态至CoVideoView 2:刷新音视频列表*/
         agoraEduCoVideoView.onLinkMediaChanged(false);
+        memberOffStage(Collections.singletonList(streamEvent));
         notifyStageVideoList();
         updateLocalStreamInfo(streamEvent);
     }
 
     @Override
-    public void onUserActionMessageReceived(@NotNull EduActionMessage actionMessage) {
+    public void onUserActionMessageReceived(@NotNull AgoraActionMessage actionMessage) {
         super.onUserActionMessageReceived(actionMessage);
-        /*老师对于举手请求的处理结果同步至coVideoView中*/
-        agoraEduCoVideoView.syncCoVideoState(actionMessage);
+//        /*老师对于举手请求的处理结果同步至coVideoView中*/
+//        agoraEduCoVideoView.syncCoVideoState(actionMessage);
+    }
+
+    @Override
+    public void onUserMessageReceived(@NotNull EduMsg message) {
+        super.onUserMessageReceived(message);
+        String msg = message.getMessage();
+        try {
+            AgoraActionMsgRes msgRes = new Gson().fromJson(msg, AgoraActionMsgRes.class);
+            /*老师对于举手请求的处理结果同步至coVideoView中*/
+            agoraEduCoVideoView.syncCoVideoState(msgRes);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -854,5 +928,80 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
         if (leftType == EduUserLeftType.KickOff) {
             showRemovedDialog();
         }
+    }
+
+    /**
+     * 举手连麦的相关回调
+     */
+    @Override
+    public void onApplyCoVideoComplete() {
+
+    }
+
+    @Override
+    public void onApplyCoVideoFailed(@NotNull EduError error) {
+
+    }
+
+    @Override
+    public void onCancelCoVideoSuccess() {
+
+    }
+
+    @Override
+    public void onCancelCoVideoFailed(@NotNull EduError error) {
+
+    }
+
+    @Override
+    public void onCoVideoAborted() {
+
+    }
+
+    @Override
+    public void onCoVideoAccepted() {
+        /*如果老师打开了举手即上台则学生需要自己发流*/
+        if (agoraEduCoVideoView.isAutoCoVideo()) {
+            getLocalUser(new EduCallback<EduUser>() {
+                @Override
+                public void onSuccess(@Nullable EduUser localUser) {
+                    if (localUser != null) {
+                        EduLocalUserInfo userInfo = localUser.getUserInfo();
+                        LocalStreamInitOptions options = new LocalStreamInitOptions(userInfo.streamUuid,
+                                false, true);
+                        localUser.initOrUpdateLocalStream(options, new EduCallback<EduStreamInfo>() {
+                            @Override
+                            public void onSuccess(@Nullable EduStreamInfo streamInfo) {
+                                if (streamInfo != null) {
+                                    localUser.publishStream(streamInfo, new EduCallback<Boolean>() {
+                                        @Override
+                                        public void onSuccess(@Nullable Boolean res) {
+                                        }
+
+                                        @Override
+                                        public void onFailure(@NotNull EduError error) {
+                                        }
+                                    });
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(@NotNull EduError error) {
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onFailure(@NotNull EduError error) {
+
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onCoVideoRejected() {
+
     }
 }

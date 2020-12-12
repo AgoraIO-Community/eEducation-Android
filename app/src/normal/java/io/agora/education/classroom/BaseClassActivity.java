@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -31,9 +30,10 @@ import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
 import io.agora.education.api.logger.DebugItem;
 import io.agora.education.api.manager.listener.EduManagerEventListener;
-import io.agora.education.api.message.EduActionMessage;
+import io.agora.education.api.message.AgoraActionMessage;
 import io.agora.education.api.message.EduChatMsg;
 import io.agora.education.api.message.EduChatMsgType;
+import io.agora.education.api.message.EduFromUserInfo;
 import io.agora.education.api.message.EduMsg;
 import io.agora.education.api.room.EduRoom;
 import io.agora.education.api.room.data.EduRoomInfo;
@@ -841,7 +841,9 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
                                 @Override
                                 public void onSuccess(@Nullable String uuid) {
                                     revRecordMsg = true;
-                                    RecordMsg recordMsg = new RecordMsg(uuid, userInfo,
+                                    EduFromUserInfo fromUser = new EduFromUserInfo(userInfo.getUserUuid(),
+                                            userInfo.getUserName(), userInfo.getRole());
+                                    RecordMsg recordMsg = new RecordMsg(uuid, fromUser,
                                             getString(R.string.replay_link), System.currentTimeMillis(),
                                             EduChatMsgType.Text.getValue());
                                     recordMsg.isMe = true;
@@ -954,7 +956,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
     }
 
     @Override
-    public void onUserActionMessageReceived(@NotNull EduActionMessage actionMessage) {
+    public void onUserActionMessageReceived(@NotNull AgoraActionMessage actionMessage) {
 
     }
 

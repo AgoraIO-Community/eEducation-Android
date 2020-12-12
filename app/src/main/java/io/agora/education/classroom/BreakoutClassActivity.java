@@ -34,6 +34,7 @@ import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
 import io.agora.education.api.message.EduChatMsg;
 import io.agora.education.api.message.EduChatMsgType;
+import io.agora.education.api.message.EduFromUserInfo;
 import io.agora.education.api.message.EduMsg;
 import io.agora.education.api.room.EduRoom;
 import io.agora.education.api.room.data.EduRoomChangeType;
@@ -527,6 +528,7 @@ public class BreakoutClassActivity extends BaseClassActivity_bak implements TabL
         });
     }
 
+
     @OnClick(R.id.iv_float)
     public void onClick(View view) {
         boolean isSelected = view.isSelected();
@@ -655,7 +657,7 @@ public class BreakoutClassActivity extends BaseClassActivity_bak implements TabL
     @Override
     public void onRoomChatMessageReceived(@NotNull EduChatMsg eduChatMsg, @NotNull EduRoom classRoom) {
         /**收到群聊消息，进行处理并展示*/
-        EduUserInfo fromUser = eduChatMsg.getFromUser();
+        EduFromUserInfo fromUser = eduChatMsg.getFromUser();
         ChannelMsg.ChatMsg chatMsg = new ChannelMsg.ChatMsg(fromUser, eduChatMsg.getMessage(),
                 System.currentTimeMillis(), eduChatMsg.getType(), true,
                 getRoleStr(fromUser.getRole().getValue()));
@@ -852,29 +854,7 @@ public class BreakoutClassActivity extends BaseClassActivity_bak implements TabL
                     }
                 });
             }
-            String recordJson = getProperty(roomProperties, RECORD);
-            if (!TextUtils.isEmpty(recordJson)) {
-                RecordBean tmp = RecordBean.fromJson(recordJson, RecordBean.class);
-                if (mainRecordBean == null || tmp.getState() != mainRecordBean.getState()) {
-                    mainRecordBean = tmp;
-                    if (mainRecordBean.getState() == END) {
-                        getLocalUserInfo(new EduCallback<EduUserInfo>() {
-                            @Override
-                            public void onSuccess(@Nullable EduUserInfo userInfo) {
-                                RecordMsg recordMsg = new RecordMsg(roomEntry.getRoomUuid(), userInfo,
-                                        getString(R.string.replay_link), System.currentTimeMillis(),
-                                        EduChatMsgType.Text.getValue());
-                                recordMsg.isMe = true;
-                                chatRoomFragment.addMessage(recordMsg);
-                            }
-
-                            @Override
-                            public void onFailure(@NotNull EduError error) {
-                            }
-                        });
-                    }
-                }
-            }
+            parseRecordMsg(roomProperties);
         }
     }
 

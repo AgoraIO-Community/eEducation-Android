@@ -2,7 +2,7 @@ package io.agora.education.impl.cmd
 
 import io.agora.Constants
 import io.agora.education.api.manager.listener.EduManagerEventListener
-import io.agora.education.api.message.EduActionMessage
+import io.agora.education.api.message.AgoraActionMessage
 import io.agora.education.api.message.EduChatMsg
 import io.agora.education.api.message.EduMsg
 import io.agora.education.api.room.EduRoom
@@ -96,7 +96,7 @@ internal class CMDCallbackManager {
         listener?.onUserMessageReceived(message)
     }
 
-    fun onUserActionMessageReceived(actionMsg: EduActionMessage, listener: EduManagerEventListener?) {
+    fun onUserActionMessageReceived(actionMsg: AgoraActionMessage, listener: EduManagerEventListener?) {
         listener?.onUserActionMessageReceived(actionMsg)
     }
 }

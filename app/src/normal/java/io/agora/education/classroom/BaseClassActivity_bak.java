@@ -30,9 +30,10 @@ import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
 import io.agora.education.api.logger.DebugItem;
 import io.agora.education.api.manager.listener.EduManagerEventListener;
-import io.agora.education.api.message.EduActionMessage;
+import io.agora.education.api.message.AgoraActionMessage;
 import io.agora.education.api.message.EduChatMsg;
 import io.agora.education.api.message.EduChatMsgType;
+import io.agora.education.api.message.EduFromUserInfo;
 import io.agora.education.api.message.EduMsg;
 import io.agora.education.api.room.EduRoom;
 import io.agora.education.api.room.data.EduRoomChangeType;
@@ -400,6 +401,37 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
                 callback.onFailure(error);
             }
         });
+    }
+
+    /**
+     * 尝试解析录制消息
+     */
+    protected void parseRecordMsg(Map<String, Object> roomProperties) {
+        String recordJson = getProperty(roomProperties, RECORD);
+        if (!TextUtils.isEmpty(recordJson)) {
+            RecordBean tmp = RecordBean.fromJson(recordJson, RecordBean.class);
+            if (mainRecordBean == null || tmp.getState() != mainRecordBean.getState()) {
+                mainRecordBean = tmp;
+                if (mainRecordBean.getState() == END) {
+                    getLocalUserInfo(new EduCallback<EduUserInfo>() {
+                        @Override
+                        public void onSuccess(@Nullable EduUserInfo userInfo) {
+                            EduFromUserInfo fromUser = new EduFromUserInfo(userInfo.getUserUuid(),
+                                    userInfo.getUserName(), userInfo.getRole());
+                            RecordMsg recordMsg = new RecordMsg(roomEntry.getRoomUuid(), fromUser,
+                                    getString(R.string.replay_link), System.currentTimeMillis(),
+                                    EduChatMsgType.Text.getValue());
+                            recordMsg.isMe = true;
+                            chatRoomFragment.addMessage(recordMsg);
+                        }
+
+                        @Override
+                        public void onFailure(@NotNull EduError error) {
+                        }
+                    });
+                }
+            }
+        }
     }
 
     @Room.Type
@@ -857,7 +889,9 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
                                 @Override
                                 public void onSuccess(@Nullable String uuid) {
                                     revRecordMsg = true;
-                                    RecordMsg recordMsg = new RecordMsg(uuid, userInfo,
+                                    EduFromUserInfo fromUser = new EduFromUserInfo(userInfo.getUserUuid(),
+                                            userInfo.getUserName(), userInfo.getRole());
+                                    RecordMsg recordMsg = new RecordMsg(uuid, fromUser,
                                             getString(R.string.replay_link), System.currentTimeMillis(),
                                             EduChatMsgType.Text.getValue());
                                     recordMsg.isMe = true;
@@ -970,7 +1004,7 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
     }
 
     @Override
-    public void onUserActionMessageReceived(@NotNull EduActionMessage actionMessage) {
+    public void onUserActionMessageReceived(@NotNull AgoraActionMessage actionMessage) {
 
     }
 

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.agora.education.api.message.EduChatMsg;
+import io.agora.education.api.message.EduFromUserInfo;
 import io.agora.education.api.user.data.EduUserInfo;
 import io.agora.education.classroom.bean.JsonBean;
 import io.agora.education.classroom.bean.channel.Room;
@@ -43,12 +44,12 @@ public class ChannelMsg extends JsonBean {
         public transient boolean showRole = false;
         public String role;
 
-        public ChatMsg(@NotNull EduUserInfo fromUser, @NotNull String message, long timestamp,
+        public ChatMsg(@NotNull EduFromUserInfo fromUser, @NotNull String message, long timestamp,
                        int type) {
             super(fromUser, message, timestamp, type);
         }
 
-        public ChatMsg(@NotNull EduUserInfo fromUser, @NotNull String message, long timestamp,
+        public ChatMsg(@NotNull EduFromUserInfo fromUser, @NotNull String message, long timestamp,
                        int type, boolean showRole, String role) {
             super(fromUser, message, timestamp, type);
             this.showRole = showRole;

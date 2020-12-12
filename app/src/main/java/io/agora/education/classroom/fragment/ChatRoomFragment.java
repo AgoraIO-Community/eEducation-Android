@@ -28,6 +28,7 @@ import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
 import io.agora.education.api.message.EduChatMsg;
 import io.agora.education.api.message.EduChatMsgType;
+import io.agora.education.api.message.EduFromUserInfo;
 import io.agora.education.api.user.data.EduUserInfo;
 import io.agora.education.base.BaseCallback;
 import io.agora.education.base.BaseFragment;
@@ -187,7 +188,9 @@ public class ChatRoomFragment extends BaseFragment implements OnItemChildClickLi
                     @Override
                     public void onSuccess(@Nullable EduUserInfo userInfo) {
                         /*本地消息直接添加*/
-                        ChannelMsg.ChatMsg msg = new ChannelMsg.ChatMsg(userInfo, text,
+                        EduFromUserInfo fromUser = new EduFromUserInfo(userInfo.getUserUuid(),
+                                userInfo.getUserName(), userInfo.getRole());
+                        ChannelMsg.ChatMsg msg = new ChannelMsg.ChatMsg(fromUser, text,
                                 System.currentTimeMillis(),
                                 EduChatMsgType.Text.getValue());
                         msg.isMe = true;
@@ -214,7 +217,9 @@ public class ChatRoomFragment extends BaseFragment implements OnItemChildClickLi
                     @Override
                     public void onSuccess(@Nullable EduUserInfo userInfo) {
                         /*本地消息直接添加*/
-                        ChannelMsg.ChatMsg msg = new ChannelMsg.ChatMsg(userInfo, text,
+                        EduFromUserInfo fromUser = new EduFromUserInfo(userInfo.getUserUuid(),
+                                userInfo.getUserName(), userInfo.getRole());
+                        ChannelMsg.ChatMsg msg = new ChannelMsg.ChatMsg(fromUser, text,
                                 System.currentTimeMillis(),
                                 EduChatMsgType.Text.getValue());
                         msg.isMe = true;

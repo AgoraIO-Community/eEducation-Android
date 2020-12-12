@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.tabs.TabLayout;
-import com.google.gson.Gson;
 import com.herewhite.sdk.domain.GlobalState;
 
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +26,6 @@ import butterknife.OnClick;
 import io.agora.education.R;
 import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
-import io.agora.education.api.message.EduActionMessage;
 import io.agora.education.api.message.EduChatMsg;
 import io.agora.education.api.message.EduMsg;
 import io.agora.education.api.room.EduRoom;
@@ -353,12 +351,6 @@ public class SmallClassActivity extends BaseClassActivity_bak implements TabLayo
     public void onLocalStreamRemoved(@NotNull EduStreamEvent streamEvent) {
         super.onLocalStreamRemoved(streamEvent);
         /**小班课场景下，此回调被调用就说明classroom结束，人员退出；所以此回调可以不处理*/
-    }
-
-    @Override
-    public void onUserActionMessageReceived(@NotNull EduActionMessage actionMessage) {
-        super.onUserActionMessageReceived(actionMessage);
-        Log.e(TAG, "action->" + new Gson().toJson(actionMessage));
     }
 
     @Override

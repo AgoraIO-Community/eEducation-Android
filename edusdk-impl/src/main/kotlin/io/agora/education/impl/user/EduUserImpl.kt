@@ -40,6 +40,7 @@ import io.agora.education.impl.stream.network.StreamService
 import io.agora.education.impl.user.data.request.*
 import io.agora.education.impl.user.network.UserService
 import io.agora.education.impl.util.Convert
+import io.agora.education.impl.util.Convert.convertFromUserInfo
 import io.agora.rtc.Constants.CLIENT_ROLE_AUDIENCE
 import io.agora.rtc.Constants.CLIENT_ROLE_BROADCASTER
 import io.agora.rtc.RtcEngine
@@ -286,7 +287,8 @@ internal open class EduUserImpl(
                 .sendChannelCustomMessage(APPID, eduRoom.getCurRoomUuid(), roomMsgReq)
                 .enqueue(RetrofitManager.Callback(0, object : ThrowableCallback<ResponseBody<String>> {
                     override fun onSuccess(res: ResponseBody<String>?) {
-                        val textMessage = EduMsg(userInfo, message, System.currentTimeMillis())
+                        val textMessage = EduMsg(convertFromUserInfo(userInfo), message,
+                                System.currentTimeMillis())
                         callback.onSuccess(textMessage)
                     }
 
@@ -306,7 +308,8 @@ internal open class EduUserImpl(
                 .sendPeerCustomMessage(APPID, eduRoom.getCurRoomUuid(), remoteUser.userUuid, userMsgReq)
                 .enqueue(RetrofitManager.Callback(0, object : ThrowableCallback<ResponseBody<String>> {
                     override fun onSuccess(res: ResponseBody<String>?) {
-                        val textMessage = EduMsg(userInfo, message, System.currentTimeMillis())
+                        val textMessage = EduMsg(convertFromUserInfo(userInfo), message,
+                                System.currentTimeMillis())
                         callback.onSuccess(textMessage)
                     }
 
@@ -327,8 +330,8 @@ internal open class EduUserImpl(
                         eduRoom.getCurRoomUuid(), roomChatMsgReq)
                 .enqueue(RetrofitManager.Callback(0, object : ThrowableCallback<ResponseBody<String>> {
                     override fun onSuccess(res: ResponseBody<String>?) {
-                        val textMessage = EduChatMsg(userInfo, message, System.currentTimeMillis(),
-                                EduChatMsgType.Text.value)
+                        val textMessage = EduChatMsg(convertFromUserInfo(userInfo), message,
+                                System.currentTimeMillis(), EduChatMsgType.Text.value)
                         callback.onSuccess(textMessage)
                     }
 
@@ -348,8 +351,8 @@ internal open class EduUserImpl(
                 .sendPeerChatMsg(APPID, eduRoom.getCurRoomUuid(), remoteUser.userUuid, userChatMsgReq)
                 .enqueue(RetrofitManager.Callback(0, object : ThrowableCallback<ResponseBody<String>> {
                     override fun onSuccess(res: ResponseBody<String>?) {
-                        val textMessage = EduChatMsg(userInfo, message, System.currentTimeMillis(),
-                                EduChatMsgType.Text.value)
+                        val textMessage = EduChatMsg(convertFromUserInfo(userInfo), message,
+                                System.currentTimeMillis(), EduChatMsgType.Text.value)
                         callback.onSuccess(textMessage)
                     }
 
@@ -380,7 +383,7 @@ internal open class EduUserImpl(
                 ReqUser(userInfo.userUuid, userInfo.userName, userInfo.role.name),
                 ReqRoom(eduRoom.getCurRoomInfo().roomName, eduRoom.getCurRoomUuid())))
         RetrofitManager.instance()!!.getService(API_BASE_URL, UserService::class.java)
-                .doAction(APPID, eduRoom.getCurRoomUuid(), config.toUserUuid, eduRoom.getCurRoomUuid(), actionReq)
+                .doAction(APPID, eduRoom.getCurRoomUuid(), config.toUserUuid, config.processUuid, actionReq)
                 .enqueue(RetrofitManager.Callback(0, object : ThrowableCallback<ResponseBody<String>> {
                     override fun onSuccess(res: ResponseBody<String>?) {
                         callback.onSuccess(Unit)

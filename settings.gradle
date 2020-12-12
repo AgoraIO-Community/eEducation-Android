@@ -1,3 +1,4 @@
+include ':AgoraActionProcess'
 include ':edusdk-impl'
 include ':edusdk-api'
 include ':app', ':base', ':log', ':timeline', ':whiteboard'

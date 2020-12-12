@@ -15,7 +15,6 @@ class GroupMemberInfo(
     var online: Boolean = false
     var onStage: Boolean = false
 
-    /**用户上台*/
     fun online() {
         online = true
     }

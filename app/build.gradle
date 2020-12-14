@@ -82,6 +82,7 @@ dependencies {
     implementation project(':whiteboard')
 //    implementation project(':edusdk-api')
     implementation project(':edusdk-impl')
+    implementation project(path: ':AgoraActionProcess')
 
     testImplementation "junit:junit:${extGet('dependencies', 'junit:junit')}"
     androidTestImplementation "androidx.test.ext:junit:${extGet('dependencies', 'androidx.test.ext:junit')}"

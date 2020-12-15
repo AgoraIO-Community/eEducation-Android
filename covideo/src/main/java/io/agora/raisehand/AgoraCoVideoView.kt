@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.CountDownTimer
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewTreeObserver
@@ -17,16 +18,17 @@ import com.google.gson.Gson
 import io.agora.base.ToastManager
 import io.agora.education.api.EduCallback
 import io.agora.education.api.base.EduError
-import io.agora.education.api.message.AgoraActionMessage
-import io.agora.education.api.message.AgoraActionType
 import io.agora.education.api.room.EduRoom
-import io.agora.education.impl.cmd.bean.AgoraActionMsgRes
+import io.agora.raisehand.CoVideoActionType.ACCEPT
+import io.agora.raisehand.CoVideoActionType.CANCEL
+import io.agora.raisehand.CoVideoActionType.REJECT
+import io.agora.raisehand.CoVideoState.DisCoVideo
 
 /**
  * 举手组件布局
  * */
-class AgoraEduCoVideoView : LinearLayout {
-    private val TAG = AgoraEduCoVideoView::class.java.simpleName
+class AgoraCoVideoView : LinearLayout {
+    private val TAG = AgoraCoVideoView::class.java.simpleName
     private lateinit var countdownLayout: RelativeLayout
     private lateinit var countDownTextView: AppCompatTextView
     private lateinit var handImg: AppCompatImageView
@@ -35,7 +37,7 @@ class AgoraEduCoVideoView : LinearLayout {
     private var initialized = false
     private var countDownTexts: Array<String> = arrayOf("4", "3", "2", "1", "0")
     private var handImgs: Array<Int> = arrayOf(R.drawable.ic_hand_up, R.drawable.ic_hand_down)
-    private var coVideoListener: AgoraEduCoVideoListener? = null
+    private var coVideoListener: AgoraCoVideoListener? = null
 
     /*举手倒计时*/
     private var coVideoCountDownTimer: CountDownTimer = object : CountDownTimer(3200, 1000) {
@@ -104,13 +106,13 @@ class AgoraEduCoVideoView : LinearLayout {
         })
     }
 
-    fun init(eduRoom: EduRoom, processUuid: String?) {
+    fun init(eduRoom: EduRoom) {
         if (!initialized) {
-            session = StudentCoVideoHelper(context, eduRoom, processUuid)
+            session = StudentCoVideoHelper(context, eduRoom)
             /*检查老师是否打开举手开关*/
             visibility = if (session.enableCoVideo) View.VISIBLE else View.GONE
-            if (context is AgoraEduCoVideoListener) {
-                coVideoListener = context as AgoraEduCoVideoListener
+            if (context is AgoraCoVideoListener) {
+                coVideoListener = context as AgoraCoVideoListener
             }
             operaAlphaAnimation(false)
             handImg.setOnTouchListener(object : OnTouchListener {
@@ -243,6 +245,10 @@ class AgoraEduCoVideoView : LinearLayout {
 
     /**申请连麦*/
     private fun applyCoVideo() {
+        if (session.curCoVideoState != DisCoVideo) {
+            Log.e(TAG, "can not apply,because current CoVideoState is not DisCoVideo!")
+            return
+        }
         if (session.autoCoVideo) {
             session.onLinkMediaChanged(true)
             /*允许举手即上台，直接回调允许上台接口*/
@@ -250,31 +256,25 @@ class AgoraEduCoVideoView : LinearLayout {
             post { handImg.setImageResource(handImgs[1]) }
             return
         }
-        session.applyCoVideo(object : EduCallback<Unit> {
-            override fun onSuccess(res: Unit?) {
-                coVideoListener?.onApplyCoVideoComplete()
-                post { handImg.setImageResource(handImgs[1]) }
-            }
+        coVideoListener?.onCoVideoApply()
+    }
 
-            override fun onFailure(error: EduError) {
-                coVideoListener?.onApplyCoVideoFailed(error)
-            }
-        })
+    /**成功发起连麦申请*/
+    fun launchCoVideoApplySuccess() {
+        session.curCoVideoState = CoVideoState.Applying
+        post { handImg.setImageResource(handImgs[1]) }
     }
 
     /**取消连麦
      * 老师处理前主动取消*/
     private fun cancelCoVideo() {
-        session.cancelCoVideo(object : EduCallback<Unit> {
-            override fun onSuccess(res: Unit?) {
-                coVideoListener?.onCancelCoVideoSuccess()
-                post { handImg.setImageResource(handImgs[0]) }
-            }
+        coVideoListener?.onCoVideoCancel()
+    }
 
-            override fun onFailure(error: EduError) {
-                coVideoListener?.onCancelCoVideoFailed(error)
-            }
-        })
+    /**成功发起取消连麦请求*/
+    fun launchCoVideoCancelSuccess() {
+        session.curCoVideoState = DisCoVideo
+        post { handImg.setImageResource(handImgs[0]) }
     }
 
     /**本地用户举手(连麦)被老师同意/(拒绝、打断)
@@ -290,25 +290,25 @@ class AgoraEduCoVideoView : LinearLayout {
         }
     }
 
-    /**同步连麦状态;同步action消息过来的状态(包括accept和reject)*/
-    fun syncCoVideoState(actionMsgRes: AgoraActionMsgRes) {
-        if (actionMsgRes.processUuid != session.processUuid) {
-            return
-        }
-        val payload = Gson().toJson(actionMsgRes.payload)
-        val actionMsg = Gson().fromJson(payload, AgoraActionMessage::class.java)
-        when (actionMsg.getCurAction()) {
-            AgoraActionType.AgoraActionTypeAccept -> {
-                onLinkMediaChanged(true)
-                ToastManager.showShort(R.string.covideo_accept_interactive)
-                coVideoListener?.onCoVideoAccepted()
-            }
-            AgoraActionType.AgoraActionTypeReject -> {
-                onLinkMediaChanged(false)
-                ToastManager.showShort(R.string.covideo_reject_interactive)
-                coVideoListener?.onCoVideoRejected()
-            }
-            else -> {
+    /**同步action消息过来的状态(包括accept和reject)*/
+    fun syncCoVideoAction(payload: String) {
+        val action = Gson().fromJson(payload, AgoraCoVideoAction::class.java)
+        action?.let {
+            when (action.action) {
+                ACCEPT -> {
+                    onLinkMediaChanged(true)
+                    coVideoListener?.onCoVideoAccepted()
+                }
+                REJECT -> {
+                    onLinkMediaChanged(false)
+                    coVideoListener?.onCoVideoRejected()
+                }
+                CANCEL -> {
+                    Log.e(TAG, "not processed yet!")
+                }
+                else -> {
+                    Log.e(TAG, "invalid action!")
+                }
             }
         }
     }
@@ -324,10 +324,6 @@ class AgoraEduCoVideoView : LinearLayout {
 
     fun isAutoCoVideo(): Boolean {
         return session.autoCoVideo
-    }
-
-    fun updateProcessUuid(processUuid: String) {
-        session.processUuid = processUuid
     }
 
     fun destroy() {

@@ -1,4 +1,4 @@
-package io.agora.education.classroom.bean;
+package io.agora.base.bean;
 
 import com.google.gson.Gson;
 

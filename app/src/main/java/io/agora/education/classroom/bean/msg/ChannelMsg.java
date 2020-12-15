@@ -8,15 +8,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.ArrayList;
-import java.util.List;
 
 import io.agora.education.api.message.EduChatMsg;
 import io.agora.education.api.message.EduFromUserInfo;
-import io.agora.education.api.user.data.EduUserInfo;
-import io.agora.education.classroom.bean.JsonBean;
-import io.agora.education.classroom.bean.channel.Room;
-import io.agora.education.classroom.bean.channel.User;
+import io.agora.base.bean.JsonBean;
 
 public class ChannelMsg extends JsonBean {
 

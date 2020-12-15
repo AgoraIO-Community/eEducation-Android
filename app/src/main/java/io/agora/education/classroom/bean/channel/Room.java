@@ -2,13 +2,10 @@ package io.agora.education.classroom.bean.channel;
 
 import androidx.annotation.IntDef;
 
-import com.google.gson.Gson;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.List;
 
-import io.agora.education.classroom.bean.JsonBean;
+import io.agora.base.bean.JsonBean;
 
 public class Room extends JsonBean {
     @Type

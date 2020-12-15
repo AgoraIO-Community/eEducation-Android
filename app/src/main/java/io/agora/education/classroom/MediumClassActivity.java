@@ -1,6 +1,5 @@
 package io.agora.education.classroom;
 
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.herewhite.sdk.domain.GlobalState;
 
@@ -27,15 +28,20 @@ import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
+import io.agora.agoraactionprocess.AgoraStartActionOptions;
+import io.agora.agoraactionprocess.AgoraStopActionOptions;
+import io.agora.base.callback.ThrowableCallback;
+import io.agora.base.network.ResponseBody;
 import io.agora.education.R;
 import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
-import io.agora.education.api.message.AgoraActionMessage;
+import io.agora.education.api.message.EduActionMessage;
 import io.agora.education.api.message.EduChatMsg;
 import io.agora.education.api.message.EduMsg;
 import io.agora.education.api.message.GroupMemberInfoMessage;
 import io.agora.education.api.room.EduRoom;
 import io.agora.education.api.room.data.EduRoomChangeType;
+import io.agora.education.api.room.data.EduRoomInfo;
 import io.agora.education.api.statistics.ConnectionState;
 import io.agora.education.api.statistics.NetworkQuality;
 import io.agora.education.api.stream.data.EduStreamEvent;
@@ -52,6 +58,7 @@ import io.agora.education.api.user.data.EduUserLeftType;
 import io.agora.education.api.user.data.EduUserRole;
 import io.agora.education.api.user.data.EduUserStateChangeType;
 import io.agora.education.classroom.adapter.StageVideoAdapter;
+import io.agora.education.classroom.bean.msg.AgoraActionResBody;
 import io.agora.education.classroom.bean.board.BoardBean;
 import io.agora.education.classroom.bean.board.BoardInfo;
 import io.agora.education.classroom.bean.channel.Room;
@@ -60,13 +67,18 @@ import io.agora.education.classroom.bean.group.GroupMemberInfo;
 import io.agora.education.classroom.bean.group.GroupStateInfo;
 import io.agora.education.classroom.bean.group.RoomGroupInfo;
 import io.agora.education.classroom.bean.group.StageStreamInfo;
+import io.agora.education.classroom.bean.msg.PeerMsg;
 import io.agora.education.classroom.fragment.StudentGroupListFragment;
 import io.agora.education.classroom.fragment.StudentListFragment;
 import io.agora.education.classroom.widget.RtcVideoView;
-import io.agora.education.impl.cmd.bean.AgoraActionMsgRes;
-import io.agora.raisehand.AgoraActionConfig;
-import io.agora.raisehand.AgoraEduCoVideoListener;
-import io.agora.raisehand.AgoraEduCoVideoView;
+import io.agora.agoraactionprocess.AgoraActionMsgRes;
+import io.agora.agoraactionprocess.AgoraActionConfigInfo;
+import io.agora.education.widget.ConfirmDialog;
+import io.agora.raisehand.AgoraCoVideoAction;
+import io.agora.raisehand.AgoraCoVideoFromRoom;
+import io.agora.raisehand.AgoraCoVideoListener;
+import io.agora.raisehand.AgoraCoVideoView;
+import io.agora.raisehand.AgoraCoVideoFromUser;
 import kotlin.Unit;
 
 import static io.agora.education.classroom.bean.group.IntermediateClassPropertyCauseType.CMD;
@@ -86,10 +98,12 @@ import static io.agora.education.classroom.bean.group.RoomGroupInfo.GROUPUUID;
 import static io.agora.education.classroom.bean.group.RoomGroupInfo.INTERACTOUTGROUPS;
 import static io.agora.education.classroom.bean.group.RoomGroupInfo.STUDENTS;
 import static io.agora.education.classroom.bean.group.RoomGroupInfo.USERUUID;
-import static io.agora.raisehand.AgoraActionConfig.PROCESSES;
+import static io.agora.agoraactionprocess.AgoraActionType.AgoraActionTypeApply;
+import static io.agora.agoraactionprocess.AgoraActionType.AgoraActionTypeCancel;
+import static io.agora.education.classroom.bean.msg.PeerMsg.Cmd.UnMutePeerCMD;
 
 public class MediumClassActivity extends BaseClassActivity_bak implements TabLayout.OnTabSelectedListener,
-        AgoraEduCoVideoListener {
+        AgoraCoVideoListener {
     private static final String TAG = MediumClassActivity.class.getSimpleName();
 
     @BindView(R.id.layout_video_teacher)
@@ -99,7 +113,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     @BindView(R.id.stage_videos_two)
     RecyclerView stageVideosTwo;
     @BindView(R.id.coVideoView)
-    AgoraEduCoVideoView agoraEduCoVideoView;
+    AgoraCoVideoView agoraCoVideoView;
     @BindView(R.id.layout_tab)
     TabLayout tabLayout;
 
@@ -114,8 +128,6 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
             getStageVideoAdapterTwo = new StageVideoAdapter();
     private List<StageStreamInfo> stageStreamInfosOne = new ArrayList<>();
     private List<StageStreamInfo> stageStreamInfosTwo = new ArrayList<>();
-
-    private AgoraActionConfig agoraActionConfig;
 
     @Override
     protected int getClassType() {
@@ -141,9 +153,10 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                             whiteboardFragment.setWritable(false);
                         });
                         initTitleTimeState();
-                        String processUuid = parseAgoraActionConfig(getMainEduRoom());
+                        buildActionProcessManager();
+                        parseAgoraActionConfig(getMainEduRoom());
                         /*初始化举手连麦组件*/
-                        agoraEduCoVideoView.init(getMainEduRoom(), processUuid);
+                        agoraCoVideoView.init(getMainEduRoom());
                         initParseBoardInfo(getMainEduRoom());
                         /*获取班级的roomProperties中可能存在的分组信息*/
                         syncRoomGroupProperty(getMainEduRoom().getRoomProperties());
@@ -645,31 +658,6 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
         }
     }
 
-    private String parseAgoraActionConfig(EduRoom eduRoom) {
-        Map<String, Object> map = null;
-        for (Map.Entry<String, Object> entry : eduRoom.getRoomProperties().entrySet()) {
-            if (entry.getKey().equals(PROCESSES)) {
-                map = (Map<String, Object>) entry.getValue();
-                break;
-            }
-        }
-        if (map != null) {
-            String processUuid = null;
-            for (Map.Entry<String, Object> entry : map.entrySet()) {
-                processUuid = entry.getKey();
-                break;
-            }
-            if (TextUtils.isEmpty(processUuid)) {
-                return null;
-            }
-            String json = new Gson().toJson(map.get(processUuid));
-            agoraActionConfig = new Gson().fromJson(json, AgoraActionConfig.class);
-            agoraActionConfig.processUuid = processUuid;
-            return agoraActionConfig.processUuid;
-        }
-        return null;
-    }
-
     @Override
     public void onRemoteUsersInitialized(@NotNull List<? extends EduUserInfo> users, @NotNull EduRoom classRoom) {
         if (classRoom.equals(getMainEduRoom())) {
@@ -863,9 +851,8 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                     case SWITCHCOVIDEO:
                     case SWITCHAUTOCOVIDEO:
                         /*同步举手开关的状态至coVideoView*/
-                        String processUuid = parseAgoraActionConfig(getMainEduRoom());
-                        agoraEduCoVideoView.updateProcessUuid(processUuid);
-                        agoraEduCoVideoView.syncCoVideoSwitchState(roomProperties);
+                        parseAgoraActionConfig(getMainEduRoom());
+                        agoraCoVideoView.syncCoVideoSwitchState(roomProperties);
                         break;
                     case STUDENTLISTCHANGED:
                         /*学生名单发生变化，刷新名单列表*/
@@ -926,17 +913,15 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
         super.onLocalStreamRemoved(streamEvent);
         /**本地流被移除，被强制下台
          * 1:同步状态至CoVideoView 2:刷新音视频列表*/
-        agoraEduCoVideoView.onLinkMediaChanged(false);
+        agoraCoVideoView.onLinkMediaChanged(false);
         memberOffStage(Collections.singletonList(streamEvent));
         notifyStageVideoList();
         updateLocalStreamInfo(streamEvent);
     }
 
     @Override
-    public void onUserActionMessageReceived(@NotNull AgoraActionMessage actionMessage) {
+    public void onUserActionMessageReceived(@NotNull EduActionMessage actionMessage) {
         super.onUserActionMessageReceived(actionMessage);
-//        /*老师对于举手请求的处理结果同步至coVideoView中*/
-//        agoraEduCoVideoView.syncCoVideoState(actionMessage);
     }
 
     @Override
@@ -944,9 +929,42 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
         super.onUserMessageReceived(message);
         String msg = message.getMessage();
         try {
-            AgoraActionMsgRes msgRes = new Gson().fromJson(msg, AgoraActionMsgRes.class);
-            /*老师对于举手请求的处理结果同步至coVideoView中*/
-            agoraEduCoVideoView.syncCoVideoState(msgRes);
+            JsonObject jsonObject = JsonParser.parseString(msg).getAsJsonObject();
+            if (jsonObject.has("cmd") && jsonObject.has("payload")) {
+                /**老师邀请学生上麦*/
+                PeerMsg peerMsg = new Gson().fromJson(msg, PeerMsg.class);
+                if (peerMsg.getCmd() == UnMutePeerCMD) {
+                    /**此处偷懒直接用了AgoraCoVideoAction.kt，实际应该再自定义类*/
+                    AgoraCoVideoAction action = new Gson().fromJson(peerMsg.getPayloadJson(),
+                            AgoraCoVideoAction.class);
+                    String content = "";
+                    LocalStreamInitOptions options = new LocalStreamInitOptions("", false, false);
+                    /**此处对本地流的操作是追加而不是覆盖，所以尝试获取本地流并同步音视频流状态*/
+                    EduStreamInfo localCameraStream = getLocalCameraStream();
+                    if (localCameraStream != null) {
+                        options.setEnableMicrophone(localCameraStream.getHasAudio());
+                        options.setEnableCamera(localCameraStream.getHasVideo());
+                    }
+                    switch (action.getAction()) {
+                        case 0:
+                            content = action.getFromUser().getName() + "申请打开麦克风";
+                            options.setEnableMicrophone(true);
+                            break;
+                        case 1:
+                            content = action.getFromUser().getName() + "申请打开摄像头";
+                            options.setEnableCamera(true);
+                            break;
+                    }
+                    confirmInviteDialog(content, options);
+                }
+            } else if (jsonObject.has("action") && jsonObject.has("processUuid")) {
+                /**举手的回调结果*/
+//                AgoraActionResBody body = new Gson().fromJson(msg, AgoraActionResBody.class);
+//                if (body.getCmd() == ApplyInviteActionCMD) {
+//                    actionProcessManager.parseActionMsg(body.getDataJson());
+//                }
+                actionProcessManager.parseActionMsg(msg);
+            }
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -966,26 +984,145 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     }
 
     /**
+     * 申请/邀请的相关回调
+     */
+    @Override
+    public void onAccept(@NotNull AgoraActionMsgRes actionMsgRes) {
+        super.onAccept(actionMsgRes);
+        agoraCoVideoView.syncCoVideoAction(actionMsgRes.getPayloadJson());
+    }
+
+    @Override
+    public void onReject(@NotNull AgoraActionMsgRes actionMsgRes) {
+        super.onReject(actionMsgRes);
+        agoraCoVideoView.syncCoVideoAction(actionMsgRes.getPayloadJson());
+    }
+
+    @Override
+    public void onCancel(@NotNull AgoraActionMsgRes actionMsgRes) {
+        super.onCancel(actionMsgRes);
+        agoraCoVideoView.syncCoVideoAction(actionMsgRes.getPayloadJson());
+    }
+
+    /**
      * 举手连麦的相关回调
      */
     @Override
-    public void onApplyCoVideoComplete() {
+    public void onCoVideoApply() {
+        getLocalUserInfo(new EduCallback<EduUserInfo>() {
+            @Override
+            public void onSuccess(@Nullable EduUserInfo info) {
+                if (info != null) {
+                    getTeacher(new EduCallback<EduUserInfo>() {
+                        @Override
+                        public void onSuccess(@Nullable EduUserInfo teacher) {
+                            if (teacher != null && actionConfigs.size() > 0) {
+                                getMainEduRoom().getRoomInfo(new EduCallback<EduRoomInfo>() {
+                                    @Override
+                                    public void onSuccess(@Nullable EduRoomInfo roomInfo) {
+                                        if (roomInfo != null) {
+                                            AgoraActionConfigInfo config = actionConfigs.get(0);
+                                            Map<String, Object> payload = new AgoraCoVideoAction(
+                                                    AgoraActionTypeApply.getValue(),
+                                                    new AgoraCoVideoFromUser(info.getUserUuid(),
+                                                            info.getUserName(), info.getRole().name()),
+                                                    new AgoraCoVideoFromRoom(roomInfo.getRoomUuid(),
+                                                            roomInfo.getRoomName())).toMap();
+                                            AgoraStartActionOptions options = new AgoraStartActionOptions(teacher.getUserUuid(),
+                                                    config.processUuid, info.getUserUuid(), payload);
+                                            actionProcessManager.startAgoraAction(options, new ThrowableCallback<ResponseBody<String>>() {
+                                                @Override
+                                                public void onSuccess(@Nullable ResponseBody<String> res) {
+                                                    agoraCoVideoView.launchCoVideoApplySuccess();
+                                                }
 
+                                                @Override
+                                                public void onFailure(@Nullable Throwable throwable) {
+                                                }
+                                            });
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(@NotNull EduError error) {
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(@NotNull EduError error) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull EduError error) {
+
+            }
+        });
     }
 
     @Override
-    public void onApplyCoVideoFailed(@NotNull EduError error) {
+    public void onCoVideoCancel() {
+        getLocalUserInfo(new EduCallback<EduUserInfo>() {
+            @Override
+            public void onSuccess(@Nullable EduUserInfo info) {
+                if (info != null) {
+                    getTeacher(new EduCallback<EduUserInfo>() {
+                        @Override
+                        public void onSuccess(@Nullable EduUserInfo teacher) {
+                            if (teacher != null && actionConfigs.size() > 0) {
+                                getMainEduRoom().getRoomInfo(new EduCallback<EduRoomInfo>() {
+                                    @Override
+                                    public void onSuccess(@Nullable EduRoomInfo roomInfo) {
+                                        if (roomInfo != null) {
+                                            AgoraActionConfigInfo config = actionConfigs.get(0);
+                                            Map<String, Object> payload = new AgoraCoVideoAction(
+                                                    AgoraActionTypeCancel.getValue(),
+                                                    new AgoraCoVideoFromUser(info.getUserUuid(),
+                                                            info.getUserName(), info.getRole().name()),
+                                                    new AgoraCoVideoFromRoom(roomInfo.getRoomUuid(),
+                                                            roomInfo.getRoomName())).toMap();
+                                            AgoraStopActionOptions options = new AgoraStopActionOptions(
+                                                    teacher.getUserUuid(), config.processUuid,
+                                                    AgoraActionTypeCancel.getValue(), info.getUserUuid(), payload);
+                                            actionProcessManager.stopAgoraAction(options, new ThrowableCallback<ResponseBody<String>>() {
+                                                @Override
+                                                public void onSuccess(@Nullable ResponseBody<String> res) {
+                                                    agoraCoVideoView.launchCoVideoCancelSuccess();
+                                                }
 
-    }
+                                                @Override
+                                                public void onFailure(@Nullable Throwable throwable) {
+                                                }
+                                            });
+                                        }
+                                    }
 
-    @Override
-    public void onCancelCoVideoSuccess() {
+                                    @Override
+                                    public void onFailure(@NotNull EduError error) {
 
-    }
+                                    }
+                                });
+                            }
+                        }
 
-    @Override
-    public void onCancelCoVideoFailed(@NotNull EduError error) {
+                        @Override
+                        public void onFailure(@NotNull EduError error) {
 
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull EduError error) {
+
+            }
+        });
     }
 
     @Override
@@ -996,7 +1133,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     @Override
     public void onCoVideoAccepted() {
         /*如果老师打开了举手即上台则学生需要自己发流*/
-        if (agoraEduCoVideoView.isAutoCoVideo()) {
+        if (agoraCoVideoView.isAutoCoVideo()) {
             getLocalUser(new EduCallback<EduUser>() {
                 @Override
                 public void onSuccess(@Nullable EduUser localUser) {

@@ -8,6 +8,7 @@
     <string name="title_chat_room">聊天区</string>
     <string name="confirm_leave_room_content">确定离开房间？</string>
     <string name="confirm_removed_from_room_content">您已经被移出房间。</string>
+    <string name="confirm_invite_onstage">老师邀请你上台。</string>
     <string name="cancel">取消</string>
     <string name="hint_im_message">说点什么</string>
     <string name="confirm">确定</string>

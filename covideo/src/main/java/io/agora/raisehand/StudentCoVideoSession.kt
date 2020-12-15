@@ -6,17 +6,14 @@ import io.agora.education.api.room.EduRoom
 import io.agora.raisehand.CoVideoState.Applying
 import io.agora.raisehand.CoVideoState.CoVideoing
 import java.lang.ref.WeakReference
-import kotlin.random.Random
 
 internal abstract class StudentCoVideoSession(
         context: Context,
-        eduRoom: EduRoom,
-        var processUuid: String?
+        eduRoom: EduRoom
 ) {
     var context: WeakReference<Context> = WeakReference(context)
     var eduRoom: WeakReference<EduRoom> = WeakReference(eduRoom)
     var curCoVideoState = CoVideoState.DisCoVideo
-        protected set
 
     /*是否允许举手
     * 1:允许  0:不允许*/
@@ -49,13 +46,6 @@ internal abstract class StudentCoVideoSession(
     fun isCoVideoing(): Boolean {
         return curCoVideoState == CoVideoing
     }
-
-    /**申请连麦*/
-    abstract fun applyCoVideo(callback: EduCallback<Unit>)
-
-    /**取消连麦
-     * 老师处理前主动取消*/
-    abstract fun cancelCoVideo(callback: EduCallback<Unit>)
 
     /**本地用户(举手、连麦)被老师同意/(拒绝、打断)
      * @param onStage 是否连麦*/

@@ -8,7 +8,7 @@ enum class AgoraActionType(val value: Int) {
     AgoraActionTypeCancel(5)
 }
 
-class AgoraActionMessage(
+class EduActionMessage(
         private val action: Int,
         val fromUser: AgoraActionFromUser,
         val fromRoom: AgoraActionFromRoom) {

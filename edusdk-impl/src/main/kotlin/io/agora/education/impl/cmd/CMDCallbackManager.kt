@@ -1,8 +1,9 @@
 package io.agora.education.impl.cmd
 
 import io.agora.Constants
+import io.agora.Constants.Companion.AgoraLog
 import io.agora.education.api.manager.listener.EduManagerEventListener
-import io.agora.education.api.message.AgoraActionMessage
+import io.agora.education.api.message.EduActionMessage
 import io.agora.education.api.message.EduChatMsg
 import io.agora.education.api.message.EduMsg
 import io.agora.education.api.room.EduRoom
@@ -70,7 +71,7 @@ internal class CMDCallbackManager {
         /**本地用户的offline数据暂不回调出去，后期会在EduUserEventListener中添加
          * onLocalUserLeft回调来处理此消息(为踢人功能预备)*/
         if (type == 2) {
-            Constants.AgoraLog.i("Local User was removed from classroom by teacher!")
+            AgoraLog.i("Local User was removed from classroom by teacher!")
         }
         eduUser.eventListener?.onLocalUserLeft(userEvent, if (type == 1) EduUserLeftType.Normal else EduUserLeftType.KickOff)
     }
@@ -96,7 +97,7 @@ internal class CMDCallbackManager {
         listener?.onUserMessageReceived(message)
     }
 
-    fun onUserActionMessageReceived(actionMsg: AgoraActionMessage, listener: EduManagerEventListener?) {
+    fun onUserActionMessageReceived(actionMsg: EduActionMessage, listener: EduManagerEventListener?) {
         listener?.onUserActionMessageReceived(actionMsg)
     }
 }

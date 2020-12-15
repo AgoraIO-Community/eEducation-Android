@@ -2,6 +2,7 @@ package io.agora.education.classroom;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -14,12 +15,18 @@ import com.herewhite.sdk.domain.GlobalState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import butterknife.BindView;
+import io.agora.agoraactionprocess.AgoraActionConfigInfo;
+import io.agora.agoraactionprocess.AgoraActionListener;
+import io.agora.agoraactionprocess.AgoraActionMsgRes;
+import io.agora.agoraactionprocess.AgoraActionProcessConfig;
+import io.agora.agoraactionprocess.AgoraActionProcessManager;
 import io.agora.base.ToastManager;
 import io.agora.base.callback.ThrowableCallback;
 import io.agora.base.network.RetrofitManager;
@@ -30,7 +37,7 @@ import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
 import io.agora.education.api.logger.DebugItem;
 import io.agora.education.api.manager.listener.EduManagerEventListener;
-import io.agora.education.api.message.AgoraActionMessage;
+import io.agora.education.api.message.EduActionMessage;
 import io.agora.education.api.message.EduChatMsg;
 import io.agora.education.api.message.EduChatMsgType;
 import io.agora.education.api.message.EduFromUserInfo;
@@ -79,6 +86,8 @@ import io.agora.whiteboard.netless.listener.GlobalStateChangeListener;
 import kotlin.Unit;
 
 import static io.agora.education.EduApplication.getAppId;
+import static io.agora.education.EduApplication.getCustomerCer;
+import static io.agora.education.EduApplication.getCustomerId;
 import static io.agora.education.EduApplication.getManager;
 import static io.agora.education.MainActivity.CODE;
 import static io.agora.education.MainActivity.REASON;
@@ -88,7 +97,7 @@ import static io.agora.education.classroom.bean.record.RecordBean.RECORD;
 import static io.agora.education.classroom.bean.record.RecordState.END;
 
 public abstract class BaseClassActivity_bak extends BaseActivity implements EduRoomEventListener, EduUserEventListener,
-        EduManagerEventListener, GlobalStateChangeListener {
+        EduManagerEventListener, GlobalStateChangeListener, AgoraActionListener {
     private static final String TAG = BaseClassActivity_bak.class.getSimpleName();
 
     public static final String ROOMENTRY = "roomEntry";
@@ -113,6 +122,8 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
     protected BoardBean mainBoardBean;
     protected RecordBean mainRecordBean;
     protected volatile boolean revRecordMsg = false;
+    protected AgoraActionProcessManager actionProcessManager;
+    protected List<AgoraActionConfigInfo> actionConfigs = new ArrayList<>();
 
 
     @Override
@@ -494,6 +505,65 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
         }).show(getSupportFragmentManager(), null);
     }
 
+    /**
+     * 显示允许远端打开本地音视频的确认框
+     */
+    public final void confirmInviteDialog(String content, LocalStreamInitOptions options) {
+        runOnUiThread(() -> {
+            ConfirmDialog dialog = ConfirmDialog.normal(content, confirm -> {
+                if (confirm) {
+                    getLocalUser(new EduCallback<EduUser>() {
+                        @Override
+                        public void onSuccess(@Nullable EduUser localUser) {
+                            if (localUser != null) {
+                                options.setStreamUuid(localUser.getUserInfo().getStreamUuid());
+                                localUser.initOrUpdateLocalStream(options, new EduCallback<EduStreamInfo>() {
+                                    @Override
+                                    public void onSuccess(@Nullable EduStreamInfo stream) {
+                                        if (stream != null) {
+                                            localUser.publishStream(stream, new EduCallback<Boolean>() {
+                                                @Override
+                                                public void onSuccess(@Nullable Boolean res) {
+                                                }
+
+                                                @Override
+                                                public void onFailure(@NotNull EduError error) {
+                                                }
+                                            });
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(@NotNull EduError error) {
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(@NotNull EduError error) {
+                        }
+                    });
+                }
+            });
+            dialog.setConfirmText(getString(R.string.confirm).concat("(10)"));
+            CountDownTimer countDownTimer = new CountDownTimer(1000 * 11, 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    dialog.setConfirmText(getString(R.string.confirm)
+                            .concat(String.format("(%d)", millisUntilFinished / 1000 + 1)));
+                }
+
+                @Override
+                public void onFinish() {
+                    dialog.dismiss();
+                }
+            };
+            countDownTimer.start();
+            dialog.show(getSupportFragmentManager(), null);
+        });
+    }
+
     private final void showLogId(String logId) {
         if (!this.isFinishing() || !this.isDestroyed()) {
             ConfirmDialog.single(getString(R.string.uploadlog_success).concat(logId), null)
@@ -718,6 +788,40 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
 
             }
         });
+    }
+
+    /**
+     * 务必在joinSuccess成功后调用
+     */
+    protected void buildActionProcessManager() {
+        getLocalUser(new EduCallback<EduUser>() {
+            @Override
+            public void onSuccess(@Nullable EduUser localUser) {
+                if (localUser != null) {
+                    EduLocalUserInfo localUserInfo = localUser.getUserInfo();
+                    AgoraActionProcessConfig config = new AgoraActionProcessConfig(getAppId(),
+                            roomEntry.getRoomUuid(), localUserInfo.getUserToken(), getCustomerId(),
+                            getCustomerCer(), API_BASE_URL);
+                    actionProcessManager = new AgoraActionProcessManager(config, BaseClassActivity_bak.this);
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull EduError error) {
+
+            }
+        });
+    }
+
+    /**
+     * 务必在buildActionProcessManager之后调用
+     */
+    protected void parseAgoraActionConfig(EduRoom room) {
+        if (actionProcessManager != null) {
+            actionConfigs = actionProcessManager.parseConfigInfo(room.getRoomProperties());
+        } else {
+            Log.e(TAG, "actionProcessManager is null!");
+        }
     }
 
     @Override
@@ -1004,7 +1108,7 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
     }
 
     @Override
-    public void onUserActionMessageReceived(@NotNull AgoraActionMessage actionMessage) {
+    public void onUserActionMessageReceived(@NotNull EduActionMessage actionMessage) {
 
     }
 
@@ -1044,5 +1148,31 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
 
             }
         });
+    }
+
+
+    @Override
+    public void onApply(@NotNull AgoraActionMsgRes actionMsgRes) {
+
+    }
+
+    @Override
+    public void onInvite(@NotNull AgoraActionMsgRes actionMsgRes) {
+
+    }
+
+    @Override
+    public void onAccept(@NotNull AgoraActionMsgRes actionMsgRes) {
+
+    }
+
+    @Override
+    public void onReject(@NotNull AgoraActionMsgRes actionMsgRes) {
+
+    }
+
+    @Override
+    public void onCancel(@NotNull AgoraActionMsgRes actionMsgRes) {
+
     }
 }

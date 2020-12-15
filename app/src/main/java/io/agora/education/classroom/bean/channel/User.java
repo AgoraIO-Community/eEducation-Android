@@ -7,7 +7,7 @@ import com.google.gson.Gson;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import io.agora.education.classroom.bean.JsonBean;
+import io.agora.base.bean.JsonBean;
 
 public class User extends JsonBean {
 

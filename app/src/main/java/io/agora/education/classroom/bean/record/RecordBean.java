@@ -3,7 +3,7 @@ package io.agora.education.classroom.bean.record;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import io.agora.education.classroom.bean.JsonBean;
+import io.agora.base.bean.JsonBean;
 
 public class RecordBean extends JsonBean implements Parcelable {
     public static final String RECORD = "record";

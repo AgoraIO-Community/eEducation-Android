@@ -7,17 +7,61 @@ import com.google.gson.Gson;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import io.agora.education.classroom.bean.JsonBean;
+import io.agora.base.bean.JsonBean;
 
 public class PeerMsg extends JsonBean {
 
     @Cmd
     public int cmd;
     public Object data;
+    public Object payload;
 
     public PeerMsg(int cmd, Object data) {
         this.cmd = cmd;
         this.data = data;
+    }
+
+    public PeerMsg(int cmd, Object data, Object payload) {
+        this.cmd = cmd;
+        this.data = data;
+        this.payload = payload;
+    }
+
+    public int getCmd() {
+        return cmd;
+    }
+
+    public void setCmd(int cmd) {
+        this.cmd = cmd;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
+    }
+
+    public Object getPayload() {
+        return payload;
+    }
+
+    public String getPayloadJson() {
+        return new Gson().toJson(payload);
+    }
+
+    public void setPayload(Object payload) {
+        this.payload = payload;
+    }
+
+    public <T> T getMsg(Class<T> tClass) {
+        return new Gson().fromJson(new Gson().toJson(data), tClass);
+    }
+
+    @Override
+    public String toJsonString() {
+        return super.toJsonString();
     }
 
     @IntDef({Cmd.CO_VIDEO})
@@ -27,6 +71,10 @@ public class PeerMsg extends JsonBean {
          * co-video operation msg
          */
         int CO_VIDEO = 1;
+        /**
+         * teacher invite student
+         * */
+        int UnMutePeerCMD = 10;
     }
 
     public static class CoVideoMsg {
@@ -87,14 +135,5 @@ public class PeerMsg extends JsonBean {
              */
             int CoVideoing = 2;
         }
-    }
-
-    public <T> T getMsg(Class<T> tClass) {
-        return new Gson().fromJson(new Gson().toJson(data), tClass);
-    }
-
-    @Override
-    public String toJsonString() {
-        return super.toJsonString();
     }
 }

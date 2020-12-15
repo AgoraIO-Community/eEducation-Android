@@ -9,6 +9,7 @@
     <string name="title_chat_room">ChatRoom</string>
     <string name="confirm_leave_room_content">Quit classroom?</string>
     <string name="confirm_removed_from_room_content">You have been removed from classroom.</string>
+    <string name="confirm_invite_onstage">The teacher invited you to the stage.</string>
     <string name="cancel">Cancel</string>
     <string name="hint_im_message">Input message</string>
     <string name="confirm">Confirm</string>

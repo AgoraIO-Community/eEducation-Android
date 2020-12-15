@@ -131,7 +131,7 @@
         app:layout_constraintEnd_toStartOf="@id/line_vertical1"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <io.agora.raisehand.AgoraEduCoVideoView
+    <io.agora.raisehand.AgoraCoVideoView
         android:id="@+id/coVideoView"
         android:layout_width="@dimen/dp_40"
         android:layout_height="@dimen/dp_80"

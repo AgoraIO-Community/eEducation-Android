@@ -111,6 +111,12 @@ public class ConfirmDialog extends DialogFragment {
         }
     }
 
+    public void setConfirmText(String text) {
+        if(tv_dialog_confirm != null) {
+            tv_dialog_confirm.setText(text);
+        }
+    }
+
     public interface DialogClickListener {
         void onClick(boolean confirm);
     }

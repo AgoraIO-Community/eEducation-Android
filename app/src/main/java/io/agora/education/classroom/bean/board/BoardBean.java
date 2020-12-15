@@ -5,8 +5,6 @@ import android.os.Parcelable;
 
 import androidx.annotation.Nullable;
 
-import io.agora.education.classroom.bean.JsonBean;
-
 public class BoardBean /*extends JsonBean*/ implements Parcelable {
     public static String BOARD = "board";
 

@@ -12,8 +12,13 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 
+import com.google.gson.Gson;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -234,10 +239,29 @@ public class MainActivity extends BaseActivity {
         /**createClassroom时，room不存在则新建，存在则返回room信息(此接口非必须调用)，
          * 只要保证在调用joinClassroom之前，classroom在服务端存在即可*/
         RoomCreateOptions options = new RoomCreateOptions(roomUuid, roomNameStr, roomType);
+
         Log.e(TAG, "调用scheduleClass函数");
+
+        RoomCreateOptionsReq optionsReq = RoomCreateOptionsReq.convertRoomCreateOptions(options);
+        Map<String, Object> roomUuidItemProperties = new HashMap<String, Object>();
+        roomUuidItemProperties.put("maxWait", 4);
+        roomUuidItemProperties.put("maxAccept", 1);
+        roomUuidItemProperties.put("timeout", 30);
+
+        Map<String, Object> roomUuidProperties = new HashMap<String, Object>();
+        roomUuidProperties.put(roomUuid, roomUuidItemProperties);
+
+        Map<String, Object> handUpStatesProperties = new HashMap<String, Object>();
+        handUpStatesProperties.put("state", 1);
+        handUpStatesProperties.put("autoCoVideo", 0);
+
+        Map<String, Object> roomProperties = new HashMap<String, Object>();
+        roomProperties.put("processes", roomUuidProperties);
+        roomProperties.put("handUpStates", handUpStatesProperties);
+        optionsReq.setRoomProperties(roomProperties);
+
         RetrofitManager.instance().getService(API_BASE_URL, CommonService.class)
-                .createClassroom(getAppId(), options.getRoomUuid(),
-                        RoomCreateOptionsReq.convertRoomCreateOptions(options))
+                .createClassroom(getAppId(), options.getRoomUuid(), optionsReq)
                 .enqueue(new RetrofitManager.Callback<>(0, new ThrowableCallback<ResponseBody<String>>() {
                     @Override
                     public void onSuccess(@Nullable ResponseBody<String> res) {

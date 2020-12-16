@@ -82,6 +82,7 @@ import io.agora.education.classroom.widget.TitleView;
 import io.agora.education.service.BoardService;
 import io.agora.education.service.bean.ResponseBody;
 import io.agora.education.widget.ConfirmDialog;
+import io.agora.raisehand.AgoraCoVideoAction;
 import io.agora.whiteboard.netless.listener.GlobalStateChangeListener;
 import kotlin.Unit;
 
@@ -124,6 +125,7 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
     protected volatile boolean revRecordMsg = false;
     protected AgoraActionProcessManager actionProcessManager;
     protected List<AgoraActionConfigInfo> actionConfigs = new ArrayList<>();
+    private ConfirmDialog audioInviteDialog, videoInviteDialog;
 
 
     @Override
@@ -508,29 +510,74 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
     /**
      * 显示允许远端打开本地音视频的确认框
      */
-    public final void confirmInviteDialog(String content, LocalStreamInitOptions options) {
+    public final void confirmInvite(AgoraCoVideoAction action) {
+        ConfirmDialog dialog = null;
+        String content = "";
+        LocalStreamInitOptions options = new LocalStreamInitOptions("", false, false);
+        /**此处对本地流的操作是追加而不是覆盖，所以尝试获取本地流并同步音视频流状态*/
+        if (localCameraStream != null) {
+            options.setEnableMicrophone(localCameraStream.getHasAudio());
+            options.setEnableCamera(localCameraStream.getHasVideo());
+        }
+        switch (action.getAction()) {
+            case 0:
+                if (audioInviteDialog != null && audioInviteDialog.isVisible()) {
+                    return;
+                }
+                content = action.getFromUser().getName() + "申请打开麦克风";
+                options.setEnableMicrophone(true);
+                dialog = audioInviteDialog = ConfirmDialog.normal(content, confirm -> {
+                    if (confirm) {
+                        upsertLocalStream(options);
+                    }
+                });
+                break;
+            case 1:
+                if (videoInviteDialog != null && videoInviteDialog.isVisible()) {
+                    return;
+                }
+                content = action.getFromUser().getName() + "申请打开摄像头";
+                options.setEnableCamera(true);
+                dialog = videoInviteDialog = ConfirmDialog.normal(content, confirm -> {
+                    if (confirm) {
+                        upsertLocalStream(options);
+                    }
+                });
+                break;
+        }
+        final ConfirmDialog finalDialog = dialog;
         runOnUiThread(() -> {
-            ConfirmDialog dialog = ConfirmDialog.normal(content, confirm -> {
-                if (confirm) {
-                    getLocalUser(new EduCallback<EduUser>() {
-                        @Override
-                        public void onSuccess(@Nullable EduUser localUser) {
-                            if (localUser != null) {
-                                options.setStreamUuid(localUser.getUserInfo().getStreamUuid());
-                                localUser.initOrUpdateLocalStream(options, new EduCallback<EduStreamInfo>() {
-                                    @Override
-                                    public void onSuccess(@Nullable EduStreamInfo stream) {
-                                        if (stream != null) {
-                                            localUser.publishStream(stream, new EduCallback<Boolean>() {
-                                                @Override
-                                                public void onSuccess(@Nullable Boolean res) {
-                                                }
+            CountDownTimer countDownTimer = new CountDownTimer(10500, 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    finalDialog.setConfirmText(getString(R.string.confirm)
+                            .concat(String.format("(%d)", millisUntilFinished / 1000 + 1)));
+                }
 
-                                                @Override
-                                                public void onFailure(@NotNull EduError error) {
-                                                }
-                                            });
-                                        }
+                @Override
+                public void onFinish() {
+                    finalDialog.dismiss();
+                }
+            };
+            countDownTimer.start();
+            finalDialog.setConfirmText(getString(R.string.confirm).concat("(10)"));
+            finalDialog.show(getSupportFragmentManager(), null);
+        });
+    }
+
+    private final void upsertLocalStream(LocalStreamInitOptions options) {
+        getLocalUser(new EduCallback<EduUser>() {
+            @Override
+            public void onSuccess(@Nullable EduUser localUser) {
+                if (localUser != null) {
+                    options.setStreamUuid(localUser.getUserInfo().getStreamUuid());
+                    localUser.initOrUpdateLocalStream(options, new EduCallback<EduStreamInfo>() {
+                        @Override
+                        public void onSuccess(@Nullable EduStreamInfo stream) {
+                            if (stream != null) {
+                                localUser.publishStream(stream, new EduCallback<Boolean>() {
+                                    @Override
+                                    public void onSuccess(@Nullable Boolean res) {
                                     }
 
                                     @Override
@@ -545,22 +592,11 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
                         }
                     });
                 }
-            });
-            dialog.setConfirmText(getString(R.string.confirm).concat("(10)"));
-            CountDownTimer countDownTimer = new CountDownTimer(1000 * 11, 1000) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    dialog.setConfirmText(getString(R.string.confirm)
-                            .concat(String.format("(%d)", millisUntilFinished / 1000 + 1)));
-                }
+            }
 
-                @Override
-                public void onFinish() {
-                    dialog.dismiss();
-                }
-            };
-            countDownTimer.start();
-            dialog.show(getSupportFragmentManager(), null);
+            @Override
+            public void onFailure(@NotNull EduError error) {
+            }
         });
     }
 

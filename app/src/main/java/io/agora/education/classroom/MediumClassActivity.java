@@ -918,25 +918,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                     /**此处偷懒直接用了AgoraCoVideoAction.kt，实际应该再自定义类*/
                     AgoraCoVideoAction action = new Gson().fromJson(peerMsg.getPayloadJson(),
                             AgoraCoVideoAction.class);
-                    String content = "";
-                    LocalStreamInitOptions options = new LocalStreamInitOptions("", false, false);
-                    /**此处对本地流的操作是追加而不是覆盖，所以尝试获取本地流并同步音视频流状态*/
-                    EduStreamInfo localCameraStream = getLocalCameraStream();
-                    if (localCameraStream != null) {
-                        options.setEnableMicrophone(localCameraStream.getHasAudio());
-                        options.setEnableCamera(localCameraStream.getHasVideo());
-                    }
-                    switch (action.getAction()) {
-                        case 0:
-                            content = action.getFromUser().getName() + "申请打开麦克风";
-                            options.setEnableMicrophone(true);
-                            break;
-                        case 1:
-                            content = action.getFromUser().getName() + "申请打开摄像头";
-                            options.setEnableCamera(true);
-                            break;
-                    }
-                    confirmInviteDialog(content, options);
+                    confirmInvite(action);
                 }
             } else if (jsonObject.has("action") && jsonObject.has("processUuid")) {
                 /**举手的回调结果*/

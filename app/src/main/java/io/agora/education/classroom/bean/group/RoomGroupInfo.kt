@@ -1,6 +1,7 @@
 package io.agora.education.classroom.bean.group
 
 import android.text.TextUtils
+import io.agora.education.api.stream.data.EduStreamEvent
 import io.agora.education.api.stream.data.EduStreamInfo
 import io.agora.education.api.user.data.EduUserInfo
 
@@ -133,7 +134,7 @@ class RoomGroupInfo() {
     }
 
     /**是否开启分组*/
-    fun enableGroup(): Boolean {
+    fun isEnableGroup(): Boolean {
         groupStates?.let {
             return it.state == GroupState.ENABLE.value
         }
@@ -141,9 +142,44 @@ class RoomGroupInfo() {
     }
 
     /**是否开启PK*/
-    fun enablePK(): Boolean {
+    fun isEnablePK(): Boolean {
         groupStates?.let {
-            return enableGroup() && it.interactOutGroup == InteractState.ENABLE.value
+            return isEnableGroup() && it.interactOutGroup == InteractState.ENABLE.value
+        }
+        return false
+    }
+
+    /**
+     * 用户上台
+     */
+    fun membersOnStage(streamEvents: List<EduStreamEvent>) {
+        allStudent?.forEach {
+            for ((streamInfo) in streamEvents) {
+                if (it.uuid == streamInfo.publisher.userUuid) {
+                    it.onStage()
+                }
+            }
+        }
+    }
+
+    /**
+     * 用户下台
+     */
+    fun membersOffStage(streamEvents: List<EduStreamEvent>) {
+        allStudent?.forEach {
+            for ((streamInfo) in streamEvents) {
+                if (it.uuid == streamInfo.publisher.userUuid) {
+                    it.offStage()
+                }
+            }
+        }
+    }
+
+    fun isOnStage(userUuid: String): Boolean {
+        allStudent?.forEach {
+            if (it.uuid == userUuid) {
+                return it.onStage
+            }
         }
         return false
     }

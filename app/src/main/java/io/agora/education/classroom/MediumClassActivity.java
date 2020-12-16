@@ -58,7 +58,6 @@ import io.agora.education.api.user.data.EduUserLeftType;
 import io.agora.education.api.user.data.EduUserRole;
 import io.agora.education.api.user.data.EduUserStateChangeType;
 import io.agora.education.classroom.adapter.StageVideoAdapter;
-import io.agora.education.classroom.bean.msg.AgoraActionResBody;
 import io.agora.education.classroom.bean.board.BoardBean;
 import io.agora.education.classroom.bean.board.BoardInfo;
 import io.agora.education.classroom.bean.channel.Room;
@@ -73,7 +72,6 @@ import io.agora.education.classroom.fragment.StudentListFragment;
 import io.agora.education.classroom.widget.RtcVideoView;
 import io.agora.agoraactionprocess.AgoraActionMsgRes;
 import io.agora.agoraactionprocess.AgoraActionConfigInfo;
-import io.agora.education.widget.ConfirmDialog;
 import io.agora.raisehand.AgoraCoVideoAction;
 import io.agora.raisehand.AgoraCoVideoFromRoom;
 import io.agora.raisehand.AgoraCoVideoListener;
@@ -210,7 +208,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     public void onTabSelected(TabLayout.Tab tab) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (tab.getPosition() == 0) {
-            Fragment fragment = roomGroupInfo.enableGroup() ? studentGroupListFragment : studentListFragment;
+            Fragment fragment = roomGroupInfo.isEnableGroup() ? studentGroupListFragment : studentListFragment;
             transaction.show(fragment).hide(chatRoomFragment);
         } else {
             transaction.show(chatRoomFragment).hide(studentListFragment).hide(studentGroupListFragment);
@@ -403,7 +401,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
      * 分为分组显示和直接列表显示
      */
     private void notifyUserList() {
-        if (roomGroupInfo.enableGroup()) {
+        if (roomGroupInfo.isEnableGroup()) {
             /*开启了分组，需要分组显示学生列表*/
             switchUserFragment(true);
             //TODO 显示分组列表
@@ -473,7 +471,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     }
 
     private void notifyStageVideoList() {
-        if (roomGroupInfo.enablePK()) {
+        if (roomGroupInfo.isEnablePK()) {
             List<GroupInfo> groupInfos = roomGroupInfo.getGroups();
             List<String> stageGroupIds = roomGroupInfo.getInteractOutGroups();
             List<GroupInfo> stageGroups = new ArrayList<>(2);
@@ -630,34 +628,6 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     }
 
 
-    /**
-     * 用户上台
-     */
-    private void memberOnStage(List<EduStreamEvent> streamEvents) {
-        for (GroupMemberInfo memberInfo : roomGroupInfo.getAllStudent()) {
-            for (EduStreamEvent streamEvent : streamEvents) {
-                EduStreamInfo streamInfo = streamEvent.getModifiedStream();
-                if (memberInfo.getUuid().equals(streamInfo.getPublisher().getUserUuid())) {
-                    memberInfo.onStage();
-                }
-            }
-        }
-    }
-
-    /**
-     * 用户下台
-     */
-    private void memberOffStage(List<EduStreamEvent> streamEvents) {
-        for (GroupMemberInfo memberInfo : roomGroupInfo.getAllStudent()) {
-            for (EduStreamEvent streamEvent : streamEvents) {
-                EduStreamInfo streamInfo = streamEvent.getModifiedStream();
-                if (memberInfo.getUuid().equals(streamInfo.getPublisher().getUserUuid())) {
-                    memberInfo.offStage();
-                }
-            }
-        }
-    }
-
     @Override
     public void onRemoteUsersInitialized(@NotNull List<? extends EduUserInfo> users, @NotNull EduRoom classRoom) {
         if (classRoom.equals(getMainEduRoom())) {
@@ -729,7 +699,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     public void onRemoteStreamsAdded(@NotNull List<EduStreamEvent> streamEvents, @NotNull EduRoom classRoom) {
         if (classRoom.equals(getMainEduRoom())) {
             super.onRemoteStreamsAdded(streamEvents, classRoom);
-            memberOnStage(streamEvents);
+            roomGroupInfo.membersOnStage(streamEvents);
             boolean needUpdateStudentList = false;
             for (EduStreamEvent streamEvent : streamEvents) {
                 EduStreamInfo streamInfo = streamEvent.getModifiedStream();
@@ -766,7 +736,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     public void onRemoteStreamUpdated(@NotNull List<EduStreamEvent> streamEvents, @NotNull EduRoom classRoom) {
         if (classRoom.equals(getMainEduRoom())) {
             super.onRemoteStreamUpdated(streamEvents, classRoom);
-            memberOnStage(streamEvents);
+            roomGroupInfo.membersOnStage(streamEvents);
             boolean needUpdateStudentList = false;
             for (EduStreamEvent streamEvent : streamEvents) {
                 EduStreamInfo streamInfo = streamEvent.getModifiedStream();
@@ -788,7 +758,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     public void onRemoteStreamsRemoved(@NotNull List<EduStreamEvent> streamEvents, @NotNull EduRoom classRoom) {
         if (classRoom.equals(getMainEduRoom())) {
             super.onRemoteStreamsRemoved(streamEvents, classRoom);
-            memberOffStage(streamEvents);
+            roomGroupInfo.membersOffStage(streamEvents);
             notifyStageVideoList();
             boolean needUpdateStudentList = false;
             for (EduStreamEvent streamEvent : streamEvents) {
@@ -895,7 +865,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     @Override
     public void onLocalStreamAdded(@NotNull EduStreamEvent streamEvent) {
         super.onLocalStreamAdded(streamEvent);
-        memberOnStage(Collections.singletonList(streamEvent));
+        roomGroupInfo.membersOnStage(Collections.singletonList(streamEvent));
         updateLocalStreamInfo(streamEvent);
         notifyStageVideoList();
     }
@@ -903,7 +873,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     @Override
     public void onLocalStreamUpdated(@NotNull EduStreamEvent streamEvent) {
         super.onLocalStreamUpdated(streamEvent);
-        memberOnStage(Collections.singletonList(streamEvent));
+        roomGroupInfo.membersOnStage(Collections.singletonList(streamEvent));
         updateLocalStreamInfo(streamEvent);
         notifyStageVideoList();
     }
@@ -914,7 +884,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
         /**本地流被移除，被强制下台
          * 1:同步状态至CoVideoView 2:刷新音视频列表*/
         agoraCoVideoView.onLinkMediaChanged(false);
-        memberOffStage(Collections.singletonList(streamEvent));
+        roomGroupInfo.membersOffStage(Collections.singletonList(streamEvent));
         notifyStageVideoList();
         updateLocalStreamInfo(streamEvent);
     }
@@ -1134,33 +1104,39 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     public void onCoVideoAccepted() {
         /*如果老师打开了举手即上台则学生需要自己发流*/
         if (agoraCoVideoView.isAutoCoVideo()) {
+            Log.e(TAG, "autoCoVideo is enable");
             getLocalUser(new EduCallback<EduUser>() {
                 @Override
                 public void onSuccess(@Nullable EduUser localUser) {
                     if (localUser != null) {
                         EduLocalUserInfo userInfo = localUser.getUserInfo();
-                        LocalStreamInitOptions options = new LocalStreamInitOptions(userInfo.streamUuid,
-                                false, true);
-                        localUser.initOrUpdateLocalStream(options, new EduCallback<EduStreamInfo>() {
-                            @Override
-                            public void onSuccess(@Nullable EduStreamInfo streamInfo) {
-                                if (streamInfo != null) {
-                                    localUser.publishStream(streamInfo, new EduCallback<Boolean>() {
-                                        @Override
-                                        public void onSuccess(@Nullable Boolean res) {
-                                        }
+                        /**判断是否已经在台上，如果已经在台上则不进行操作*/
+                        if (!roomGroupInfo.isOnStage(userInfo.getUserUuid())) {
+                            LocalStreamInitOptions options = new LocalStreamInitOptions(userInfo.streamUuid,
+                                    false, true);
+                            localUser.initOrUpdateLocalStream(options, new EduCallback<EduStreamInfo>() {
+                                @Override
+                                public void onSuccess(@Nullable EduStreamInfo streamInfo) {
+                                    if (streamInfo != null) {
+                                        localUser.publishStream(streamInfo, new EduCallback<Boolean>() {
+                                            @Override
+                                            public void onSuccess(@Nullable Boolean res) {
+                                            }
 
-                                        @Override
-                                        public void onFailure(@NotNull EduError error) {
-                                        }
-                                    });
+                                            @Override
+                                            public void onFailure(@NotNull EduError error) {
+                                            }
+                                        });
+                                    }
                                 }
-                            }
 
-                            @Override
-                            public void onFailure(@NotNull EduError error) {
-                            }
-                        });
+                                @Override
+                                public void onFailure(@NotNull EduError error) {
+                                }
+                            });
+                        } else {
+                            Log.e(TAG, "curUser is already onstage, do nothing.");
+                        }
                     }
                 }
 

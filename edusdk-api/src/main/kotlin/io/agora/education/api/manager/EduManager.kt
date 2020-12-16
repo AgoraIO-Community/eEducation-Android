@@ -1,6 +1,7 @@
 package io.agora.education.api.manager
 
 import android.app.Activity
+import android.app.Service
 import android.text.TextUtils
 import io.agora.education.api.BuildConfig
 import io.agora.education.api.EduCallback
@@ -31,6 +32,18 @@ abstract class EduManager(
          * 301:network error，透传后台错误msg字段*/
         @JvmStatic
         fun init(options: EduManagerOptions, callback: EduCallback<EduManager>) {
+            if (options.context == null) {
+                callback.onFailure(EduError.parameterError("context"))
+                return
+            } else {
+                if (options.context is Activity) {
+                    if (options.context.isFinishing || options.context.isDestroyed) {
+                        callback.onFailure(EduError.parameterError("context"))
+                    }
+                } else if (options.context is Service) {
+
+                }
+            }
             if (TextUtils.isEmpty(options.appId)) {
                 callback.onFailure(EduError.parameterError("appId"))
                 return

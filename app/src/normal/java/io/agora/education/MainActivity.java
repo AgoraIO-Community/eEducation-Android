@@ -240,6 +240,7 @@ public class MainActivity extends BaseActivity {
          * 只要保证在调用joinClassroom之前，classroom在服务端存在即可*/
         RoomCreateOptions options = new RoomCreateOptions(roomUuid, roomNameStr, roomType);
         Log.e(TAG, "调用scheduleClass函数");
+
         RoomCreateOptionsReq optionsReq = RoomCreateOptionsReq.convertRoomCreateOptions(options);
         RetrofitManager.instance().getService(API_BASE_URL, CommonService.class)
                 .createClassroom(getAppId(), options.getRoomUuid(), optionsReq)

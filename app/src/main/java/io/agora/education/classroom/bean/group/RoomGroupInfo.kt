@@ -175,6 +175,7 @@ class RoomGroupInfo() {
         }
     }
 
+    /**用户是否在台上*/
     fun isOnStage(userUuid: String): Boolean {
         allStudent?.forEach {
             if (it.uuid == userUuid) {

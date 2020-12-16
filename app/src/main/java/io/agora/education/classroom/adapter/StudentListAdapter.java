@@ -39,7 +39,7 @@ public class StudentListAdapter extends RecyclerView.Adapter<StudentListAdapter.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         GroupMemberInfo memberInfo = students.get(position);
-//        holder.textView.setText(memberInfo.getUserName() + (memberInfo.getOnline()?"":R.string.offline_state));
+//        holder.textView.setText(memberInfo.getUserName() + (memberInfo.getOnline() ? "" : R.string.offline_state));
         holder.textView.setText(memberInfo.getUserName());
         holder.muteAudio.setSelected(memberInfo.getEnableAudio());
         holder.muteVideo.setSelected(memberInfo.getEnableVideo());

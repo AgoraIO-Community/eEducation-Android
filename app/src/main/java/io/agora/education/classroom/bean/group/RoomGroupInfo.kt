@@ -7,7 +7,7 @@ import io.agora.education.api.user.data.EduUserInfo
 
 class RoomGroupInfo() {
     companion object {
-        const val GROUPSTATES = "groupsStates"
+        const val GROUPSTATES = "groupStates"
         const val INTERACTOUTGROUPS = "interactOutGroups"
         val INTERACTOUTGROUPKEYS = arrayOf("g1", "g2")
         const val GROUPS = "groups"
@@ -180,6 +180,17 @@ class RoomGroupInfo() {
         allStudent?.forEach {
             if (it.uuid == userUuid) {
                 return it.onStage
+            }
+        }
+        return false
+    }
+
+    /**用户是是否在名单中
+     * 即students列表中是否有当前用户*/
+    fun existsInList(userUuid: String): Boolean {
+        allStudent?.forEach {
+            if (it.uuid == userUuid) {
+                return true
             }
         }
         return false

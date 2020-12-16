@@ -671,7 +671,7 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
         if (properties != null) {
             for (Map.Entry<String, Object> property : properties.entrySet()) {
                 if (property.getKey().equals(key)) {
-                    return String.valueOf(property.getValue());
+                    return new Gson().toJson(property.getValue());
                 }
             }
         }

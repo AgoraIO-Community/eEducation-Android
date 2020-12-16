@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/dp_8"
         android:layout_marginTop="@dimen/dp_8"
-        android:text="组1"
+        android:text="%s:(%d)"
         android:textColor="@color/gray_191919"
         android:textSize="@dimen/sp_13"
         app:layout_constraintStart_toStartOf="parent"

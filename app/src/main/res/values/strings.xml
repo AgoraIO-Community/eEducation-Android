@@ -53,4 +53,5 @@
     <string name="uploadlog_success">Log reported successfully\n</string>
     <string name="title_msg">Message</string>
     <string name="offline_state">(Offline)</string>
+    <string name="groupname" translatable="false">%s:(%d)</string>
 </resources>

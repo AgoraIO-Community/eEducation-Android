@@ -46,7 +46,7 @@ public class StudentListFragment extends BaseFragment {
         rcvStudents.setAdapter(studentListAdapter);
     }
 
-    public void setLocalUserUuid(String userUuid) {
+    public void updateLocalUserUuid(String userUuid) {
         localUserUuid = userUuid;
     }
 
@@ -65,8 +65,9 @@ public class StudentListFragment extends BaseFragment {
                     }
                 }
             }
-            for(GroupMemberInfo memberInfo : allStudent){
-                if(memberInfo.getOnline()){
+            /**过滤掉不在线的人数*/
+            for (GroupMemberInfo memberInfo : allStudent) {
+                if (memberInfo.getOnline()) {
                     onlineStudents.add(memberInfo);
                 }
             }

@@ -305,7 +305,13 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                 new TypeToken<Map<String, GroupInfo>>() {
                 }.getType());
         roomGroupInfo.updateGroups(groups);
-        /*解析当前的学生名单*/
+        syncAllStudentData(roomProperties);
+    }
+
+    /**
+     * 解析并同步当前的学生名单和在线、上台状态
+     */
+    private void syncAllStudentData(Map<String, Object> roomProperties) {
         Map<String, GroupMemberInfo> allStudent = new Gson()
                 .fromJson(new Gson().toJson(roomProperties.get(STUDENTS)),
                         new TypeToken<Map<String, GroupMemberInfo>>() {
@@ -369,23 +375,25 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
             public void onSuccess(@Nullable EduUser user) {
                 if (user != null) {
                     EduUserInfo userInfo = user.getUserInfo();
-                    GroupMemberInfoMessage memberInfo = new GroupMemberInfoMessage(userInfo.getUserUuid(),
-                            userInfo.getUserName(), "", 0);
-                    Map<String, GroupMemberInfoMessage> memberInfoMap = new HashMap<>();
-                    memberInfoMap.put(STUDENTS.concat(".").concat(memberInfo.getUuid()),
-                            memberInfo);
-                    Map<String, String> cause = new HashMap<>();
-                    cause.put(CMD, String.valueOf(STUDENTLISTCHANGED));
-                    user.setRoomProperties(memberInfoMap, cause, new EduCallback<Unit>() {
-                        @Override
-                        public void onSuccess(@Nullable Unit res) {
-                        }
+                    if (!roomGroupInfo.existsInList(userInfo.getUserUuid())) {
+                        GroupMemberInfoMessage memberInfo = new GroupMemberInfoMessage(
+                                userInfo.getUserUuid(), userInfo.getUserName(), "", 0);
+                        Map<String, GroupMemberInfoMessage> memberInfoMap = new HashMap<>();
+                        memberInfoMap.put(STUDENTS.concat(".").concat(memberInfo.getUuid()),
+                                memberInfo);
+                        Map<String, String> cause = new HashMap<>();
+                        cause.put(CMD, String.valueOf(STUDENTLISTCHANGED));
+                        user.setRoomProperties(memberInfoMap, cause, new EduCallback<Unit>() {
+                            @Override
+                            public void onSuccess(@Nullable Unit res) {
+                            }
 
-                        @Override
-                        public void onFailure(@NotNull EduError error) {
-                            Log.e(TAG, "更新本地用户信息至课堂名单中失败->" + error.getMsg());
-                        }
-                    });
+                            @Override
+                            public void onFailure(@NotNull EduError error) {
+                                Log.e(TAG, "更新本地用户信息至课堂名单中失败->" + error.getMsg());
+                            }
+                        });
+                    }
                 }
             }
 
@@ -471,6 +479,8 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     }
 
     private void notifyStageVideoList() {
+        stageStreamInfosOne.clear();
+        stageStreamInfosTwo.clear();
         if (roomGroupInfo.isEnablePK()) {
             List<GroupInfo> groupInfos = roomGroupInfo.getGroups();
             List<String> stageGroupIds = roomGroupInfo.getInteractOutGroups();
@@ -482,7 +492,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                     stageGroups.add(element);
                 }
             }
-            /*打开pk,肯定有一个组整体上台*/
+            /*开启了pk,肯定有一个组整体上台*/
             List<String> stageMemberIdsOne = stageGroups.get(0).getMembers();
             final List<String> stageMemberIdsTwo = stageGroups.size() > 1 ?
                     stageGroups.get(1).getMembers() : new ArrayList<>();
@@ -577,8 +587,6 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                     }
                 }
             }
-            stageStreamInfosOne.clear();
-            stageStreamInfosTwo.clear();
             if (curStageStreams != null && curStageStreams.size() > 0) {
                 for (EduStreamInfo stream : curStageStreams) {
                     String userUuid = stream.getPublisher().getUserUuid();
@@ -645,12 +653,14 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     @Override
     public void onRemoteUsersJoined(@NotNull List<? extends EduUserInfo> users, @NotNull EduRoom classRoom) {
         super.onRemoteUsersJoined(users, classRoom);
+        syncAllStudentData(classRoom.getRoomProperties());
         notifyUserList();
     }
 
     @Override
     public void onRemoteUserLeft(@NotNull EduUserEvent userEvent, @NotNull EduRoom classRoom) {
         super.onRemoteUserLeft(userEvent, classRoom);
+        syncAllStudentData(classRoom.getRoomProperties());
         notifyUserList();
     }
 
@@ -658,6 +668,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     public void onRemoteUserUpdated(@NotNull EduUserEvent userEvent, @NotNull EduUserStateChangeType type,
                                     @NotNull EduRoom classRoom) {
         super.onRemoteUserUpdated(userEvent, type, classRoom);
+        syncAllStudentData(classRoom.getRoomProperties());
         notifyUserList();
     }
 

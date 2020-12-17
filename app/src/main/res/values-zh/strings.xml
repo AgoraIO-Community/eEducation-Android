@@ -49,4 +49,6 @@
     <string name="uploadlog_success">日志上报成功\n</string>
     <string name="title_msg">消息</string>
     <string name="offline_state">(已离线)</string>
+    <string name="teacherinviteaudio">老师申请打开麦克风!</string>
+    <string name="teacherinvitevideo">老师申请打开摄像头!</string>
 </resources>

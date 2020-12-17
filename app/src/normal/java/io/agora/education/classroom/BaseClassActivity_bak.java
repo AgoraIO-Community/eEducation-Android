@@ -524,7 +524,7 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
                 if (audioInviteDialog != null && audioInviteDialog.isVisible()) {
                     return;
                 }
-                content = action.getFromUser().getName() + "申请打开麦克风";
+                content = getString(R.string.teacherinviteaudio);
                 options.setEnableMicrophone(true);
                 dialog = audioInviteDialog = ConfirmDialog.normal(content, confirm -> {
                     if (confirm) {
@@ -536,7 +536,7 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
                 if (videoInviteDialog != null && videoInviteDialog.isVisible()) {
                     return;
                 }
-                content = action.getFromUser().getName() + "申请打开摄像头";
+                content = getString(R.string.teacherinvitevideo);
                 options.setEnableCamera(true);
                 dialog = videoInviteDialog = ConfirmDialog.normal(content, confirm -> {
                     if (confirm) {

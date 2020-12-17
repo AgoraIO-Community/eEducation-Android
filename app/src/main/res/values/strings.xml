@@ -53,4 +53,6 @@
     <string name="uploadlog_success">Log reported successfully\n</string>
     <string name="title_msg">Message</string>
     <string name="offline_state">(Offline)</string>
+    <string name="teacherinviteaudio">teacher applied to turn on your microphone!</string>
+    <string name="teacherinvitevideo">teacher applied to turn on your camera!</string>
 </resources>

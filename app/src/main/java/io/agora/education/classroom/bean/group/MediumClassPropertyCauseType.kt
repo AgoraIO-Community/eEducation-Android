@@ -1,6 +1,6 @@
 package io.agora.education.classroom.bean.group
 
-object IntermediateClassPropertyCauseType {
+object MediumClassPropertyCauseType {
     const val CMD = "cmd"
 
     /*开关分组*/

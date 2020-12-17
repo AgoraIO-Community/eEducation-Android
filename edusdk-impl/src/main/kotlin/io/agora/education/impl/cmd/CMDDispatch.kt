@@ -31,7 +31,7 @@ internal class CMDDispatch(private val eduRoom: EduRoom) {
         }
     }
 
-    fun dispatchChannelMsg(text: String) {
+    private fun dispatchChannelMsg(text: String) {
         val cmdResponseBody = Gson().fromJson<CMDResponseBody<Any>>(text, object :
                 TypeToken<CMDResponseBody<Any>>() {}.type)
         when (cmdResponseBody.cmd) {

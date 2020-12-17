@@ -213,7 +213,16 @@ internal class RoomSyncHelper(private val eduRoom: EduRoom, roomInfo: EduRoomInf
                             lastSequenceId = it.sequence
                         }
                         syncing = false
-                        callback.onSuccess(Unit)
+                        /**snapshot访问成功，重新拉一次sequence数据，防止丢失*/
+                        fetchLostSequence(object : EduCallback<Unit> {
+                            override fun onSuccess(res: Unit?) {
+                                callback.onSuccess(Unit)
+                            }
+
+                            override fun onFailure(error: EduError) {
+                                callback.onFailure(error)
+                            }
+                        })
                     }
 
                     override fun onFailure(throwable: Throwable?) {

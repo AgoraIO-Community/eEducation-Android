@@ -324,6 +324,16 @@ internal class EduRoomImpl(
         })
     }
 
+    fun onRemoteInitialized() {
+        /**本地缓存的远端人流数据为空，则不走initialized回调*/
+        if (getCurRemoteUserList().size > 0) {
+            eventListener?.onRemoteUsersInitialized(getCurRemoteUserList(), this@EduRoomImpl)
+        }
+        if (getCurRemoteStreamList().size > 0) {
+            eventListener?.onRemoteStreamsInitialized(getCurRemoteStreamList(), this@EduRoomImpl)
+        }
+    }
+
     /**判断joining状态防止多次调用*/
     private fun joinSuccess(eduUser: EduUser, callback: EduCallback<EduUser>) {
         if (joining) {
@@ -334,13 +344,8 @@ internal class EduRoomImpl(
                 getCurRoomStatus().onlineUsersCount = getCurUserList().size
                 joinSuccess = true
                 callback.onSuccess(eduUser as EduStudent)
-                /**本地缓存的远端人流数据为空，则不走initialized回调*/
-                if (getCurRemoteUserList().size > 0) {
-                    eventListener?.onRemoteUsersInitialized(getCurRemoteUserList(), this@EduRoomImpl)
-                }
-                if (getCurRemoteStreamList().size > 0) {
-                    eventListener?.onRemoteStreamsInitialized(getCurRemoteStreamList(), this@EduRoomImpl)
-                }
+                /**把本地缓存的远端人流数据回调出去*/
+                onRemoteInitialized()
                 /**检查是否有默认流信息(直接处理数据)*/
                 val addedStreamsIterable = defaultStreams.iterator()
                 while (addedStreamsIterable.hasNext()) {

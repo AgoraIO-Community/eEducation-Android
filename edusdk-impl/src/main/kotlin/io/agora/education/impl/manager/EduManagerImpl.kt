@@ -212,6 +212,8 @@ internal class EduManagerImpl(
                     override fun onSuccess(res: Unit?) {
                         /*断线重连之后，数据同步成功之后再把重连成功的事件回调出去*/
                         it.eventListener?.onConnectionStateChanged(Convert.convertConnectionState(p0), it)
+                        /*断线重连之后，重新走initialized回调*/
+                        it.onRemoteInitialized()
                     }
 
                     override fun onFailure(error: EduError) {

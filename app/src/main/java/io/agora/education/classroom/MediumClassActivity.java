@@ -79,17 +79,17 @@ import io.agora.raisehand.AgoraCoVideoView;
 import io.agora.raisehand.AgoraCoVideoFromUser;
 import kotlin.Unit;
 
-import static io.agora.education.classroom.bean.group.IntermediateClassPropertyCauseType.CMD;
-import static io.agora.education.classroom.bean.group.IntermediateClassPropertyCauseType.GROUOREWARD;
-import static io.agora.education.classroom.bean.group.IntermediateClassPropertyCauseType.GROUPMEDIA;
-import static io.agora.education.classroom.bean.group.IntermediateClassPropertyCauseType.STUDENTLISTCHANGED;
-import static io.agora.education.classroom.bean.group.IntermediateClassPropertyCauseType.STUDENTREWARD;
-import static io.agora.education.classroom.bean.group.IntermediateClassPropertyCauseType.SWITCHAUTOCOVIDEO;
-import static io.agora.education.classroom.bean.group.IntermediateClassPropertyCauseType.SWITCHCOVIDEO;
-import static io.agora.education.classroom.bean.group.IntermediateClassPropertyCauseType.SWITCHGROUP;
-import static io.agora.education.classroom.bean.group.IntermediateClassPropertyCauseType.SWITCHINTERACTIN;
-import static io.agora.education.classroom.bean.group.IntermediateClassPropertyCauseType.SWITCHINTERACTOUT;
-import static io.agora.education.classroom.bean.group.IntermediateClassPropertyCauseType.UPDATEGROUP;
+import static io.agora.education.classroom.bean.group.MediumClassPropertyCauseType.CMD;
+import static io.agora.education.classroom.bean.group.MediumClassPropertyCauseType.GROUOREWARD;
+import static io.agora.education.classroom.bean.group.MediumClassPropertyCauseType.GROUPMEDIA;
+import static io.agora.education.classroom.bean.group.MediumClassPropertyCauseType.STUDENTLISTCHANGED;
+import static io.agora.education.classroom.bean.group.MediumClassPropertyCauseType.STUDENTREWARD;
+import static io.agora.education.classroom.bean.group.MediumClassPropertyCauseType.SWITCHAUTOCOVIDEO;
+import static io.agora.education.classroom.bean.group.MediumClassPropertyCauseType.SWITCHCOVIDEO;
+import static io.agora.education.classroom.bean.group.MediumClassPropertyCauseType.SWITCHGROUP;
+import static io.agora.education.classroom.bean.group.MediumClassPropertyCauseType.SWITCHINTERACTIN;
+import static io.agora.education.classroom.bean.group.MediumClassPropertyCauseType.SWITCHINTERACTOUT;
+import static io.agora.education.classroom.bean.group.MediumClassPropertyCauseType.UPDATEGROUP;
 import static io.agora.education.classroom.bean.group.RoomGroupInfo.GROUPS;
 import static io.agora.education.classroom.bean.group.RoomGroupInfo.GROUPSTATES;
 import static io.agora.education.classroom.bean.group.RoomGroupInfo.GROUPUUID;
@@ -412,59 +412,6 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
         if (roomGroupInfo.isEnableGroup()) {
             /*开启了分组，需要分组显示学生列表*/
             switchUserFragment(true);
-            //TODO 显示分组列表
-//            /**测试代码*/
-//            List<GroupInfo> groupInfos = new ArrayList<>();
-//            List<List<String>> memberUuidsList = new ArrayList<>();
-//            List<String> memberIds = null;
-//            for (int i = 0; i < 36; i++) {
-//                if (i % 6 == 0) {
-//                    memberIds = new ArrayList<>();
-//                }
-//                if (i == 0) {
-//                    memberIds.add("1232");
-//                }
-//                memberIds.add("999" + i);
-//                if (memberIds.size() == 6) {
-//                    memberUuidsList.add(memberIds);
-//                }
-//            }
-//            for (int i = 0; i < 6; i++) {
-//                GroupInfo groupInfo = new GroupInfo("123-" + i, "组" + i, memberUuidsList.get(i), "0",
-//                        new HashMap<>());
-//                groupInfos.add(groupInfo);
-//            }
-//            /**测试代码*/
-//            roomGroupInfo.setGroups(groupInfos);
-//            getCurAllStudentUser(new EduCallback<List<EduUserInfo>>() {
-//                @Override
-//                public void onSuccess(@Nullable List<EduUserInfo> onlineStudentUsers) {
-//                    List<GroupMemberInfo> allStudent = new ArrayList<>();
-//                    for (int i = 0; i < 35; i++) {
-//                        GroupMemberInfo memberInfo = new GroupMemberInfo("999" + i, "学" + i, "", 0);
-//                        for (EduUserInfo userInfo : onlineStudentUsers) {
-//                            if (userInfo.getUserUuid().equals(memberInfo.getUuid())) {
-//                                memberInfo.setOnline(true);
-//                            }
-//                        }
-//                        allStudent.add(memberInfo);
-//                    }
-//                    GroupMemberInfo memberInfo = new GroupMemberInfo("1232", "123", "", 0);
-//                    for (EduUserInfo userInfo : onlineStudentUsers) {
-//                        if (userInfo.getUserUuid().equals(memberInfo.getUuid())) {
-//                            memberInfo.setOnline(true);
-//                        }
-//                    }
-//                    allStudent.add(0, memberInfo);
-//                    /**测试代码*/
-//                    roomGroupInfo.setAllStudent(allStudent);
-//                    studentGroupListFragment.updateGroupList(groupInfos, allStudent);
-//                }
-//
-//                @Override
-//                public void onFailure(@NotNull EduError error) {
-//                }
-//            });
             List<GroupInfo> groupInfos = roomGroupInfo.getGroups();
             List<GroupMemberInfo> allStudent = roomGroupInfo.getAllStudent();
             if (groupInfos != null && groupInfos.size() > 0 && allStudent != null
@@ -493,39 +440,10 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                 }
             }
             /*开启了pk,肯定有一个组整体上台*/
-            List<String> stageMemberIdsOne = stageGroups.get(0).getMembers();
+            List<String> stageMemberIdsOne = stageGroups.size() > 0 ?
+                    stageGroups.get(0).getMembers() : new ArrayList<>();
             final List<String> stageMemberIdsTwo = stageGroups.size() > 1 ?
                     stageGroups.get(1).getMembers() : new ArrayList<>();
-//            /**测试代码*/
-//            List<EduStreamInfo> curFullStreams = new ArrayList<>();
-//            if (roomGroupInfo.getAllStudent() != null) {
-//                for (GroupMemberInfo memberInfo : roomGroupInfo.getAllStudent()) {
-//                    EduBaseUserInfo baseUserInfo = new EduBaseUserInfo(memberInfo.getUuid(),
-//                            memberInfo.getUserName(), EduUserRole.STUDENT);
-//                    EduStreamInfo streamInfo = new EduStreamInfo(memberInfo.getUuid().concat("000"),
-//                            "stream-".concat(memberInfo.getUserName()), VideoSourceType.CAMERA,
-//                            true, true, baseUserInfo);
-//                    curFullStreams.add(streamInfo);
-//                }
-//            }
-//            stageStreamInfosOne.clear();
-//            stageStreamInfosTwo.clear();
-//            if (curFullStreams != null && curFullStreams.size() > 0) {
-//                for (EduStreamInfo stream : curFullStreams) {
-//                    String userUuid = stream.getPublisher().getUserUuid();
-//                    if (stageMemberIdsOne.contains(userUuid)) {
-//                        StageStreamInfo stageStream = new StageStreamInfo(stream,
-//                                roomGroupInfo.getStudentReward(userUuid));
-//                        stageStreamInfosOne.add(stageStream);
-//                    } else if (stageMemberIdsTwo.contains(userUuid)) {
-//                        StageStreamInfo stageStream = new StageStreamInfo(stream,
-//                                roomGroupInfo.getStudentReward(userUuid));
-//                        stageStreamInfosTwo.add(stageStream);
-//                    }
-//                }
-//                notifyStageVideoListOne();
-//                notifyStageVideoListTwo();
-//            }
             getCurFullStream(new EduCallback<List<EduStreamInfo>>() {
                 @Override
                 public void onSuccess(@Nullable List<EduStreamInfo> curFullStreams) {
@@ -639,7 +557,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     @Override
     public void onRemoteUsersInitialized(@NotNull List<? extends EduUserInfo> users, @NotNull EduRoom classRoom) {
         if (classRoom.equals(getMainEduRoom())) {
-            initParseBoardInfo(getMainEduRoom());
+            super.onRemoteUsersInitialized(users, classRoom);
             /*获取班级的roomProperties中可能存在的分组信息*/
             Map<String, Object> roomProperties = getMainEduRoom().getRoomProperties();
             syncRoomGroupProperty(roomProperties);
@@ -647,6 +565,8 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
             updateStudentList();
             notifyUserList();
             notifyStageVideoList();
+            /*刷新举手开关状态*/
+            agoraCoVideoView.syncCoVideoSwitchState(roomProperties);
         }
     }
 
@@ -806,45 +726,31 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                 switch (causeType) {
                     case SWITCHGROUP:
                         /*开关分组，*/
-                        notifyUserList();
-                        break;
                     case UPDATEGROUP:
-                        /*分组更新：删除原分组信息*/
+                        /*分组更新*/
+                    case STUDENTLISTCHANGED:
+                        /*学生名单发生变化，刷新名单列表*/
                         notifyUserList();
                         break;
                     case SWITCHINTERACTIN:
                         break;
                     case SWITCHINTERACTOUT:
                         /*开关PK，刷新分组列表*/
+                    case GROUOREWARD:
+                        /*整组奖励，刷新分组列表*/
+                    case STUDENTREWARD:
+                        /*学生个人奖励，刷新分组列表*/
                         notifyUserList();
                         notifyStageVideoList();
                         break;
                     case GROUPMEDIA:
                         /*开关整组音频*/
                         break;
-                    case GROUOREWARD:
-                        /*整组奖励，刷新分组列表*/
-                        String groupUuid = String.valueOf(cause.get(GROUPUUID));
-                        roomGroupInfo.updateRewardByGroup(groupUuid);
-                        notifyUserList();
-                        notifyStageVideoList();
-                        break;
                     case SWITCHCOVIDEO:
                     case SWITCHAUTOCOVIDEO:
                         /*同步举手开关的状态至coVideoView*/
                         parseAgoraActionConfig(getMainEduRoom());
                         agoraCoVideoView.syncCoVideoSwitchState(roomProperties);
-                        break;
-                    case STUDENTLISTCHANGED:
-                        /*学生名单发生变化，刷新名单列表*/
-                        notifyUserList();
-                        break;
-                    case STUDENTREWARD:
-                        /*学生个人奖励，刷新分组列表*/
-                        String userUuid = String.valueOf(cause.get(USERUUID));
-                        roomGroupInfo.updateRewardByUser(userUuid);
-                        notifyUserList();
-                        notifyStageVideoList();
                         break;
                     default:
                         break;

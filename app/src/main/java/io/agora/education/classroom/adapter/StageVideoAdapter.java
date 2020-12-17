@@ -95,7 +95,7 @@ public class StageVideoAdapter extends BaseQuickAdapter<StageStreamInfo, StageVi
     protected void convert(@NonNull ViewHolder viewHolder, StageStreamInfo item) {
         viewHolder.convert(item);
         BaseClassActivity_bak activity = ((BaseClassActivity_bak) viewHolder.view.getContext());
-        if(item.getStreamInfo().getHasVideo())
+        if (item.getStreamInfo().getHasVideo())
             activity.renderStream(activity.getMainEduRoom(), item.getStreamInfo(),
                     viewHolder.view.getVideoLayout());
     }

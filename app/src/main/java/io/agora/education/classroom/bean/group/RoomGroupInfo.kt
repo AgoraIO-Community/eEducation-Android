@@ -85,7 +85,7 @@ class RoomGroupInfo() {
                     /*单独判断当前用户是否在线*/
                     memberInfo.online = onlineUserIds.contains(memberInfo.uuid)
                 }
-                memberInfo.reward = getGroupReward(memberInfo.uuid)
+//                memberInfo.reward += getGroupReward(memberInfo.uuid)
                 allStudent!!.add(memberInfo)
             }
         }

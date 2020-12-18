@@ -39,6 +39,10 @@ public class PeerMsg extends JsonBean {
         return data;
     }
 
+    public String getDataJson() {
+        return new Gson().toJson(data);
+    }
+
     public void setData(Object data) {
         this.data = data;
     }
@@ -72,8 +76,12 @@ public class PeerMsg extends JsonBean {
          */
         int CO_VIDEO = 1;
         /**
-         * teacher invite student
-         * */
+         * 申请/邀请消息
+         */
+        int ApplyInviteActionCMD = 1;
+        /**
+         * teacher open student`s media
+         */
         int UnMutePeerCMD = 10;
     }
 

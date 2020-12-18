@@ -66,6 +66,7 @@ import io.agora.education.classroom.bean.group.GroupMemberInfo;
 import io.agora.education.classroom.bean.group.GroupStateInfo;
 import io.agora.education.classroom.bean.group.RoomGroupInfo;
 import io.agora.education.classroom.bean.group.StageStreamInfo;
+import io.agora.education.classroom.bean.msg.AgoraActionResBody;
 import io.agora.education.classroom.bean.msg.PeerMsg;
 import io.agora.education.classroom.fragment.StudentGroupListFragment;
 import io.agora.education.classroom.fragment.StudentListFragment;
@@ -95,10 +96,11 @@ import static io.agora.education.classroom.bean.group.RoomGroupInfo.GROUPSTATES;
 import static io.agora.education.classroom.bean.group.RoomGroupInfo.GROUPUUID;
 import static io.agora.education.classroom.bean.group.RoomGroupInfo.INTERACTOUTGROUPS;
 import static io.agora.education.classroom.bean.group.RoomGroupInfo.STUDENTS;
-import static io.agora.education.classroom.bean.group.RoomGroupInfo.USERUUID;
 import static io.agora.agoraactionprocess.AgoraActionType.AgoraActionTypeApply;
 import static io.agora.agoraactionprocess.AgoraActionType.AgoraActionTypeCancel;
+import static io.agora.education.classroom.bean.group.RoomGroupInfo.USERUUID;
 import static io.agora.education.classroom.bean.msg.PeerMsg.Cmd.UnMutePeerCMD;
+import static io.agora.education.classroom.bean.msg.PeerMsg.Cmd.ApplyInviteActionCMD;
 
 public class MediumClassActivity extends BaseClassActivity_bak implements TabLayout.OnTabSelectedListener,
         AgoraCoVideoListener {
@@ -425,6 +427,35 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
         }
     }
 
+    private void notifyStageVideoByReward(String uuid, boolean isGroup) {
+        if (isGroup) {
+            /*个人奖励*/
+            List<String> stageUuidsOne = new ArrayList<>();
+            for (StageStreamInfo stream : stageStreamInfosOne) {
+                stageUuidsOne.add(stream.getStreamInfo().getPublisher().getUserUuid());
+            }
+            if (stageUuidsOne.contains(uuid)) {
+                /*刷新stageOne*/
+            } else {
+                List<String> stageUuidsTwo = new ArrayList<>();
+                for (StageStreamInfo stream : stageStreamInfosTwo) {
+                    stageUuidsTwo.add(stream.getStreamInfo().getPublisher().getUserUuid());
+                    /*刷新stageOne*/
+                }
+            }
+        } else {
+            /*整组奖励*/
+            List<String> stageGroupIds = roomGroupInfo.getInteractOutGroups();
+            if (stageGroupIds != null && stageGroupIds.size() > 0) {
+                if (stageGroupIds.get(0).equals(uuid)) {
+                    /*奖励属于stageOne*/
+                } else if (stageGroupIds.size() > 1 && stageGroupIds.get(1).equals(uuid)) {
+                    /*奖励属于stageTwo*/
+                }
+            }
+        }
+    }
+
     private void notifyStageVideoList() {
         stageStreamInfosOne.clear();
         stageStreamInfosTwo.clear();
@@ -452,10 +483,12 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                             String userUuid = stream.getPublisher().getUserUuid();
                             if (stageMemberIdsOne.contains(userUuid)) {
                                 StageStreamInfo stageStream = new StageStreamInfo(stream,
+                                        stageGroupIds.get(0),
                                         roomGroupInfo.getStudentReward(userUuid));
                                 stageStreamInfosOne.add(stageStream);
                             } else if (stageMemberIdsTwo.contains(userUuid)) {
                                 StageStreamInfo stageStream = new StageStreamInfo(stream,
+                                        stageGroupIds.get(1),
                                         roomGroupInfo.getStudentReward(userUuid));
                                 stageStreamInfosTwo.add(stageStream);
                             }
@@ -508,7 +541,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
             if (curStageStreams != null && curStageStreams.size() > 0) {
                 for (EduStreamInfo stream : curStageStreams) {
                     String userUuid = stream.getPublisher().getUserUuid();
-                    StageStreamInfo stageStream = new StageStreamInfo(stream,
+                    StageStreamInfo stageStream = new StageStreamInfo(stream, null,
                             roomGroupInfo.getStudentReward(userUuid));
                     stageStreamInfosOne.add(stageStream);
                 }
@@ -736,10 +769,16 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                         break;
                     case SWITCHINTERACTOUT:
                         /*开关PK，刷新分组列表*/
+                        notifyUserList();
+                        notifyStageVideoList();
                     case GROUOREWARD:
                         /*整组奖励，刷新分组列表*/
+                        String groupUUid = String.valueOf(cause.get(GROUPUUID));
+                        notifyUserList();
+                        notifyStageVideoList();
                     case STUDENTREWARD:
                         /*学生个人奖励，刷新分组列表*/
+                        String userUuid = String.valueOf(cause.get(USERUUID));
                         notifyUserList();
                         notifyStageVideoList();
                         break;
@@ -826,13 +865,12 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                             AgoraCoVideoAction.class);
                     confirmInvite(action);
                 }
-            } else if (jsonObject.has("action") && jsonObject.has("processUuid")) {
+            } else if (jsonObject.has("cmd") && jsonObject.has("data")) {
                 /**举手的回调结果*/
-//                AgoraActionResBody body = new Gson().fromJson(msg, AgoraActionResBody.class);
-//                if (body.getCmd() == ApplyInviteActionCMD) {
-//                    actionProcessManager.parseActionMsg(body.getDataJson());
-//                }
-                actionProcessManager.parseActionMsg(msg);
+                PeerMsg peerMsg = new Gson().fromJson(msg, PeerMsg.class);
+                if (peerMsg.getCmd() == ApplyInviteActionCMD) {
+                    actionProcessManager.parseActionMsg(peerMsg.getDataJson());
+                }
             }
         }
         catch (Exception e) {

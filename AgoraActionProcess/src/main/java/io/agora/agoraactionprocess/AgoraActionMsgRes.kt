@@ -6,7 +6,7 @@ class AgoraActionMsgRes(
         val action: Int = AgoraActionType.AgoraActionTypeApply.value,
         val processUuid: String,
         val fromUserUuid: String,
-        val payload: Map<String, Any>?
+        private val payload: Map<String, Any>?
 ) {
 
     fun getPayloadJson(): String {

@@ -79,7 +79,7 @@ public class StageVideoView extends ConstraintLayout {
 
     public void enableVideo(boolean enable) {
         post(() -> {
-            layout_place_holder.setVisibility(enable?GONE:VISIBLE);
+            layout_place_holder.setVisibility(enable ? GONE : VISIBLE);
         });
     }
 
@@ -103,7 +103,7 @@ public class StageVideoView extends ConstraintLayout {
      * 显示奖励动画
      */
     public void showRewardAnim() {
-        rewardAnimImageView.setVisibility(GONE);
+        rewardAnimImageView.setVisibility(VISIBLE);
         Glide.with(getContext()).asGif().skipMemoryCache(true)
                 .load(R.drawable.img_reward_anim).listener(new RequestListener<GifDrawable>() {
             @Override

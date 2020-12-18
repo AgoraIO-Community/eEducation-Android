@@ -27,8 +27,8 @@
         android:id="@+id/view_bg_info"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_20"
-        android:background="@color/black"
         android:alpha="0.4"
+        android:background="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -46,9 +46,9 @@
     <io.agora.education.classroom.widget.StageAudioView
         android:id="@+id/ic_audio"
         android:layout_width="@dimen/dp_20"
-        android:visibility="gone"
         android:layout_height="@dimen/dp_20"
         android:layout_marginStart="@dimen/dp_8"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/tv_name"
         app:layout_constraintStart_toEndOf="@id/tv_name"
         app:layout_constraintTop_toTopOf="@id/tv_name" />
@@ -58,21 +58,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ellipsize="end"
-        android:visibility="gone"
         android:maxEms="2"
         android:singleLine="true"
-        android:text="9"
+        android:text="0"
         android:textColor="@color/white"
         android:textSize="@dimen/dp_12"
         app:layout_constraintBottom_toBottomOf="@id/view_bg_info"
         app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="@dimen/dp_1"
         app:layout_constraintTop_toTopOf="@id/view_bg_info" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/integral_ImageView"
-        android:layout_width="@dimen/dp_20"
-        android:layout_height="@dimen/dp_20"
+        android:layout_width="@dimen/dp_14"
+        android:layout_height="@dimen/dp_14"
         android:layout_marginEnd="@dimen/dp_2"
+        android:src="@drawable/ic_integral_1"
         app:layout_constraintBottom_toBottomOf="@id/view_bg_info"
         app:layout_constraintEnd_toStartOf="@id/reward_TextView"
         app:layout_constraintTop_toTopOf="@id/view_bg_info" />

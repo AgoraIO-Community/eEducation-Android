@@ -20,7 +20,7 @@ interface AgoraActionService {
             @Path("processUuid") processUuid: String
     ): Call<ResponseBody<String>>
 
-    @POST("/invitation/apps/{appId}/v1/rooms/{roomUuid}/users/{toUserUuid}/process/{processUuid}")
+    @POST("/invitation/apps/{appId}/v2/rooms/{roomUuid}/users/{toUserUuid}/process/{processUuid}")
     fun startAgoraAction(
             @Path("appId") appId: String,
             @Path("roomUuid") roomUuid: String,
@@ -30,7 +30,7 @@ interface AgoraActionService {
     ): Call<ResponseBody<String>>
 
 
-    @HTTP(method = "DELETE", path = "/invitation/apps/{appId}/v1/rooms/{roomUuid}/users/{toUserUuid}/process/{processUuid}", hasBody = true)
+    @HTTP(method = "DELETE", path = "/invitation/apps/{appId}/v2/rooms/{roomUuid}/users/{toUserUuid}/process/{processUuid}", hasBody = true)
     fun stopAgoraAction(
             @Path("appId") appId: String,
             @Path("roomUuid") roomUuid: String,

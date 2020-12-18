@@ -9,6 +9,8 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.chad.library.adapter.base.listener.OnItemChildClickListener;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +28,20 @@ public class StudentListAdapter extends RecyclerView.Adapter<StudentListAdapter.
         return students;
     }
 
-    public StudentListAdapter() {
+    private String localUserUuid;
+
+    private OnItemChildClickListener onItemChildClickListener;
+
+    public StudentListAdapter(String localUserUuid) {
+        this.localUserUuid = localUserUuid;
+    }
+
+    public void setOnItemChildClickListener(OnItemChildClickListener onItemChildClickListener) {
+        this.onItemChildClickListener = onItemChildClickListener;
+    }
+
+    public void updateLocalUserUuid(String userUuid) {
+        localUserUuid = userUuid;
     }
 
     @NonNull
@@ -41,8 +56,29 @@ public class StudentListAdapter extends RecyclerView.Adapter<StudentListAdapter.
         GroupMemberInfo memberInfo = students.get(position);
 //        holder.textView.setText(memberInfo.getUserName() + (memberInfo.getOnline()?"":R.string.offline_state));
         holder.textView.setText(memberInfo.getUserName());
-        holder.muteAudio.setSelected(memberInfo.getEnableAudio());
-        holder.muteVideo.setSelected(memberInfo.getEnableVideo());
+        if (memberInfo.getUuid().equals(localUserUuid) && memberInfo.getOnStage()) {
+            holder.muteAudio.setImageResource(R.drawable.ic_audio_green);
+            holder.muteVideo.setImageResource(R.drawable.ic_video_green);
+            holder.muteAudio.setClickable(true);
+            holder.muteVideo.setClickable(true);
+            holder.muteAudio.setOnClickListener(v -> {
+                if (onItemChildClickListener != null) {
+                    onItemChildClickListener.onItemChildClick(null, holder.muteAudio, position);
+                }
+            });
+            holder.muteVideo.setOnClickListener(v -> {
+                if (onItemChildClickListener != null) {
+                    onItemChildClickListener.onItemChildClick(null, holder.muteVideo, position);
+                }
+            });
+        } else {
+            holder.muteAudio.setImageResource(R.drawable.ic_audio_gray);
+            holder.muteVideo.setImageResource(R.drawable.ic_video_gray);
+            holder.muteAudio.setClickable(false);
+            holder.muteVideo.setClickable(false);
+        }
+        holder.muteAudio.setSelected(memberInfo.getOnStage() && memberInfo.getEnableAudio());
+        holder.muteVideo.setSelected(memberInfo.getOnStage() && memberInfo.getEnableVideo());
     }
 
     @Override

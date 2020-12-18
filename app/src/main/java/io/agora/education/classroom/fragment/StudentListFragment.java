@@ -1,8 +1,12 @@
 package io.agora.education.classroom.fragment;
 
 import android.text.TextUtils;
+import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.listener.OnItemChildClickListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,10 +16,11 @@ import butterknife.BindView;
 import io.agora.education.R;
 import io.agora.education.api.user.data.EduUserInfo;
 import io.agora.education.base.BaseFragment;
+import io.agora.education.classroom.BaseClassActivity_bak;
 import io.agora.education.classroom.adapter.StudentListAdapter;
 import io.agora.education.classroom.bean.group.GroupMemberInfo;
 
-public class StudentListFragment extends BaseFragment {
+public class StudentListFragment extends BaseFragment implements OnItemChildClickListener {
     private static final String TAG = StudentListFragment.class.getSimpleName();
 
     @BindView(R.id.rcv_students)
@@ -38,7 +43,8 @@ public class StudentListFragment extends BaseFragment {
 
     @Override
     protected void initData() {
-        studentListAdapter = new StudentListAdapter();
+        studentListAdapter = new StudentListAdapter(localUserUuid);
+        studentListAdapter.setOnItemChildClickListener(this);
     }
 
     @Override
@@ -46,8 +52,9 @@ public class StudentListFragment extends BaseFragment {
         rcvStudents.setAdapter(studentListAdapter);
     }
 
-    public void setLocalUserUuid(String userUuid) {
+    public void updateLocalUserUuid(String userUuid) {
         localUserUuid = userUuid;
+        studentListAdapter.updateLocalUserUuid(userUuid);
     }
 
     public void updateStudentList(List<GroupMemberInfo> allStudent) {
@@ -65,8 +72,8 @@ public class StudentListFragment extends BaseFragment {
                     }
                 }
             }
-            for(GroupMemberInfo memberInfo : allStudent){
-                if(memberInfo.getOnline()){
+            for (GroupMemberInfo memberInfo : allStudent) {
+                if (memberInfo.getOnline()) {
                     onlineStudents.add(memberInfo);
                 }
             }
@@ -76,6 +83,23 @@ public class StudentListFragment extends BaseFragment {
                 }, 300);
             } else {
                 rcvStudents.post(() -> studentListAdapter.updateStudentList(onlineStudents));
+            }
+        }
+    }
+
+    @Override
+    public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+        if (context instanceof BaseClassActivity_bak) {
+            boolean isSelected = view.isSelected();
+            switch (view.getId()) {
+                case R.id.iv_btn_mute_audio:
+                    ((BaseClassActivity_bak) context).muteLocalAudio(isSelected);
+                    break;
+                case R.id.iv_btn_mute_video:
+                    ((BaseClassActivity_bak) context).muteLocalVideo(isSelected);
+                    break;
+                default:
+                    break;
             }
         }
     }

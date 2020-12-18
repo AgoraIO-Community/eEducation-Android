@@ -404,59 +404,6 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
         if (roomGroupInfo.isEnableGroup()) {
             /*开启了分组，需要分组显示学生列表*/
             switchUserFragment(true);
-            //TODO 显示分组列表
-//            /**测试代码*/
-//            List<GroupInfo> groupInfos = new ArrayList<>();
-//            List<List<String>> memberUuidsList = new ArrayList<>();
-//            List<String> memberIds = null;
-//            for (int i = 0; i < 36; i++) {
-//                if (i % 6 == 0) {
-//                    memberIds = new ArrayList<>();
-//                }
-//                if (i == 0) {
-//                    memberIds.add("1232");
-//                }
-//                memberIds.add("999" + i);
-//                if (memberIds.size() == 6) {
-//                    memberUuidsList.add(memberIds);
-//                }
-//            }
-//            for (int i = 0; i < 6; i++) {
-//                GroupInfo groupInfo = new GroupInfo("123-" + i, "组" + i, memberUuidsList.get(i), "0",
-//                        new HashMap<>());
-//                groupInfos.add(groupInfo);
-//            }
-//            /**测试代码*/
-//            roomGroupInfo.setGroups(groupInfos);
-//            getCurAllStudentUser(new EduCallback<List<EduUserInfo>>() {
-//                @Override
-//                public void onSuccess(@Nullable List<EduUserInfo> onlineStudentUsers) {
-//                    List<GroupMemberInfo> allStudent = new ArrayList<>();
-//                    for (int i = 0; i < 35; i++) {
-//                        GroupMemberInfo memberInfo = new GroupMemberInfo("999" + i, "学" + i, "", 0);
-//                        for (EduUserInfo userInfo : onlineStudentUsers) {
-//                            if (userInfo.getUserUuid().equals(memberInfo.getUuid())) {
-//                                memberInfo.setOnline(true);
-//                            }
-//                        }
-//                        allStudent.add(memberInfo);
-//                    }
-//                    GroupMemberInfo memberInfo = new GroupMemberInfo("1232", "123", "", 0);
-//                    for (EduUserInfo userInfo : onlineStudentUsers) {
-//                        if (userInfo.getUserUuid().equals(memberInfo.getUuid())) {
-//                            memberInfo.setOnline(true);
-//                        }
-//                    }
-//                    allStudent.add(0, memberInfo);
-//                    /**测试代码*/
-//                    roomGroupInfo.setAllStudent(allStudent);
-//                    studentGroupListFragment.updateGroupList(groupInfos, allStudent);
-//                }
-//
-//                @Override
-//                public void onFailure(@NotNull EduError error) {
-//                }
-//            });
             List<GroupInfo> groupInfos = roomGroupInfo.getGroups();
             List<GroupMemberInfo> allStudent = roomGroupInfo.getAllStudent();
             if (groupInfos != null && groupInfos.size() > 0 && allStudent != null
@@ -868,6 +815,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
         roomGroupInfo.membersOnStage(Collections.singletonList(streamEvent));
         updateLocalStreamInfo(streamEvent);
         notifyStageVideoList();
+        notifyUserList();
     }
 
     @Override
@@ -876,6 +824,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
         roomGroupInfo.membersOnStage(Collections.singletonList(streamEvent));
         updateLocalStreamInfo(streamEvent);
         notifyStageVideoList();
+        notifyUserList();
     }
 
     @Override
@@ -887,6 +836,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
         roomGroupInfo.membersOffStage(Collections.singletonList(streamEvent));
         notifyStageVideoList();
         updateLocalStreamInfo(streamEvent);
+        notifyUserList();
     }
 
     @Override

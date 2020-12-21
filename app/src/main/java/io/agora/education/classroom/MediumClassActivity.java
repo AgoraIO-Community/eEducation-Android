@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
+import io.agora.agoraactionprocess.AgoraActionWaitACK;
 import io.agora.agoraactionprocess.AgoraStartActionOptions;
 import io.agora.agoraactionprocess.AgoraStopActionOptions;
 import io.agora.base.callback.ThrowableCallback;
@@ -99,6 +100,8 @@ import static io.agora.education.classroom.bean.group.RoomGroupInfo.USERUUID;
 import static io.agora.agoraactionprocess.AgoraActionType.AgoraActionTypeApply;
 import static io.agora.agoraactionprocess.AgoraActionType.AgoraActionTypeCancel;
 import static io.agora.education.classroom.bean.msg.PeerMsg.Cmd.UnMutePeerCMD;
+import static io.agora.agoraactionprocess.AgoraActionWaitACK.DISABLE;
+import static io.agora.agoraactionprocess.AgoraActionWaitACK.ENABLE;
 
 public class MediumClassActivity extends BaseClassActivity_bak implements TabLayout.OnTabSelectedListener,
         AgoraCoVideoListener {
@@ -784,6 +787,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     @Override
     public void onLocalStreamAdded(@NotNull EduStreamEvent streamEvent) {
         super.onLocalStreamAdded(streamEvent);
+        agoraCoVideoView.onLinkMediaChanged(true);
         roomGroupInfo.membersOnStage(Collections.singletonList(streamEvent));
         updateLocalStreamInfo(streamEvent);
         notifyStageVideoList();
@@ -793,6 +797,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     @Override
     public void onLocalStreamUpdated(@NotNull EduStreamEvent streamEvent) {
         super.onLocalStreamUpdated(streamEvent);
+        agoraCoVideoView.onLinkMediaChanged(true);
         roomGroupInfo.membersOnStage(Collections.singletonList(streamEvent));
         updateLocalStreamInfo(streamEvent);
         notifyStageVideoList();
@@ -962,7 +967,8 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                                                             roomInfo.getRoomName())).toMap();
                                             AgoraStopActionOptions options = new AgoraStopActionOptions(
                                                     teacher.getUserUuid(), config.processUuid,
-                                                    AgoraActionTypeCancel.getValue(), info.getUserUuid(), payload);
+                                                    AgoraActionTypeCancel.getValue(), info.getUserUuid(),
+                                                    payload, DISABLE.getValue());
                                             actionProcessManager.stopAgoraAction(options, new ThrowableCallback<ResponseBody<String>>() {
                                                 @Override
                                                 public void onSuccess(@Nullable ResponseBody<String> res) {

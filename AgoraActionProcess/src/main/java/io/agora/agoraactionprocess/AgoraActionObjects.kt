@@ -54,6 +54,11 @@ class AgoraStopActionOptions(
         val processUuid: String,
         val action: Int = AgoraActionType.AgoraActionTypeAccept.value,
         val fromUserUuid: String?,
-        var payload: Map<String, Any>?) {
+        var payload: Map<String, Any>?,
+        var waitAck: Int = AgoraActionWaitACK.DISABLE.value) {
 }
 
+enum class AgoraActionWaitACK(val value: Int) {
+    DISABLE(0),
+    ENABLE(1)
+}

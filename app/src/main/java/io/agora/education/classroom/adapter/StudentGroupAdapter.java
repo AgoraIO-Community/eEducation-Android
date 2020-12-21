@@ -40,9 +40,8 @@ public class StudentGroupAdapter extends RecyclerView.Adapter<StudentGroupAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         GroupInfo groupInfo = groupInfoList.get(position);
-        String content = String.format(holder.itemView.getContext().getString(R.string.groupname),
-                groupInfo.getGroupName(), groupInfo.getMembers().size());
-        holder.groupNameTextView.setText(content);
+        holder.groupNameTextView.setText(groupInfo.getGroupName());
+        holder.coVideoing.setVisibility(groupInfo.getOnStage() ? View.VISIBLE : View.GONE);
         List<GroupMemberInfo> curGroupMembers = new ArrayList<>();
         for (GroupMemberInfo memberInfo : allMemberList) {
             if (groupInfo.getMembers().contains(memberInfo.getUuid())) {

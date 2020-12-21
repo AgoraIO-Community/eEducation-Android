@@ -42,6 +42,7 @@ class RoomGroupInfo() {
         }
     }
 
+    /**须在updateInteractOutGroups字后调用，保证整组上台状态的正确*/
     fun updateGroups(data: MutableMap<String, GroupInfo>?) {
         if (data != null) {
             groups = mutableListOf()
@@ -50,6 +51,11 @@ class RoomGroupInfo() {
                 val element = iterable.next()
                 val groupInfo = element.value
                 groupInfo.groupUuid = element.key
+                if (interactOutGroups == null) {
+                    groupInfo.onStage = false
+                } else {
+                    groupInfo.onStage = interactOutGroups!!.contains(groupInfo.groupUuid)
+                }
                 groups!!.add(groupInfo)
             }
         } else {

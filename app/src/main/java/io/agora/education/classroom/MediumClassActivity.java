@@ -100,6 +100,8 @@ import static io.agora.agoraactionprocess.AgoraActionType.AgoraActionTypeCancel;
 import static io.agora.education.classroom.bean.group.RoomGroupInfo.USERUUID;
 import static io.agora.education.classroom.bean.msg.PeerMsg.Cmd.UnMutePeerCMD;
 import static io.agora.education.classroom.bean.msg.PeerMsg.Cmd.ApplyInviteActionCMD;
+import static io.agora.agoraactionprocess.AgoraActionWaitACK.DISABLE;
+import static io.agora.agoraactionprocess.AgoraActionWaitACK.ENABLE;
 
 public class MediumClassActivity extends BaseClassActivity_bak implements TabLayout.OnTabSelectedListener,
         AgoraCoVideoListener {
@@ -1002,7 +1004,8 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                                                             roomInfo.getRoomName())).toMap();
                                             AgoraStopActionOptions options = new AgoraStopActionOptions(
                                                     teacher.getUserUuid(), config.processUuid,
-                                                    AgoraActionTypeCancel.getValue(), info.getUserUuid(), payload);
+                                                    AgoraActionTypeCancel.getValue(), info.getUserUuid(),
+                                                    payload, DISABLE.getValue());
                                             actionProcessManager.stopAgoraAction(options, new ThrowableCallback<ResponseBody<String>>() {
                                                 @Override
                                                 public void onSuccess(@Nullable ResponseBody<String> res) {

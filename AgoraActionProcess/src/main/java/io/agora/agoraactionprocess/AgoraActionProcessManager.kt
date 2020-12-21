@@ -47,24 +47,28 @@ class AgoraActionProcessManager(
     fun parseActionMsg(msgRes: String) {
         val actionMsgRes = Gson().fromJson<AgoraActionMsgRes>(msgRes, AgoraActionMsgRes::class.java)
         actionMsgRes?.let {
-            when (actionMsgRes.action) {
-                AgoraActionType.AgoraActionTypeApply.value -> {
-                    actionListener?.onApply(actionMsgRes)
-                }
-                AgoraActionType.AgoraActionTypeInvitation.value -> {
-                    actionListener?.onInvite(actionMsgRes)
-                }
-                AgoraActionType.AgoraActionTypeAccept.value -> {
-                    actionListener?.onAccept(actionMsgRes)
-                }
-                AgoraActionType.AgoraActionTypeReject.value -> {
-                    actionListener?.onReject(actionMsgRes)
-                }
-                AgoraActionType.AgoraActionTypeCancel.value -> {
-                    actionListener?.onCancel(actionMsgRes)
-                }
-                else -> {
-                    Log.e(TAG, "invalid action!")
+            actionMsgRes.payload?.let {
+                if (it.containsKey("action")) {
+                    when ((it.getValue("action") as Double).toInt()) {
+                        AgoraActionType.AgoraActionTypeApply.value -> {
+                            actionListener?.onApply(actionMsgRes)
+                        }
+                        AgoraActionType.AgoraActionTypeInvitation.value -> {
+                            actionListener?.onInvite(actionMsgRes)
+                        }
+                        AgoraActionType.AgoraActionTypeAccept.value -> {
+                            actionListener?.onAccept(actionMsgRes)
+                        }
+                        AgoraActionType.AgoraActionTypeReject.value -> {
+                            actionListener?.onReject(actionMsgRes)
+                        }
+                        AgoraActionType.AgoraActionTypeCancel.value -> {
+                            actionListener?.onCancel(actionMsgRes)
+                        }
+                        else -> {
+                            Log.e(TAG, "invalid action!")
+                        }
+                    }
                 }
             }
         }

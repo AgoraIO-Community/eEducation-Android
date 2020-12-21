@@ -836,7 +836,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                             AgoraCoVideoAction.class);
                     confirmInvite(action);
                 }
-            } else if (jsonObject.has("action") && jsonObject.has("processUuid")) {
+            } else if (jsonObject.has("fromUserUuid") && jsonObject.has("processUuid")) {
                 /**举手的回调结果*/
 //                AgoraActionResBody body = new Gson().fromJson(msg, AgoraActionResBody.class);
 //                if (body.getCmd() == ApplyInviteActionCMD) {

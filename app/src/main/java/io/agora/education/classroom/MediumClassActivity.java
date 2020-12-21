@@ -118,8 +118,6 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     private RtcVideoView videoTeacher;
     private StudentListFragment studentListFragment;
     private StudentGroupListFragment studentGroupListFragment;
-    /*分组讨论时，本地用户所处的小组房间对象*/
-    private EduRoom curGroupRoom;
     /*当前班级的分组情况*/
     private RoomGroupInfo roomGroupInfo = new RoomGroupInfo();
     private StageVideoAdapter stageVideoAdapterOne = new StageVideoAdapter(),
@@ -329,32 +327,6 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
 
             @Override
             public void onFailure(@NotNull EduError error) {
-            }
-        });
-    }
-
-    private void getCurAllStudentUser(EduCallback<List<EduUserInfo>> callback) {
-        getCurFullUser(new EduCallback<List<EduUserInfo>>() {
-            @Override
-            public void onSuccess(@Nullable List<EduUserInfo> res) {
-                if (res != null) {
-                    List<EduUserInfo> students = new ArrayList<>();
-                    Iterator<EduUserInfo> iterator = res.iterator();
-                    while (iterator.hasNext()) {
-                        EduUserInfo element = iterator.next();
-                        if (element.getRole().equals(EduUserRole.STUDENT)) {
-                            students.add(element);
-                        }
-                    }
-                    callback.onSuccess(students);
-                } else {
-                    callback.onFailure(EduError.Companion.customMsgError("current room no user!"));
-                }
-            }
-
-            @Override
-            public void onFailure(@NotNull EduError error) {
-                callback.onFailure(error);
             }
         });
     }

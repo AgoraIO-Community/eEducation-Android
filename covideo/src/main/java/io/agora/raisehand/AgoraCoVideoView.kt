@@ -36,7 +36,7 @@ class AgoraCoVideoView : LinearLayout {
     private lateinit var session: StudentCoVideoSession
     private var initialized = false
     private var countDownTexts: Array<String> = arrayOf("4", "3", "2", "1", "0")
-    private var handImgs: Array<Int> = arrayOf(R.drawable.ic_hand_up, R.drawable.ic_hand_down)
+    private var handImgs: Array<Int> = arrayOf(R.drawable.ic_handup, R.drawable.ic_handup_x, R.drawable.ic_handup_gray)
     private var coVideoListener: AgoraCoVideoListener? = null
 
     /*举手倒计时*/
@@ -253,7 +253,7 @@ class AgoraCoVideoView : LinearLayout {
             session.onLinkMediaChanged(true)
             /*允许举手即上台，直接回调允许上台接口*/
             coVideoListener?.onCoVideoAccepted()
-            post { handImg.setImageResource(handImgs[1]) }
+            post { handImg.setImageResource(handImgs[2]) }
             return
         }
         coVideoListener?.onCoVideoApply()
@@ -281,7 +281,7 @@ class AgoraCoVideoView : LinearLayout {
      * @param onStage 举手(连麦)请求是否被允许*/
     fun onLinkMediaChanged(onStage: Boolean) {
         session.onLinkMediaChanged(onStage)
-        post { handImg.setImageResource(if (session.isCoVideoing()) handImgs[1] else handImgs[0]) }
+        post { handImg.setImageResource(if (session.isCoVideoing()) handImgs[2] else handImgs[0]) }
     }
 
     fun abortCoVideoing() {

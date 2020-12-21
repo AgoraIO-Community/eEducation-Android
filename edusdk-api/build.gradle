@@ -26,8 +26,7 @@ android {
 
         /**可配置项*/
         buildConfigField 'String', 'SDK_VERSION', '"102"'
-        buildConfigField 'String', 'API_BASE_URL', '"http://api-solutions-dev.bj2.agoralab.co"'
-//        buildConfigField 'String', 'API_BASE_URL', '"https://api.agora.io"'
+        buildConfigField 'String', 'API_BASE_URL', '"https://api.agora.io"'
     }
 
     sourceSets {

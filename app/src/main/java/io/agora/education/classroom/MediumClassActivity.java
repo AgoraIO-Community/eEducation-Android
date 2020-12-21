@@ -66,7 +66,6 @@ import io.agora.education.classroom.bean.group.GroupMemberInfo;
 import io.agora.education.classroom.bean.group.GroupStateInfo;
 import io.agora.education.classroom.bean.group.RoomGroupInfo;
 import io.agora.education.classroom.bean.group.StageStreamInfo;
-import io.agora.education.classroom.bean.msg.AgoraActionResBody;
 import io.agora.education.classroom.bean.msg.PeerMsg;
 import io.agora.education.classroom.fragment.StudentGroupListFragment;
 import io.agora.education.classroom.fragment.StudentListFragment;
@@ -125,7 +124,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     /*当前班级的分组情况*/
     private RoomGroupInfo roomGroupInfo = new RoomGroupInfo();
     private StageVideoAdapter stageVideoAdapterOne = new StageVideoAdapter(),
-            getStageVideoAdapterTwo = new StageVideoAdapter();
+            stageVideoAdapterTwo = new StageVideoAdapter();
     private List<StageStreamInfo> stageStreamInfosOne = new ArrayList<>();
     private List<StageStreamInfo> stageStreamInfosTwo = new ArrayList<>();
 
@@ -203,7 +202,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
         stageVideosOne.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         stageVideosOne.setAdapter(stageVideoAdapterOne);
         stageVideosTwo.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        stageVideosTwo.setAdapter(getStageVideoAdapterTwo);
+        stageVideosTwo.setAdapter(stageVideoAdapterTwo);
     }
 
     @Override
@@ -428,19 +427,23 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     }
 
     private void notifyStageVideoByReward(String uuid, boolean isGroup) {
-        if (isGroup) {
+        if (!isGroup) {
             /*个人奖励*/
             List<String> stageUuidsOne = new ArrayList<>();
             for (StageStreamInfo stream : stageStreamInfosOne) {
                 stageUuidsOne.add(stream.getStreamInfo().getPublisher().getUserUuid());
             }
             if (stageUuidsOne.contains(uuid)) {
-                /*刷新stageOne*/
+                /*刷新stageOne中的某一个item*/
+                stageVideoAdapterOne.notifyRewardByUser(uuid);
             } else {
                 List<String> stageUuidsTwo = new ArrayList<>();
                 for (StageStreamInfo stream : stageStreamInfosTwo) {
                     stageUuidsTwo.add(stream.getStreamInfo().getPublisher().getUserUuid());
-                    /*刷新stageOne*/
+                }
+                if (stageUuidsTwo.contains(uuid)) {
+                    /*刷新stageTwo中的某一个item*/
+                    stageVideoAdapterTwo.notifyRewardByUser(uuid);
                 }
             }
         } else {
@@ -448,9 +451,11 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
             List<String> stageGroupIds = roomGroupInfo.getInteractOutGroups();
             if (stageGroupIds != null && stageGroupIds.size() > 0) {
                 if (stageGroupIds.get(0).equals(uuid)) {
-                    /*奖励属于stageOne*/
+                    /*奖励属于stageOne,刷新stageOne中部分item*/
+                    stageVideoAdapterOne.notifyRewardByGroup(uuid);
                 } else if (stageGroupIds.size() > 1 && stageGroupIds.get(1).equals(uuid)) {
-                    /*奖励属于stageTwo*/
+                    /*奖励属于stageTwo,刷新整个stageTwo*/
+                    stageVideoAdapterTwo.notifyRewardByGroup(uuid);
                 }
             }
         }
@@ -575,7 +580,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                 if (res != null) {
                     runOnUiThread(() -> {
                         stageVideosTwo.setVisibility(stageStreamInfosTwo.size() > 0 ? View.VISIBLE : View.GONE);
-                        getStageVideoAdapterTwo.setNewList(stageStreamInfosTwo, res.getUserUuid());
+                        stageVideoAdapterTwo.setNewList(stageStreamInfosTwo, res.getUserUuid());
                     });
                 }
             }
@@ -776,11 +781,13 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                         String groupUUid = String.valueOf(cause.get(GROUPUUID));
                         notifyUserList();
                         notifyStageVideoList();
+                        notifyStageVideoByReward(groupUUid, true);
                     case STUDENTREWARD:
                         /*学生个人奖励，刷新分组列表*/
                         String userUuid = String.valueOf(cause.get(USERUUID));
                         notifyUserList();
                         notifyStageVideoList();
+                        notifyStageVideoByReward(userUuid, false);
                         break;
                     case GROUPMEDIA:
                         /*开关整组音频*/

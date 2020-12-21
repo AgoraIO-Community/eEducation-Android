@@ -1,6 +1,7 @@
 package io.agora.education.classroom.adapter;
 
 import android.app.Activity;
+import android.text.TextUtils;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -22,6 +23,7 @@ import io.agora.education.classroom.widget.StageVideoView;
 public class StageVideoAdapter extends BaseQuickAdapter<StageStreamInfo, StageVideoAdapter.ViewHolder> {
 
     private static String localUserUuid;
+    private static String rewardUuid;
 
     public StageVideoAdapter() {
         super(0);
@@ -94,10 +96,21 @@ public class StageVideoAdapter extends BaseQuickAdapter<StageStreamInfo, StageVi
     @Override
     protected void convert(@NonNull ViewHolder viewHolder, StageStreamInfo item) {
         viewHolder.convert(item);
-        BaseClassActivity_bak activity = ((BaseClassActivity_bak) viewHolder.view.getContext());
-        if (item.getStreamInfo().getHasVideo())
-            activity.renderStream(activity.getMainEduRoom(), item.getStreamInfo(),
+        Activity activity = (Activity) viewHolder.view.getContext();
+        if (item.getStreamInfo().getHasVideo() && activity instanceof BaseClassActivity_bak)
+            ((BaseClassActivity_bak) activity).renderStream(
+                    ((BaseClassActivity_bak) activity).getMainEduRoom(), item.getStreamInfo(),
                     viewHolder.view.getVideoLayout());
+        if (!TextUtils.isEmpty(rewardUuid) && !TextUtils.isEmpty(item.getGroupUuid())) {
+            if (item.getGroupUuid().equals(rewardUuid) || item.getStreamInfo().getPublisher()
+                    .getUserUuid().equals(rewardUuid)) {
+                viewHolder.rewardAnim();
+            }
+        }
+        List<StageStreamInfo> streamInfos = getData();
+        if(getItemPosition(item) == streamInfos.size() - 1) {
+            this.rewardUuid = null;
+        }
     }
 
     public void setNewList(@Nullable List<StageStreamInfo> data, String localUserUuid) {
@@ -108,6 +121,23 @@ public class StageVideoAdapter extends BaseQuickAdapter<StageStreamInfo, StageVi
             setNewData(list);
             notifyDataSetChanged();
         });
+    }
+
+    public void notifyRewardByUser(String userUuid) {
+        List<StageStreamInfo> streamInfos = getData();
+        for (int i = 0; i < streamInfos.size(); i++) {
+            String uuid = streamInfos.get(i).getStreamInfo().getPublisher().getUserUuid();
+            if (uuid.equals(userUuid)) {
+                this.rewardUuid = uuid;
+                int finalI = i;
+                ((Activity) getContext()).runOnUiThread(() -> notifyItemChanged(finalI));
+            }
+        }
+    }
+
+    public void notifyRewardByGroup(String groupUuid) {
+        this.rewardUuid = groupUuid;
+        ((Activity) getContext()).runOnUiThread(() -> notifyDataSetChanged());
     }
 
     static class ViewHolder extends BaseViewHolder {
@@ -123,6 +153,10 @@ public class StageVideoAdapter extends BaseQuickAdapter<StageStreamInfo, StageVi
             view.setName(item.getStreamInfo().getPublisher().getUserName());
             view.setReward(item.getReward());
             view.enableVideo(item.getStreamInfo().getHasVideo());
+        }
+
+        public void rewardAnim() {
+            view.showRewardAnim();
         }
     }
 

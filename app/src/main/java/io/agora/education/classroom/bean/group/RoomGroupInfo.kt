@@ -1,6 +1,5 @@
 package io.agora.education.classroom.bean.group
 
-import android.text.TextUtils
 import io.agora.education.api.stream.data.EduStreamEvent
 import io.agora.education.api.stream.data.EduStreamInfo
 import io.agora.education.api.user.data.EduUserInfo
@@ -107,37 +106,6 @@ class RoomGroupInfo() {
         return null
     }
 
-    fun updateRewardByGroup(groupUuid: String) {
-        groups?.forEach {
-            if (it.groupUuid == groupUuid) {
-                val reward = it.reward.toInt() + 1
-                it.reward = reward.toString()
-            }
-        }
-    }
-
-    fun updateRewardByUser(userUuid: String) {
-        allStudent?.forEach {
-            if (it.uuid == userUuid) {
-                it.reward = it.reward + 1
-            }
-        }
-    }
-
-    private fun getGroupReward(userUuid: String): Int {
-        var reward = 0
-        groups?.forEach {
-            if (it.members.contains(userUuid)) {
-                reward = if (TextUtils.isEmpty(it.reward)) {
-                    0
-                } else {
-                    it.reward.toInt()
-                }
-            }
-        }
-        return reward
-    }
-
     /**根据用户的uuid获取用户的奖励*/
     fun getStudentReward(uuid: String): Int {
         var reward = 0
@@ -207,6 +175,23 @@ class RoomGroupInfo() {
         allStudent?.forEach {
             if (it.uuid == userUuid) {
                 return true
+            }
+        }
+        return false
+    }
+
+    /**此学生是否存在于台2上(即student.uuid是否存在于g2的组中)*/
+    fun existInG2(student: GroupMemberInfo): Boolean {
+        if (interactOutGroups != null && interactOutGroups!!.size > 1) {
+            val g2Uuid = interactOutGroups!![1]
+            groups?.forEach {
+                if (it.groupUuid == g2Uuid) {
+                    for (element in it.members) {
+                        if (element == student.uuid) {
+                            return true
+                        }
+                    }
+                }
             }
         }
         return false

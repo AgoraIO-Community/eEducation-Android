@@ -97,6 +97,16 @@ class RoomGroupInfo() {
         }
     }
 
+    /**根据userUuid尝试获取当前所在的组，不属于任何组则返回空*/
+    fun getGroupIdByUser(userUuid: String): String? {
+        groups?.forEach {
+            if (it.members.contains(userUuid)) {
+                return it.groupUuid
+            }
+        }
+        return null
+    }
+
     fun updateRewardByGroup(groupUuid: String) {
         groups?.forEach {
             if (it.groupUuid == groupUuid) {

@@ -101,14 +101,14 @@ public class StageVideoAdapter extends BaseQuickAdapter<StageStreamInfo, StageVi
             ((BaseClassActivity_bak) activity).renderStream(
                     ((BaseClassActivity_bak) activity).getMainEduRoom(), item.getStreamInfo(),
                     viewHolder.view.getVideoLayout());
-        if (!TextUtils.isEmpty(rewardUuid) && !TextUtils.isEmpty(item.getGroupUuid())) {
-            if (item.getGroupUuid().equals(rewardUuid) || item.getStreamInfo().getPublisher()
-                    .getUserUuid().equals(rewardUuid)) {
+        if (!TextUtils.isEmpty(rewardUuid)) {
+            boolean a = !TextUtils.isEmpty(item.getGroupUuid()) && item.getGroupUuid().equals(rewardUuid);
+            if (a || item.getStreamInfo().getPublisher().getUserUuid().equals(rewardUuid)) {
                 viewHolder.rewardAnim();
             }
         }
         List<StageStreamInfo> streamInfos = getData();
-        if(getItemPosition(item) == streamInfos.size() - 1) {
+        if (getItemPosition(item) == streamInfos.size() - 1) {
             this.rewardUuid = null;
         }
     }

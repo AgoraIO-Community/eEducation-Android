@@ -5,7 +5,7 @@ import com.google.gson.Gson
 class AgoraActionMsgRes(
         val action: Int = AgoraActionType.AgoraActionTypeApply.value,
         val processUuid: String,
-        val fromUserUuid: String,
+        val fromUser: AgoraActionFromUser,
         private val payload: Map<String, Any>?
 ) {
 
@@ -13,3 +13,10 @@ class AgoraActionMsgRes(
         return Gson().toJson(payload ?: "")
     }
 }
+
+class AgoraActionFromUser(
+        val uuid: String,
+        val name: String,
+        val role: String
+)
+

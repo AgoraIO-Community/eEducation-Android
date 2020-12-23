@@ -213,7 +213,7 @@ internal open class EduUserImpl(
                 /**改变流状态的参数*/
                 val eduStreamStatusReq = EduStreamStatusReq(stream.streamName, stream.videoSourceType.value,
                         AudioSourceType.MICROPHONE.value, if (stream.hasVideo) 1 else 0,
-                        if (stream.hasAudio) 1 else 0)
+                        if (stream.hasAudio) 1 else 0, 0)
                 RetrofitManager.instance()!!.getService(API_BASE_URL, StreamService::class.java)
                         .updateStreamInfo(APPID, eduRoom.getCurRoomUuid(), userInfo.userUuid,
                                 stream.streamUuid, eduStreamStatusReq)

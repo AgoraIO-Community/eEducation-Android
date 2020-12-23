@@ -12,4 +12,13 @@ class EduStreamStatusReq(
         val videoState: Int,
         val audioState: Int
 ) {
+    /*是否针对当前流生成rtcToken;默认为1:生成*/
+    var generateToken: Int = 1
+
+    constructor(streamName: String?, videoSourceType: Int, audioSourceType: Int, videoState: Int,
+                audioState: Int,
+                generateToken: Int) :
+            this(streamName, videoSourceType, audioSourceType, videoState, audioState) {
+        this.generateToken = generateToken
+    }
 }

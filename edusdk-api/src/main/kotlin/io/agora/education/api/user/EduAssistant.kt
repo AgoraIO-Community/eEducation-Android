@@ -8,7 +8,7 @@ import io.agora.education.api.user.listener.EduAssistantEventListener
 interface EduAssistant : EduUser {
     fun setEventListener(eventListener: EduAssistantEventListener?)
 
-    fun createOrUpdateTeacherStream(callback: EduCallback<EduStreamInfo>)
+    fun createOrUpdateTeacherStream(streamInfo: EduStreamInfo, callback: EduCallback<Unit>)
 
-    fun createOrUpdateStudentStream(callback: EduCallback<EduStreamInfo>)
+    fun createOrUpdateStudentStream(streamInfo: EduStreamInfo, callback: EduCallback<Unit>)
 }

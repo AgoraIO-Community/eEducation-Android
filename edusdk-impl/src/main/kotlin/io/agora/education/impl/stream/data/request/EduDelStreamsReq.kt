@@ -1,6 +1,6 @@
 package io.agora.education.impl.stream.data.request
 
-class EduDelStreamReq(
+class EduDelStreamsReq(
         val userUuid: String,
         val streamUuid: String
 ) {

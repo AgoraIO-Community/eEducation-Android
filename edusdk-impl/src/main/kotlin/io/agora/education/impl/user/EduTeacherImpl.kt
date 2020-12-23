@@ -8,7 +8,6 @@ import io.agora.education.api.BuildConfig.API_BASE_URL
 import io.agora.education.api.EduCallback
 import io.agora.education.api.base.EduError.Companion.httpError
 import io.agora.education.api.room.data.EduRoomState
-import io.agora.education.api.stream.data.AudioSourceType
 import io.agora.education.api.stream.data.EduStreamInfo
 import io.agora.education.api.stream.data.ScreenStreamInitOptions
 import io.agora.education.api.user.EduTeacher
@@ -20,11 +19,10 @@ import io.agora.education.api.user.data.EduLocalUserInfo
 import io.agora.education.api.user.listener.EduTeacherEventListener
 import io.agora.education.impl.network.RetrofitManager
 import io.agora.education.impl.room.network.RoomService
-import io.agora.education.impl.stream.data.request.EduDelStreamReq
-import io.agora.education.impl.stream.data.request.EduUpsertStreamReq
+import io.agora.education.impl.stream.data.request.EduDelStreamsReq
+import io.agora.education.impl.stream.data.request.EduUpsertStreamsReq
 import io.agora.education.impl.stream.network.StreamService
 import io.agora.education.impl.user.data.request.EduRoomMuteStateReq
-import io.agora.education.impl.user.data.request.EduStreamStatusReq
 import io.agora.education.impl.user.data.request.EduUserStatusReq
 import io.agora.education.impl.user.data.request.RoleMuteConfig
 import io.agora.education.impl.user.network.UserService
@@ -101,9 +99,9 @@ internal class EduTeacherImpl(
     }
 
     override fun upsertStudentStreams(streamInfos: MutableList<EduStreamInfo>, callback: EduCallback<Unit>) {
-        val streams = mutableListOf<EduUpsertStreamReq>()
+        val streams = mutableListOf<EduUpsertStreamsReq>()
         streamInfos.forEach {
-            val eduUpsertStreamReq = EduUpsertStreamReq(it.publisher.userUuid, it.streamUuid,
+            val eduUpsertStreamReq = EduUpsertStreamsReq(it.publisher.userUuid, it.streamUuid,
                     it.streamName, it.videoSourceType, if (it.hasVideo) 1 else 0,
                     if (it.hasAudio) 1 else 0)
             streams.add(eduUpsertStreamReq)
@@ -124,9 +122,9 @@ internal class EduTeacherImpl(
     }
 
     override fun deleteStudentStreams(streamInfos: MutableList<EduStreamInfo>, callback: EduCallback<Unit>) {
-        val streams = mutableListOf<EduDelStreamReq>()
+        val streams = mutableListOf<EduDelStreamsReq>()
         streamInfos.forEach {
-            val eduDelStreamReq = EduDelStreamReq(it.publisher.userUuid, it.streamUuid)
+            val eduDelStreamReq = EduDelStreamsReq(it.publisher.userUuid, it.streamUuid)
             streams.add(eduDelStreamReq)
         }
         RetrofitManager.instance()!!.getService(API_BASE_URL, StreamService::class.java)

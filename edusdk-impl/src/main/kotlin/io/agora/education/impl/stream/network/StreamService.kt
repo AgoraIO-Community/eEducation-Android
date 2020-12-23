@@ -1,8 +1,8 @@
 package io.agora.education.impl.stream.network
 
 import io.agora.base.network.ResponseBody
-import io.agora.education.impl.stream.data.request.EduDelStreamReq
-import io.agora.education.impl.stream.data.request.EduUpsertStreamReq
+import io.agora.education.impl.stream.data.request.EduDelStreamsReq
+import io.agora.education.impl.stream.data.request.EduUpsertStreamsReq
 import io.agora.education.impl.user.data.request.EduStreamStatusReq
 import retrofit2.Call
 import retrofit2.http.*
@@ -12,9 +12,9 @@ interface StreamService {
     /**创建流*/
     @POST("/scene/apps/{appId}/v1/rooms/{roomUuid}/users/{userUuid}/streams/{streamUuid}")
     fun createStream(
-            @Path("appId")  appId: String,
+            @Path("appId") appId: String,
             @Path("roomUuid") roomUuid: String,
-            @Path("userUuid")  userUuid: String,
+            @Path("userUuid") userUuid: String,
             @Path("streamUuid") streamUuid: String,
             @Body eduStreamStatusReq: EduStreamStatusReq
     ): Call<ResponseBody<String>>
@@ -22,9 +22,9 @@ interface StreamService {
     /**更新流状态*/
     @PUT("/scene/apps/{appId}/v1/rooms/{roomUuid}/users/{userUuid}/streams/{streamUuid}")
     fun updateStreamInfo(
-            @Path("appId")  appId: String,
+            @Path("appId") appId: String,
             @Path("roomUuid") roomUuid: String,
-            @Path("userUuid")  userUuid: String,
+            @Path("userUuid") userUuid: String,
             @Path("streamUuid") streamUuid: String,
             @Body eduStreamStatusReq: EduStreamStatusReq
     ): Call<ResponseBody<String>>
@@ -32,18 +32,28 @@ interface StreamService {
     /**删除流*/
     @DELETE("/scene/apps/{appId}/v1/rooms/{roomUuid}/users/{userUuid}/streams/{streamUuid}")
     fun deleteStream(
-            @Path("appId")  appId: String,
+            @Path("appId") appId: String,
             @Path("roomUuid") roomUuid: String,
-            @Path("userUuid")  userUuid: String,
+            @Path("userUuid") userUuid: String,
             @Path("streamUuid") streamUuid: String
     ): Call<ResponseBody<String>>
 
+    /**新增/更新流*/
+    @PUT("/scene/apps/{appId}/v1/rooms/{roomUuid}/users/{userUuid}/streams/{streamUuid}")
+    fun upsertStream(
+            @Path("appId") appId: String,
+            @Path("roomUuid") roomUuid: String,
+            @Path("userUuid") userUuid: String,
+            @Path("streamUuid") streamUuid: String,
+            @Body eduStreamStatusReq: EduStreamStatusReq
+    ): Call<ResponseBody<String>>
+
     /**批量upsert流*/
-    @DELETE("/scene/apps/{appId}/v1/rooms/{roomUuid}/streams")
+    @PUT("/scene/apps/{appId}/v1/rooms/{roomUuid}/streams")
     fun upsertStreams(
             @Path("appId") appId: String,
             @Path("roomUuid") roomUuid: String,
-            @Field("streams") streams: MutableList<EduUpsertStreamReq>
+            @Field("streams") streams: MutableList<EduUpsertStreamsReq>
     ): Call<ResponseBody<String>>
 
     /**批量删除流*/
@@ -51,6 +61,6 @@ interface StreamService {
     fun delStreams(
             @Path("appId") appId: String,
             @Path("roomUuid") roomUuid: String,
-            @Field("streams") streams: MutableList<EduDelStreamReq>
+            @Field("streams") streams: MutableList<EduDelStreamsReq>
     ): Call<ResponseBody<String>>
 }

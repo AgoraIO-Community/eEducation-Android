@@ -81,6 +81,7 @@ import io.agora.education.classroom.fragment.WhiteBoardFragment;
 import io.agora.education.classroom.widget.TitleView;
 import io.agora.education.service.BoardService;
 import io.agora.education.service.bean.ResponseBody;
+import io.agora.education.util.AppUtil;
 import io.agora.education.widget.ConfirmDialog;
 import io.agora.raisehand.AgoraCoVideoAction;
 import io.agora.whiteboard.netless.listener.GlobalStateChangeListener;
@@ -181,8 +182,8 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
         return room;
     }
 
-    protected void joinRoom(EduRoom eduRoom, String yourNameStr, String yourUuid, boolean autoSubscribe,
-                            boolean autoPublish, boolean needUserListener, EduCallback<EduStudent> callback) {
+    protected void joinRoomAsStudent(EduRoom eduRoom, String yourNameStr, String yourUuid, boolean autoSubscribe,
+                                     boolean autoPublish, boolean needUserListener, EduCallback<EduStudent> callback) {
         if (isJoining) {
             return;
         }
@@ -605,8 +606,12 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
 
     private final void showLogId(String logId) {
         if (!this.isFinishing() || !this.isDestroyed()) {
-            ConfirmDialog.single(getString(R.string.uploadlog_success).concat(logId), null)
-                    .show(getSupportFragmentManager(), null);
+            ConfirmDialog.singleWithButton(getString(R.string.uploadlog_success).concat(logId),
+                    getString(R.string.copy1), confirm -> {
+                        if (confirm) {
+                            AppUtil.copyToClipboard(BaseClassActivity_bak.this, logId);
+                        }
+                    }).show(getSupportFragmentManager(), null);
         }
     }
 

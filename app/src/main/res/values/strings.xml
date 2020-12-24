@@ -56,4 +56,5 @@
     <string name="groupname" translatable="false">%s:(%d)</string>
     <string name="teacherinviteaudio">teacher applied to turn on your microphone!</string>
     <string name="teacherinvitevideo">teacher applied to turn on your camera!</string>
+    <string name="copy1">Copy</string>
 </resources>

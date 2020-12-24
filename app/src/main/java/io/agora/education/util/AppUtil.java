@@ -1,6 +1,8 @@
 package io.agora.education.util;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -55,5 +57,11 @@ public class AppUtil {
     public static int dip2px(Context context, float dpValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
+    }
+
+    public static void copyToClipboard(Context context, String text) {
+        ClipboardManager cm = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData mClipData = ClipData.newPlainText("simple text", text);
+        cm.setPrimaryClip(mClipData);
     }
 }

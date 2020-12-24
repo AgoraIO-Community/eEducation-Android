@@ -33,7 +33,6 @@ import io.agora.education.R;
 import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
 import io.agora.education.api.message.EduChatMsg;
-import io.agora.education.api.message.EduChatMsgType;
 import io.agora.education.api.message.EduFromUserInfo;
 import io.agora.education.api.message.EduMsg;
 import io.agora.education.api.room.EduRoom;
@@ -62,8 +61,6 @@ import io.agora.education.classroom.bean.board.BoardBean;
 import io.agora.education.classroom.bean.board.BoardInfo;
 import io.agora.education.classroom.bean.channel.Room;
 import io.agora.education.classroom.bean.msg.ChannelMsg;
-import io.agora.education.classroom.bean.record.RecordBean;
-import io.agora.education.classroom.bean.record.RecordMsg;
 import io.agora.education.classroom.fragment.UserListFragment;
 import io.agora.education.service.CommonService;
 import io.agora.education.service.bean.ResponseBody;
@@ -74,8 +71,6 @@ import kotlin.Unit;
 import static io.agora.education.EduApplication.getAppId;
 import static io.agora.education.api.BuildConfig.API_BASE_URL;
 import static io.agora.education.classroom.bean.board.BoardBean.BOARD;
-import static io.agora.education.classroom.bean.record.RecordBean.RECORD;
-import static io.agora.education.classroom.bean.record.RecordState.END;
 
 public class BreakoutClassActivity extends BaseClassActivity_bak implements TabLayout.OnTabSelectedListener {
     private static final String TAG = "BreakoutClassActivity";
@@ -104,7 +99,7 @@ public class BreakoutClassActivity extends BaseClassActivity_bak implements TabL
     protected void initData() {
         super.initData();
         /**needUserListener为false,将不会收到大班级中的任何local回调*/
-        joinRoom(getMainEduRoom(), roomEntry.getUserName(), roomEntry.getUserUuid(), true, false, true,
+        joinRoomAsStudent(getMainEduRoom(), roomEntry.getUserName(), roomEntry.getUserUuid(), true, false, true,
                 new EduCallback<EduStudent>() {
                     @Override
                     public void onSuccess(@Nullable EduStudent res) {
@@ -175,7 +170,7 @@ public class BreakoutClassActivity extends BaseClassActivity_bak implements TabL
                     RoomCreateOptions createOptions = new RoomCreateOptions(res.getRoomUuid(),
                             res.getRoomName(), RoomType.BREAKOUT_CLASS.getValue());
                     subEduRoom = buildEduRoom(createOptions, res.getRoomUuid());
-                    joinRoom(subEduRoom, userName, userUuid, true, true, true, new EduCallback<EduStudent>() {
+                    joinRoomAsStudent(subEduRoom, userName, userUuid, true, true, true, new EduCallback<EduStudent>() {
                         @Override
                         public void onSuccess(@Nullable EduStudent res) {
                             /**设置全局的userToken(注意同一个user在不同的room内，token不一样)*/

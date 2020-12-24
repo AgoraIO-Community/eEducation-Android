@@ -110,7 +110,7 @@ public class LargeClassActivity extends BaseClassActivity_bak implements TabLayo
     @Override
     protected void initData() {
         super.initData();
-        joinRoom(getMainEduRoom(), roomEntry.getUserName(), roomEntry.getUserUuid(), true, false, true,
+        joinRoomAsStudent(getMainEduRoom(), roomEntry.getUserName(), roomEntry.getUserUuid(), true, false, true,
                 new EduCallback<EduStudent>() {
                     @Override
                     public void onSuccess(@Nullable EduStudent res) {

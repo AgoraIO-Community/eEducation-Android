@@ -140,7 +140,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     @Override
     protected void initData() {
         super.initData();
-        joinRoom(getMainEduRoom(), roomEntry.getUserName(), roomEntry.getUserUuid(), true, false, true,
+        joinRoomAsStudent(getMainEduRoom(), roomEntry.getUserName(), roomEntry.getUserUuid(), true, false, true,
                 new EduCallback<EduStudent>() {
                     @Override
                     public void onSuccess(@org.jetbrains.annotations.Nullable EduStudent res) {
@@ -1069,7 +1069,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                         /**判断是否已经在台上，如果已经在台上则不进行操作*/
                         if (!roomGroupInfo.isOnStage(userInfo.getUserUuid())) {
                             LocalStreamInitOptions options = new LocalStreamInitOptions(userInfo.streamUuid,
-                                    false, true);
+                                    true, true);
                             localUser.initOrUpdateLocalStream(options, new EduCallback<EduStreamInfo>() {
                                 @Override
                                 public void onSuccess(@Nullable EduStreamInfo streamInfo) {

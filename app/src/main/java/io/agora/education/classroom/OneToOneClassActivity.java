@@ -50,7 +50,7 @@ public class OneToOneClassActivity extends BaseClassActivity_bak {
     @Override
     protected void initData() {
         super.initData();
-        joinRoom(getMainEduRoom(), roomEntry.getUserName(), roomEntry.getUserUuid(), true, true, true,
+        joinRoomAsStudent(getMainEduRoom(), roomEntry.getUserName(), roomEntry.getUserUuid(), true, true, true,
                 new EduCallback<EduStudent>() {
                     @Override
                     public void onSuccess(@org.jetbrains.annotations.Nullable EduStudent res) {

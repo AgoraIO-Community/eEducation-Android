@@ -40,7 +40,9 @@ import io.agora.education.impl.room.data.request.EduJoinClassroomReq
 import io.agora.education.impl.room.data.response.*
 import io.agora.education.impl.sync.RoomSyncHelper
 import io.agora.education.impl.sync.RoomSyncSession
+import io.agora.education.impl.user.EduAssistantImpl
 import io.agora.education.impl.user.EduStudentImpl
+import io.agora.education.impl.user.EduTeacherImpl
 import io.agora.education.impl.user.EduUserImpl
 import io.agora.education.impl.user.data.EduLocalUserInfoImpl
 import io.agora.education.impl.user.network.UserService
@@ -184,10 +186,18 @@ internal class EduRoomImpl(
             AgoraLog.i("$TAG->roomJoinOptions.userName is null,user default userName:$defaultUserName")
             options.userName = defaultUserName
         }
-        val localUserInfo = EduLocalUserInfoImpl(options.userUuid, options.userName!!, EduUserRole.STUDENT,
+        val localUserInfo = EduLocalUserInfoImpl(options.userUuid, options.userName!!, options.roleType,
                 true, null, mutableListOf(), System.currentTimeMillis())
         /**此处需要把localUserInfo设置进localUser中*/
-        syncSession.localUser = EduStudentImpl(localUserInfo)
+        if (options.roleType == EduUserRole.STUDENT) {
+            syncSession.localUser = EduStudentImpl(localUserInfo)
+        } else if (options.roleType == EduUserRole.TEACHER) {
+            syncSession.localUser = EduTeacherImpl(localUserInfo)
+        } else if (options.roleType == EduUserRole.ASSISTANT) {
+            syncSession.localUser = EduAssistantImpl(localUserInfo)
+        } else {
+            callback.onFailure(parameterError("roleType"))
+        }
         (syncSession.localUser as EduUserImpl).eduRoom = this
         /**大班课强制不自动发流*/
         if (getCurRoomType() == RoomType.LARGE_CLASS) {

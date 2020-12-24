@@ -51,4 +51,5 @@
     <string name="offline_state">(已离线)</string>
     <string name="teacherinviteaudio">老师申请打开麦克风!</string>
     <string name="teacherinvitevideo">老师申请打开摄像头!</string>
+    <string name="copy1">复制</string>
 </resources>

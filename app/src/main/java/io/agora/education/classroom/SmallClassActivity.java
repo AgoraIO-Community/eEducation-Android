@@ -70,7 +70,7 @@ public class SmallClassActivity extends BaseClassActivity_bak implements TabLayo
     @Override
     protected void initData() {
         super.initData();
-        joinRoom(getMainEduRoom(), roomEntry.getUserName(), roomEntry.getUserUuid(), true, true, true,
+        joinRoomAsStudent(getMainEduRoom(), roomEntry.getUserName(), roomEntry.getUserUuid(), true, true, true,
                 new EduCallback<EduStudent>() {
                     @Override
                     public void onSuccess(@Nullable EduStudent res) {

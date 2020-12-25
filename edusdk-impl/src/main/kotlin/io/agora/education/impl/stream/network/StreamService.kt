@@ -1,7 +1,9 @@
 package io.agora.education.impl.stream.network
 
 import io.agora.base.network.ResponseBody
+import io.agora.education.impl.stream.data.request.EduDelStreamsBody
 import io.agora.education.impl.stream.data.request.EduDelStreamsReq
+import io.agora.education.impl.stream.data.request.EduUpsertStreamsBody
 import io.agora.education.impl.stream.data.request.EduUpsertStreamsReq
 import io.agora.education.impl.user.data.request.EduStreamStatusReq
 import retrofit2.Call
@@ -53,7 +55,7 @@ interface StreamService {
     fun upsertStreams(
             @Path("appId") appId: String,
             @Path("roomUuid") roomUuid: String,
-            @Field("streams") streams: MutableList<EduUpsertStreamsReq>
+            @Body streams: EduUpsertStreamsBody
     ): Call<ResponseBody<String>>
 
     /**批量删除流*/
@@ -61,6 +63,6 @@ interface StreamService {
     fun delStreams(
             @Path("appId") appId: String,
             @Path("roomUuid") roomUuid: String,
-            @Field("streams") streams: MutableList<EduDelStreamsReq>
+            @Body streams: EduDelStreamsBody
     ): Call<ResponseBody<String>>
 }

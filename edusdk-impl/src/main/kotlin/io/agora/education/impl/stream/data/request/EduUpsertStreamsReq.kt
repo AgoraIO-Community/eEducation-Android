@@ -8,7 +8,7 @@ import io.agora.education.api.stream.data.VideoSourceType
 class EduUpsertStreamsReq(var userUuid: String,
                           var streamUuid: String,
                           var streamName: String?,
-                          var videoSourceType: VideoSourceType,
+                          var videoSourceType: Int,
                           var videoState: Int, var audioState: Int) {
     var audioSourceType: Int = AudioSourceType.MICROPHONE.value
 
@@ -16,9 +16,13 @@ class EduUpsertStreamsReq(var userUuid: String,
     var generateToken: Int = 1
 
     constructor(userUuid: String, streamUuid: String, streamName: String?,
-                videoSourceType: VideoSourceType, videoState: Int, audioState: Int, generateToken: Int) :
+                videoSourceType: Int, videoState: Int, audioState: Int, generateToken: Int) :
             this(userUuid, streamUuid, streamName, videoSourceType, videoState, audioState) {
         this.generateToken = generateToken
     }
 
 }
+
+class EduUpsertStreamsBody(
+        val streams: MutableList<EduUpsertStreamsReq>
+)

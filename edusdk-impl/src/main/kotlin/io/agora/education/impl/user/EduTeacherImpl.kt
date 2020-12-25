@@ -19,7 +19,9 @@ import io.agora.education.api.user.data.EduLocalUserInfo
 import io.agora.education.api.user.listener.EduTeacherEventListener
 import io.agora.education.impl.network.RetrofitManager
 import io.agora.education.impl.room.network.RoomService
+import io.agora.education.impl.stream.data.request.EduDelStreamsBody
 import io.agora.education.impl.stream.data.request.EduDelStreamsReq
+import io.agora.education.impl.stream.data.request.EduUpsertStreamsBody
 import io.agora.education.impl.stream.data.request.EduUpsertStreamsReq
 import io.agora.education.impl.stream.network.StreamService
 import io.agora.education.impl.user.data.request.EduRoomMuteStateReq
@@ -102,12 +104,13 @@ internal class EduTeacherImpl(
         val streams = mutableListOf<EduUpsertStreamsReq>()
         streamInfos.forEach {
             val eduUpsertStreamReq = EduUpsertStreamsReq(it.publisher.userUuid, it.streamUuid,
-                    it.streamName, it.videoSourceType, if (it.hasVideo) 1 else 0,
+                    it.streamName, it.videoSourceType.value, if (it.hasVideo) 1 else 0,
                     if (it.hasAudio) 1 else 0)
             streams.add(eduUpsertStreamReq)
         }
+        val body = EduUpsertStreamsBody(streams)
         RetrofitManager.instance()!!.getService(API_BASE_URL, StreamService::class.java)
-                .upsertStreams(APPID, eduRoom.getCurRoomUuid(), streams)
+                .upsertStreams(APPID, eduRoom.getCurRoomUuid(), body)
                 .enqueue(RetrofitManager.Callback(0, object : ThrowableCallback<ResponseBody<String>> {
                     override fun onSuccess(res: ResponseBody<String>?) {
                         callback.onSuccess(Unit)
@@ -127,8 +130,9 @@ internal class EduTeacherImpl(
             val eduDelStreamReq = EduDelStreamsReq(it.publisher.userUuid, it.streamUuid)
             streams.add(eduDelStreamReq)
         }
+        val body = EduDelStreamsBody(streams)
         RetrofitManager.instance()!!.getService(API_BASE_URL, StreamService::class.java)
-                .delStreams(APPID, eduRoom.getCurRoomUuid(), streams)
+                .delStreams(APPID, eduRoom.getCurRoomUuid(), body)
                 .enqueue(RetrofitManager.Callback(0, object : ThrowableCallback<ResponseBody<String>> {
                     override fun onSuccess(res: ResponseBody<String>?) {
                         callback.onSuccess(Unit)

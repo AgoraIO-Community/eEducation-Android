@@ -98,6 +98,20 @@
             android:textSize="@dimen/sp_16"
             app:layout_constraintTop_toBottomOf="@id/et_room_type" />
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_teacherJoin"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_44"
+            android:layout_marginStart="@dimen/dp_80"
+            android:layout_marginTop="@dimen/dp_10"
+            android:layout_marginEnd="@dimen/dp_80"
+            android:background="@drawable/btn_circle_44a2fc"
+            android:gravity="center"
+            android:text="老师加入"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sp_16"
+            app:layout_constraintTop_toBottomOf="@id/btn_join" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

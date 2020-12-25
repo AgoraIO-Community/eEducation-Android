@@ -11,14 +11,12 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import io.agora.education.R;
 import io.agora.education.api.stream.data.EduStreamInfo;
 import io.agora.education.api.stream.data.VideoSourceType;
-import io.agora.education.classroom.BaseClassActivity;
 import io.agora.education.classroom.BaseClassActivity_bak;
 import io.agora.education.classroom.widget.RtcVideoView;
 

@@ -17,11 +17,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.agora.education.R;
 import io.agora.education.api.statistics.NetworkQuality;
-import io.agora.education.classroom.BaseClassActivity;
 import io.agora.education.classroom.BaseClassActivity_bak;
-import io.agora.rtc.Constants;
-
-import static io.agora.education.api.statistics.NetworkQuality.*;
 
 public class TitleView extends ConstraintLayout {
 

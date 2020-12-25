@@ -6,4 +6,5 @@ interface EduCallback<T> {
     fun onSuccess(res: T?)
 
     fun onFailure(error: EduError)
+
 }

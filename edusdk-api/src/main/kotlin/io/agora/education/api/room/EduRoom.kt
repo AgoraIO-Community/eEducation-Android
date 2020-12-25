@@ -28,7 +28,7 @@ abstract class EduRoom {
      * 101:communication error:code，透传rtm错误code或者message。
      * 201:media error:code，透传rtc错误code或者message。
      * 301:network error，透传后台错误msg字段*/
-    abstract fun joinClassroom(options: RoomJoinOptions, callback: EduCallback<EduStudent>)
+    abstract fun joinClassroom(options: RoomJoinOptions, callback: EduCallback<EduUser>)
 
     /**code:message
      * 1:you haven't joined the room*/

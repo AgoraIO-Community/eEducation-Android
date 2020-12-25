@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true"
-    tools:context=".classroom.LargeClassActivity">
+    tools:context=".classroom.MediumClassActivity">
 
     <io.agora.education.classroom.widget.TitleView
         android:id="@+id/title_view"

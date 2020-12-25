@@ -5,3 +5,8 @@ class EduDelStreamsReq(
         val streamUuid: String
 ) {
 }
+
+class EduDelStreamsBody(
+        val streams: MutableList<EduDelStreamsReq>
+)
+

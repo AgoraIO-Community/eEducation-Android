@@ -12,13 +12,8 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 
-import com.google.gson.Gson;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -36,13 +31,13 @@ import io.agora.education.api.room.data.RoomType;
 import io.agora.education.api.statistics.AgoraError;
 import io.agora.education.api.user.data.EduUserRole;
 import io.agora.education.base.BaseActivity;
-import io.agora.education.classroom.BaseClassActivity;
 import io.agora.education.classroom.BaseClassActivity_bak;
 import io.agora.education.classroom.BreakoutClassActivity;
 import io.agora.education.classroom.MediumClassActivity;
 import io.agora.education.classroom.LargeClassActivity;
 import io.agora.education.classroom.OneToOneClassActivity;
 import io.agora.education.classroom.SmallClassActivity;
+import io.agora.education.classroom.SmallClassActivity_Teacher;
 import io.agora.education.classroom.bean.channel.Room;
 import io.agora.education.service.CommonService;
 import io.agora.education.service.bean.ResponseBody;
@@ -55,7 +50,7 @@ import static io.agora.education.EduApplication.getCustomerCer;
 import static io.agora.education.EduApplication.getCustomerId;
 import static io.agora.education.EduApplication.setManager;
 import static io.agora.education.api.BuildConfig.API_BASE_URL;
-import static io.agora.education.classroom.BaseClassActivity.RESULT_CODE;
+import static io.agora.education.classroom.BaseClassActivity_bak.RESULT_CODE;
 
 public class MainActivity extends BaseActivity {
     private static final String TAG = "MainActivity";
@@ -74,6 +69,7 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.card_room_type)
     protected CardView card_room_type;
 
+    private EduUserRole curRole = EduUserRole.STUDENT;
 
     @Override
     protected int getLayoutResId() {
@@ -118,13 +114,15 @@ public class MainActivity extends BaseActivity {
     }
 
     @OnClick({R.id.iv_setting, R.id.et_room_type, R.id.btn_join, R.id.tv_one2one, R.id.tv_small_class,
-            R.id.tv_large_class, R.id.tv_breakout_class, R.id.tv_intermediate_class})
+            R.id.tv_large_class, R.id.tv_breakout_class, R.id.tv_intermediate_class,
+            R.id.btn_teacherJoin})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.iv_setting:
                 startActivity(new Intent(this, SettingActivity.class));
                 break;
             case R.id.btn_join:
+                curRole = EduUserRole.STUDENT;
                 if (AppUtil.isFastClick()) {
                     return;
                 }
@@ -155,6 +153,10 @@ public class MainActivity extends BaseActivity {
             case R.id.tv_intermediate_class:
                 et_room_type.setText(R.string.intermediate);
                 card_room_type.setVisibility(View.GONE);
+                break;
+            case R.id.btn_teacherJoin:
+                curRole = EduUserRole.TEACHER;
+                start();
                 break;
             default:
                 break;
@@ -193,7 +195,7 @@ public class MainActivity extends BaseActivity {
 
         /**userUuid和roomUuid需用户自己指定，并保证唯一性*/
         int roomType = getClassType(roomTypeStr);
-        String userUuid = yourNameStr + EduUserRole.STUDENT.getValue();
+        String userUuid = yourNameStr + curRole.getValue();
         String roomUuid = roomNameStr + roomType;
 
         assert getAppId() != null;
@@ -280,7 +282,11 @@ public class MainActivity extends BaseActivity {
         if (roomType == RoomType.ONE_ON_ONE.getValue()) {
             intent.setClass(this, OneToOneClassActivity.class);
         } else if (roomType == RoomType.SMALL_CLASS.getValue()) {
-            intent.setClass(this, SmallClassActivity.class);
+            if (curRole == EduUserRole.STUDENT) {
+                intent.setClass(this, SmallClassActivity.class);
+            } else if (curRole == EduUserRole.TEACHER) {
+                intent.setClass(this, SmallClassActivity_Teacher.class);
+            }
         } else if (roomType == RoomType.LARGE_CLASS.getValue()) {
             intent.setClass(this, LargeClassActivity.class);
         } else if (roomType == RoomType.BREAKOUT_CLASS.getValue()) {

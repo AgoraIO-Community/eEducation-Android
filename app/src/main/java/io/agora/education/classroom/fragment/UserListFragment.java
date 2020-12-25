@@ -11,7 +11,6 @@ import com.chad.library.adapter.base.listener.OnItemChildClickListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -19,10 +18,8 @@ import io.agora.education.R;
 import io.agora.education.api.stream.data.EduStreamInfo;
 import io.agora.education.api.stream.data.VideoSourceType;
 import io.agora.education.api.user.data.EduBaseUserInfo;
-import io.agora.education.api.user.data.EduUserInfo;
 import io.agora.education.api.user.data.EduUserRole;
 import io.agora.education.base.BaseFragment;
-import io.agora.education.classroom.BaseClassActivity;
 import io.agora.education.classroom.BaseClassActivity_bak;
 import io.agora.education.classroom.adapter.UserListAdapter;
 
@@ -54,28 +51,33 @@ public class UserListFragment extends BaseFragment implements OnItemChildClickLi
         rcv_users.setAdapter(adapter);
     }
 
-    public void setUserList(List<EduStreamInfo> userList) {
-        getActivity().runOnUiThread(() -> {
-            /**过滤掉非学生和非摄像头流的user*/
-            List<EduStreamInfo> students = new ArrayList<>(userList.size());
-            for (EduStreamInfo streamInfo : userList) {
-                EduBaseUserInfo userInfo = streamInfo.getPublisher();
-                if (userInfo.getRole().equals(EduUserRole.STUDENT) &&
-                        streamInfo.getVideoSourceType().equals(VideoSourceType.CAMERA)) {
-                    students.add(streamInfo);
-                }
+    public void setUserList(List<EduStreamInfo> users) {
+        /*copy一份数据，防止出现多个adapter使用同一数据源而导致的数据错乱问题*/
+        List<EduStreamInfo> userList = new ArrayList<>(users.size());
+        for (EduStreamInfo element : users) {
+            userList.add(element.copy());
+        }
+        /**过滤掉非学生和非摄像头流的user*/
+        List<EduStreamInfo> students = new ArrayList<>(userList.size());
+        for (EduStreamInfo streamInfo : userList) {
+            EduBaseUserInfo userInfo = streamInfo.getPublisher();
+            if (userInfo.getRole().equals(EduUserRole.STUDENT) &&
+                    streamInfo.getVideoSourceType().equals(VideoSourceType.CAMERA)) {
+                students.add(streamInfo);
             }
-            /**本地用户始终在第一位*/
-            if (!TextUtils.isEmpty(localUserUuid)) {
-                for (int i = 0; i < students.size(); i++) {
-                    EduStreamInfo streamInfo = students.get(i);
-                    if (streamInfo.getPublisher().getUserUuid().equals(localUserUuid)) {
-                        if (i != 0) {
-                            Collections.swap(students, 0, i);
-                        }
+        }
+        /**本地用户始终在第一位*/
+        if (!TextUtils.isEmpty(localUserUuid)) {
+            for (int i = 0; i < students.size(); i++) {
+                EduStreamInfo streamInfo = students.get(i);
+                if (streamInfo.getPublisher().getUserUuid().equals(localUserUuid)) {
+                    if (i != 0) {
+                        Collections.swap(students, 0, i);
                     }
                 }
             }
+        }
+        getActivity().runOnUiThread(() -> {
             adapter.setNewData(students);
         });
     }

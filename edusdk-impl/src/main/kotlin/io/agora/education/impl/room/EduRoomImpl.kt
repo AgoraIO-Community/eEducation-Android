@@ -80,8 +80,8 @@ internal class EduRoomImpl(
 
     lateinit var rtcToken: String
 
-    /**用户监听学生join是否成功的回调*/
-    private var studentJoinCallback: EduCallback<EduStudent>? = null
+    /**用户监听join是否成功的回调*/
+    private var joinCallback: EduCallback<EduUser>? = null
     private lateinit var roomEntryRes: EduEntryRes
     lateinit var mediaOptions: RoomMediaOptions
 
@@ -173,14 +173,14 @@ internal class EduRoomImpl(
 
     /**上课过程中，学生的角色目前不发生改变;
      * join流程包括请求加入classroom的API接口、加入rte、同步roomInfo、同步、本地流初始化成功，任何一步出错即视为join失败*/
-    override fun joinClassroom(options: RoomJoinOptions, callback: EduCallback<EduStudent>) {
+    override fun joinClassroom(options: RoomJoinOptions, callback: EduCallback<EduUser>) {
         if (TextUtils.isEmpty(options.userUuid)) {
             callback.onFailure(parameterError("userUuid"))
             return
         }
         AgoraLog.i("$TAG->User[${options.userUuid}]is ready to join the eduRoom:${getCurRoomUuid()}")
         this.joining = true
-        this.studentJoinCallback = callback
+        this.joinCallback = callback
         /**判断是否指定了用户名*/
         if (options.userName == null) {
             AgoraLog.i("$TAG->roomJoinOptions.userName is null,user default userName:$defaultUserName")
@@ -249,11 +249,11 @@ internal class EduRoomImpl(
                                         AgoraLog.i("$TAG->Full data pull and merge successfully,init localStream")
                                         initOrUpdateLocalStream(roomEntryRes, mediaOptions, object : EduCallback<Unit> {
                                             override fun onSuccess(res: Unit?) {
-                                                joinSuccess(syncSession.localUser, studentJoinCallback as EduCallback<EduUser>)
+                                                joinSuccess(syncSession.localUser, joinCallback as EduCallback<EduUser>)
                                             }
 
                                             override fun onFailure(error: EduError) {
-                                                joinFailed(error, studentJoinCallback as EduCallback<EduUser>)
+                                                joinFailed(error, joinCallback as EduCallback<EduUser>)
                                             }
                                         })
                                     }
@@ -353,7 +353,7 @@ internal class EduRoomImpl(
                 /**维护本地存储的在线人数*/
                 getCurRoomStatus().onlineUsersCount = getCurUserList().size
                 joinSuccess = true
-                callback.onSuccess(eduUser as EduStudent)
+                callback.onSuccess(eduUser)
                 /**把本地缓存的远端人流数据回调出去*/
                 onRemoteInitialized()
                 /**检查是否有默认流信息(直接处理数据)*/
@@ -535,7 +535,7 @@ internal class EduRoomImpl(
             RteEngineImpl[getCurRoomUuid()]?.release()
             eventListener = null
             syncSession.localUser.eventListener = null
-            studentJoinCallback = null
+            joinCallback = null
             (getCurLocalUser() as EduUserImpl).removeAllSurfaceView()
             /*移除掉当前room*/
             val rtn = EduManagerImpl.removeRoom(this)

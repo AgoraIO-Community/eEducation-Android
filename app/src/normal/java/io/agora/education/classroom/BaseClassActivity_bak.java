@@ -58,7 +58,9 @@ import io.agora.education.api.stream.data.EduStreamEvent;
 import io.agora.education.api.stream.data.EduStreamInfo;
 import io.agora.education.api.stream.data.LocalStreamInitOptions;
 import io.agora.education.api.stream.data.VideoSourceType;
+import io.agora.education.api.user.EduAssistant;
 import io.agora.education.api.user.EduStudent;
+import io.agora.education.api.user.EduTeacher;
 import io.agora.education.api.user.EduUser;
 import io.agora.education.api.user.data.EduLocalUserInfo;
 import io.agora.education.api.user.data.EduUserEvent;
@@ -190,9 +192,9 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
         isJoining = true;
         RoomJoinOptions options = new RoomJoinOptions(yourUuid, yourNameStr, EduUserRole.STUDENT,
                 new RoomMediaOptions(autoSubscribe, autoPublish), roomEntry.getRoomType());
-        eduRoom.joinClassroom(options, new EduCallback<EduStudent>() {
+        eduRoom.joinClassroom(options, new EduCallback<EduUser>() {
             @Override
-            public void onSuccess(@Nullable EduStudent user) {
+            public void onSuccess(@Nullable EduUser user) {
                 if (user != null) {
                     /**设置全局的userToken(注意同一个user在不同的room内，token不一样)*/
                     RetrofitManager.instance().addHeader("token", user.getUserInfo().getUserToken());
@@ -201,7 +203,76 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
                     if (needUserListener) {
                         user.setEventListener(BaseClassActivity_bak.this);
                     }
-                    callback.onSuccess(user);
+                    EduStudent student = (EduStudent) user;
+                    callback.onSuccess(student);
+                } else {
+                    callback.onFailure(EduError.Companion.internalError("localUser is null"));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull EduError error) {
+                isJoining = false;
+                callback.onFailure(error);
+            }
+        });
+    }
+
+    protected void joinRoomAsTeacher(EduRoom eduRoom, String yourNameStr, String yourUuid, boolean autoSubscribe,
+                                     boolean autoPublish, boolean needUserListener, EduCallback<EduTeacher> callback) {
+        if (isJoining) {
+            return;
+        }
+        isJoining = true;
+        RoomJoinOptions options = new RoomJoinOptions(yourUuid, yourNameStr, EduUserRole.TEACHER,
+                new RoomMediaOptions(autoSubscribe, autoPublish), roomEntry.getRoomType());
+        eduRoom.joinClassroom(options, new EduCallback<EduUser>() {
+            @Override
+            public void onSuccess(@Nullable EduUser user) {
+                if (user != null) {
+                    /**设置全局的userToken(注意同一个user在不同的room内，token不一样)*/
+                    RetrofitManager.instance().addHeader("token", user.getUserInfo().getUserToken());
+                    joinSuccess = true;
+                    isJoining = false;
+                    if (needUserListener) {
+                        user.setEventListener(BaseClassActivity_bak.this);
+                    }
+                    EduTeacher teacher = (EduTeacher) user;
+                    callback.onSuccess(teacher);
+                } else {
+                    callback.onFailure(EduError.Companion.internalError("localUser is null"));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull EduError error) {
+                isJoining = false;
+                callback.onFailure(error);
+            }
+        });
+    }
+
+    protected void joinRoomAsAssistant(EduRoom eduRoom, String yourNameStr, String yourUuid, boolean autoSubscribe,
+                                       boolean autoPublish, boolean needUserListener, EduCallback<EduAssistant> callback) {
+        if (isJoining) {
+            return;
+        }
+        isJoining = true;
+        RoomJoinOptions options = new RoomJoinOptions(yourUuid, yourNameStr, EduUserRole.ASSISTANT,
+                new RoomMediaOptions(autoSubscribe, autoPublish), roomEntry.getRoomType());
+        eduRoom.joinClassroom(options, new EduCallback<EduUser>() {
+            @Override
+            public void onSuccess(@Nullable EduUser user) {
+                if (user != null) {
+                    /**设置全局的userToken(注意同一个user在不同的room内，token不一样)*/
+                    RetrofitManager.instance().addHeader("token", user.getUserInfo().getUserToken());
+                    joinSuccess = true;
+                    isJoining = false;
+                    if (needUserListener) {
+                        user.setEventListener(BaseClassActivity_bak.this);
+                    }
+                    EduAssistant assistant = (EduAssistant) user;
+                    callback.onSuccess(assistant);
                 } else {
                     callback.onFailure(EduError.Companion.internalError("localUser is null"));
                 }

@@ -59,7 +59,7 @@ interface StreamService {
     ): Call<ResponseBody<String>>
 
     /**批量删除流*/
-    @DELETE("/scene/apps/{appId}/v1/rooms/{roomUuid}/streams")
+    @HTTP(method = "DELETE", path = "/scene/apps/{appId}/v1/rooms/{roomUuid}/streams", hasBody = true)
     fun delStreams(
             @Path("appId") appId: String,
             @Path("roomUuid") roomUuid: String,

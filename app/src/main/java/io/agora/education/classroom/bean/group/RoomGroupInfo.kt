@@ -3,12 +3,14 @@ package io.agora.education.classroom.bean.group
 import io.agora.education.api.stream.data.EduStreamEvent
 import io.agora.education.api.stream.data.EduStreamInfo
 import io.agora.education.api.user.data.EduUserInfo
+import java.util.*
 
 class RoomGroupInfo() {
     companion object {
         const val GROUPSTATES = "groupStates"
         const val INTERACTOUTGROUPS = "interactOutGroups"
-        val INTERACTOUTGROUPKEYS = arrayOf("g1", "g2")
+        const val G1 = "g1"
+        const val G2 = "g2"
         const val GROUPS = "groups"
         const val STUDENTS = "students"
         const val GROUPUUID = "groupUuid"
@@ -19,7 +21,7 @@ class RoomGroupInfo() {
     var groupStates: GroupStateInfo? = null
 
     /*参与组外互动的小组id集合*/
-    var interactOutGroups: MutableList<String>? = null
+    var interactOutGroups: MutableMap<String, String>? = null
 
     /*分组后的各小组信息集合*/
     var groups: MutableList<GroupInfo>? = null
@@ -29,12 +31,12 @@ class RoomGroupInfo() {
 
     fun updateInteractOutGroups(data: MutableMap<String, String>?) {
         if (data != null) {
-            interactOutGroups = mutableListOf()
-            data[INTERACTOUTGROUPKEYS[0]]?.let {
-                interactOutGroups!!.add(it)
+            interactOutGroups = mutableMapOf()
+            data[G1]?.let {
+                interactOutGroups!!.put(G1, it)
             }
-            data[INTERACTOUTGROUPKEYS[1]]?.let {
-                interactOutGroups!!.add(it)
+            data[G2]?.let {
+                interactOutGroups!!.put(G2, it)
             }
         } else {
             interactOutGroups = null
@@ -53,7 +55,7 @@ class RoomGroupInfo() {
                 if (interactOutGroups == null) {
                     groupInfo.onStage = false
                 } else {
-                    groupInfo.onStage = interactOutGroups!!.contains(groupInfo.groupUuid)
+                    groupInfo.onStage = interactOutGroups!!.containsValue(groupInfo.groupUuid)
                 }
                 groups!!.add(groupInfo)
             }
@@ -183,7 +185,7 @@ class RoomGroupInfo() {
     /**此学生是否存在于台2上(即student.uuid是否存在于g2的组中)*/
     fun existInG2(student: GroupMemberInfo): Boolean {
         if (interactOutGroups != null && interactOutGroups!!.size > 1) {
-            val g2Uuid = interactOutGroups!![1]
+            val g2Uuid = interactOutGroups!![G2]
             groups?.forEach {
                 if (it.groupUuid == g2Uuid) {
                     for (element in it.members) {

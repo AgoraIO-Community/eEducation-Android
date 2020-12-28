@@ -90,6 +90,8 @@ import static io.agora.education.classroom.bean.group.MediumClassPropertyCauseTy
 import static io.agora.education.classroom.bean.group.MediumClassPropertyCauseType.SWITCHINTERACTIN;
 import static io.agora.education.classroom.bean.group.MediumClassPropertyCauseType.SWITCHINTERACTOUT;
 import static io.agora.education.classroom.bean.group.MediumClassPropertyCauseType.UPDATEGROUP;
+import static io.agora.education.classroom.bean.group.RoomGroupInfo.G1;
+import static io.agora.education.classroom.bean.group.RoomGroupInfo.G2;
 import static io.agora.education.classroom.bean.group.RoomGroupInfo.GROUPS;
 import static io.agora.education.classroom.bean.group.RoomGroupInfo.GROUPSTATES;
 import static io.agora.education.classroom.bean.group.RoomGroupInfo.GROUPUUID;
@@ -446,15 +448,19 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                 }
             }
         } else {
-            /*整组奖励:整组上台后的整组奖励和组内成员单一上台后的整组奖励*/
-            List<String> stageGroupIds = roomGroupInfo.getInteractOutGroups();
-            if (stageGroupIds != null && stageGroupIds.size() > 0) {
-                if (stageGroupIds.get(0).equals(uuid)) {
-                    /*奖励属于stageOne,刷新stageOne中部分item*/
-                    stageVideoAdapterOne.notifyRewardByGroup(uuid);
-                } else if (stageGroupIds.size() > 1 && stageGroupIds.get(1).equals(uuid)) {
-                    /*奖励属于stageTwo,刷新整个stageTwo*/
-                    stageVideoAdapterTwo.notifyRewardByGroup(uuid);
+            /*整组奖励包括:整组上台后的整组奖励和组内成员单一上台后的整组奖励*/
+            Map<String, String> map = roomGroupInfo.getInteractOutGroups();
+            if (map != null) {
+                Iterator<Map.Entry<String, String>> iterator = map.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<String, String> element = iterator.next();
+                    if (element.getKey().equals(G1) && element.getValue().equals(uuid)) {
+                        /*奖励属于stageOne,刷新stageOne中部分item*/
+                        stageVideoAdapterOne.notifyRewardByGroup(uuid);
+                    } else if (element.getKey().equals(G2) && element.getValue().equals(uuid)) {
+                        /*奖励属于stageTwo,刷新整个stageTwo*/
+                        stageVideoAdapterTwo.notifyRewardByGroup(uuid);
+                    }
                 }
             }
         }
@@ -483,34 +489,49 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
             public void onSuccess(@Nullable List<EduStreamInfo> curFullStreams) {
                 stageStreamInfosOne.clear();
                 stageStreamInfosTwo.clear();
-                /*尝试获取正组上台(g1、g2)的台上用户*/
+                /*尝试获取整组上台(g1、g2)的台上用户*/
                 List<GroupInfo> groupInfos = roomGroupInfo.getGroups();
-                List<String> stageGroupIds = roomGroupInfo.getInteractOutGroups();
-                if (groupInfos != null && groupInfos.size() > 0 && stageGroupIds != null &&
-                        stageGroupIds.size() > 0) {
-                    List<GroupInfo> stageGroups = new ArrayList<>(2);
-                    Iterator<GroupInfo> iterator = groupInfos.iterator();
+                Map<String, GroupInfo> stageGroups = new HashMap<>(2);
+                Map<String, String> map = roomGroupInfo.getInteractOutGroups();
+                if (groupInfos != null && groupInfos.size() > 0 && map != null) {
+                    Iterator<Map.Entry<String, String>> iterator = map.entrySet().iterator();
                     while (iterator.hasNext()) {
-                        GroupInfo element = iterator.next();
-                        if (stageGroupIds.contains(element.getGroupUuid())) {
-                            stageGroups.add(element);
+                        Map.Entry<String, String> element = iterator.next();
+                        if (element.getKey().equals(G1)) {
+                            Iterator<GroupInfo> iterator1 = groupInfos.iterator();
+                            while (iterator1.hasNext()) {
+                                GroupInfo groupInfo = iterator1.next();
+                                if (element.getValue().equals(groupInfo.getGroupUuid())) {
+                                    stageGroups.put(element.getKey(), groupInfo);
+                                }
+                            }
+                        } else if (element.getKey().equals(G2)) {
+                            Iterator<GroupInfo> iterator1 = groupInfos.iterator();
+                            while (iterator1.hasNext()) {
+                                GroupInfo groupInfo = iterator1.next();
+                                if (element.getValue().equals(groupInfo.getGroupUuid())) {
+                                    stageGroups.put(element.getKey(), groupInfo);
+                                }
+                            }
                         }
                     }
-                    List<String> stageMemberIdsOne = stageGroups.size() > 0 ?
-                            stageGroups.get(0).getMembers() : new ArrayList<>();
-                    final List<String> stageMemberIdsTwo = stageGroups.size() > 1 ?
-                            stageGroups.get(1).getMembers() : new ArrayList<>();
+                    List<String> stageMemberIdsOne = stageGroups.get(G1) != null ?
+                            stageGroups.get(G1).getMembers() : null;
+                    stageMemberIdsOne = stageMemberIdsOne != null ? stageMemberIdsOne : new ArrayList<>();
+                    List<String> stageMemberIdsTwo = stageGroups.get(G2) != null ?
+                            stageGroups.get(G2).getMembers() : null;
+                    stageMemberIdsTwo = stageMemberIdsTwo != null ? stageMemberIdsTwo : new ArrayList<>();
                     if (curFullStreams != null && curFullStreams.size() > 0) {
                         for (EduStreamInfo stream : curFullStreams) {
                             String userUuid = stream.getPublisher().getUserUuid();
                             if (stageMemberIdsOne.contains(userUuid)) {
                                 StageStreamInfo stageStream = new StageStreamInfo(stream,
-                                        stageGroupIds.get(0),
+                                        stageGroups.get(G1).getGroupUuid(),
                                         roomGroupInfo.getStudentReward(userUuid));
                                 stageStreamInfosOne.add(stageStream);
                             } else if (stageMemberIdsTwo.contains(userUuid)) {
                                 StageStreamInfo stageStream = new StageStreamInfo(stream,
-                                        stageGroupIds.get(1),
+                                        stageGroups.get(G2).getGroupUuid(),
                                         roomGroupInfo.getStudentReward(userUuid));
                                 stageStreamInfosTwo.add(stageStream);
                             }

@@ -24,7 +24,7 @@ import io.agora.education.classroom.widget.StageVideoView;
 public class StageVideoAdapter extends BaseQuickAdapter<StageStreamInfo, StageVideoAdapter.ViewHolder> {
 
     private static String localUserUuid;
-    private static String rewardUuid;
+    private String rewardUuid;
 
     public StageVideoAdapter() {
         super(0);

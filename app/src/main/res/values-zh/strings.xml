@@ -49,7 +49,13 @@
     <string name="uploadlog_success">日志上报成功\n</string>
     <string name="title_msg">消息</string>
     <string name="offline_state">(已离线)</string>
+    <string name="groupname">%s(%d 人)</string>
     <string name="teacherinviteaudio">老师申请打开麦克风!</string>
     <string name="teacherinvitevideo">老师申请打开摄像头!</string>
     <string name="copy1">复制</string>
+    <string name="handsupsuccess">举手成功</string>
+    <string name="handsupfailed">举手失败</string>
+    <string name="cancelhandsupsuccess">取消举手成功</string>
+    <string name="cancelhandsupfailed">取消举手失败</string>
+    <string name="onstage">正在台上</string>
 </resources>

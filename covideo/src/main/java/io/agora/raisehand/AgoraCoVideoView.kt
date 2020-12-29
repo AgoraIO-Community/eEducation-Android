@@ -22,6 +22,7 @@ import io.agora.education.api.room.EduRoom
 import io.agora.raisehand.CoVideoActionType.ACCEPT
 import io.agora.raisehand.CoVideoActionType.CANCEL
 import io.agora.raisehand.CoVideoActionType.REJECT
+import io.agora.raisehand.CoVideoState.Applying
 import io.agora.raisehand.CoVideoState.DisCoVideo
 
 /**
@@ -253,7 +254,10 @@ class AgoraCoVideoView : LinearLayout {
             session.onLinkMediaChanged(true)
             /*允许举手即上台，直接回调允许上台接口*/
             coVideoListener?.onCoVideoAccepted()
-            post { handImg.setImageResource(handImgs[2]) }
+            post {
+                handImg.setImageResource(handImgs[2])
+                handImg.isEnabled = false
+            }
             return
         }
         coVideoListener?.onCoVideoApply()
@@ -261,8 +265,10 @@ class AgoraCoVideoView : LinearLayout {
 
     /**成功发起连麦申请*/
     fun launchCoVideoApplySuccess() {
-        session.curCoVideoState = CoVideoState.Applying
-        post { handImg.setImageResource(handImgs[1]) }
+        session.curCoVideoState = Applying
+        post {
+            handImg.setImageResource(handImgs[1])
+        }
     }
 
     /**取消连麦
@@ -281,7 +287,10 @@ class AgoraCoVideoView : LinearLayout {
      * @param onStage 举手(连麦)请求是否被允许*/
     fun onLinkMediaChanged(onStage: Boolean) {
         session.onLinkMediaChanged(onStage)
-        post { handImg.setImageResource(if (session.isCoVideoing()) handImgs[2] else handImgs[0]) }
+        post {
+            handImg.setImageResource(if (session.isCoVideoing()) handImgs[2] else handImgs[0])
+            handImg.isEnabled = !session.isCoVideoing()
+        }
     }
 
     fun abortCoVideoing() {
@@ -291,10 +300,10 @@ class AgoraCoVideoView : LinearLayout {
     }
 
     /**同步action消息过来的状态(包括accept和reject)*/
-    fun syncCoVideoAction(payload: String) {
-        val action = Gson().fromJson(payload, AgoraCoVideoAction::class.java)
-        action?.let {
-            when (action.action) {
+    fun syncCoVideoAction(payload: String, actionCode: Int) {
+//        val action = Gson().fromJson(payload, AgoraCoVideoAction::class.java)
+        actionCode?.let {
+            when (actionCode) {
                 ACCEPT -> {
                     onLinkMediaChanged(true)
                     coVideoListener?.onCoVideoAccepted()

@@ -1,6 +1,7 @@
 package io.agora.education.classroom.adapter;
 
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +27,7 @@ import io.agora.education.classroom.bean.group.GroupInfo;
 import io.agora.education.classroom.bean.group.GroupMemberInfo;
 
 public class StudentGroupAdapter extends RecyclerView.Adapter<StudentGroupAdapter.ViewHolder> {
+    private static final String TAG = "StudentGroupAdapter";
 
     private List<GroupInfo> groupInfoList = new ArrayList<>();
     private List<GroupMemberInfo> allMemberList = new ArrayList<>();
@@ -40,7 +44,8 @@ public class StudentGroupAdapter extends RecyclerView.Adapter<StudentGroupAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         GroupInfo groupInfo = groupInfoList.get(position);
-        holder.groupNameTextView.setText(groupInfo.getGroupName());
+        holder.groupNameTextView.setText(String.format(holder.itemView.getContext().getString(
+                R.string.groupname), groupInfo.getGroupName(), groupInfo.getMembers().size()));
         holder.coVideoing.setVisibility(groupInfo.getOnStage() ? View.VISIBLE : View.GONE);
         List<GroupMemberInfo> curGroupMembers = new ArrayList<>();
         for (GroupMemberInfo memberInfo : allMemberList) {
@@ -48,6 +53,7 @@ public class StudentGroupAdapter extends RecyclerView.Adapter<StudentGroupAdapte
                 curGroupMembers.add(memberInfo);
             }
         }
+        Log.e(TAG, new Gson().toJson(curGroupMembers));
         GroupMemberAdapter memberAdapter = new GroupMemberAdapter(curGroupMembers);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(holder.itemView.getContext(),
                 LinearLayoutManager.HORIZONTAL, false);

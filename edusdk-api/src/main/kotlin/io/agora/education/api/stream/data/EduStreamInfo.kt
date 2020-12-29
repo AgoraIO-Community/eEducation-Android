@@ -12,6 +12,7 @@ enum class AudioSourceType(var value: Int) {
 }
 
 open class EduStreamInfo(
+        /*仅支持数字类型的字符串*/
         val streamUuid: String,
         var streamName: String?,
         var videoSourceType: VideoSourceType,

@@ -22,7 +22,6 @@ import io.agora.education.api.logger.LogLevel
 import io.agora.education.api.message.EduChatMsg
 import io.agora.education.api.message.EduChatMsgType
 import io.agora.education.api.message.EduMsg
-import io.agora.education.api.message.GroupMemberInfoMessage
 import io.agora.education.api.statistics.AgoraError
 import io.agora.education.api.stream.data.*
 import io.agora.education.api.user.EduUser
@@ -511,7 +510,7 @@ internal open class EduUserImpl(
         return null
     }
 
-    override fun setRoomProperties(properties: MutableMap<String, GroupMemberInfoMessage>,
+    override fun setRoomProperties(properties: MutableMap<String, Any>,
                                    cause: MutableMap<String, String>, callback: EduCallback<Unit>) {
         val req = EduUpsertRoomPropertyReq(properties, cause)
         RetrofitManager.instance()!!.getService(API_BASE_URL, RoomService::class.java)

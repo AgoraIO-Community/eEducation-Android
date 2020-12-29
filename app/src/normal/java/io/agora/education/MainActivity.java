@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
@@ -68,6 +69,8 @@ public class MainActivity extends BaseActivity {
     protected EditText et_room_type;
     @BindView(R.id.card_room_type)
     protected CardView card_room_type;
+    @BindView(R.id.btn_join)
+    protected Button btnJoin;
 
     private EduUserRole curRole = EduUserRole.STUDENT;
 
@@ -175,6 +178,8 @@ public class MainActivity extends BaseActivity {
     }
 
     private void start() {
+        notifyBtnJoinEnable(false);
+
         String roomNameStr = et_room_name.getText().toString();
         if (TextUtils.isEmpty(roomNameStr)) {
             ToastManager.showShort(R.string.room_name_should_not_be_empty);
@@ -216,6 +221,7 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onFailure(@NotNull EduError error) {
+                notifyBtnJoinEnable(true);
                 Log.e(TAG, "初始化EduManager失败->code:" + error.getType() + ",reason:" + error.getMsg());
             }
         });
@@ -242,13 +248,13 @@ public class MainActivity extends BaseActivity {
          * 只要保证在调用joinClassroom之前，classroom在服务端存在即可*/
         RoomCreateOptions options = new RoomCreateOptions(roomUuid, roomNameStr, roomType);
         Log.e(TAG, "调用scheduleClass函数");
-
         RoomCreateOptionsReq optionsReq = RoomCreateOptionsReq.convertRoomCreateOptions(options);
         RetrofitManager.instance().getService(API_BASE_URL, CommonService.class)
                 .createClassroom(getAppId(), options.getRoomUuid(), optionsReq)
                 .enqueue(new RetrofitManager.Callback<>(0, new ThrowableCallback<ResponseBody<String>>() {
                     @Override
                     public void onSuccess(@Nullable ResponseBody<String> res) {
+                        notifyBtnJoinEnable(true);
                         Log.e(TAG, "调用scheduleClass函数成功");
                         Intent intent = createIntent(yourNameStr, yourUuid, roomNameStr, roomUuid, roomType);
                         startActivityForResult(intent, REQUEST_CODE_RTE);
@@ -256,6 +262,7 @@ public class MainActivity extends BaseActivity {
 
                     @Override
                     public void onFailure(@Nullable Throwable throwable) {
+                        notifyBtnJoinEnable(true);
                         BusinessException error;
                         if (throwable instanceof BusinessException) {
                             error = (BusinessException) throwable;
@@ -296,6 +303,14 @@ public class MainActivity extends BaseActivity {
         }
         intent.putExtra(BaseClassActivity_bak.ROOMENTRY, roomEntry);
         return intent;
+    }
+
+    private void notifyBtnJoinEnable(boolean enable) {
+        runOnUiThread(() -> {
+            if(btnJoin != null) {
+                btnJoin.setEnabled(enable);
+            }
+        });
     }
 
 }

@@ -53,8 +53,13 @@
     <string name="uploadlog_success">Log reported successfully\n</string>
     <string name="title_msg">Message</string>
     <string name="offline_state">(Offline)</string>
-    <string name="groupname" translatable="false">%s:(%d)</string>
+    <string name="groupname">%s(%d person)</string>
     <string name="teacherinviteaudio">teacher applied to turn on your microphone!</string>
     <string name="teacherinvitevideo">teacher applied to turn on your camera!</string>
     <string name="copy1">Copy</string>
+    <string name="handsupsuccess">hands up success</string>
+    <string name="handsupfailed">hands up failed</string>
+    <string name="cancelhandsupsuccess">cancel hands up success</string>
+    <string name="cancelhandsupfailed">cancel hands up failed</string>
+    <string name="onstage">on stage</string>
 </resources>

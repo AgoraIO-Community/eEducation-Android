@@ -1,9 +1,7 @@
 package io.agora.education.impl.room.data.request
 
-import io.agora.education.api.message.GroupMemberInfoMessage
-
 class EduUpsertRoomPropertyReq(
-        val properties: MutableMap<String, GroupMemberInfoMessage>,
+        val properties: MutableMap<String, Any>,
         val cause: MutableMap<String, String>
 ) {
 }

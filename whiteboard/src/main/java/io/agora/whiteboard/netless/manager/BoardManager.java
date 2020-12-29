@@ -17,14 +17,11 @@ import com.herewhite.sdk.domain.RoomState;
 import com.herewhite.sdk.domain.SDKError;
 import com.herewhite.sdk.domain.SceneState;
 
-import io.agora.log.LogManager;
 import io.agora.whiteboard.netless.annotation.Appliance;
 import io.agora.whiteboard.netless.listener.BoardEventListener;
 
 public class BoardManager extends NetlessManager<Room> implements RoomCallbacks {
     private static final String TAG = "BoardManager";
-
-    private final LogManager log = new LogManager(this.getClass().getSimpleName());
 
     private String appliance;
     private int[] strokeColor;
@@ -41,7 +38,7 @@ public class BoardManager extends NetlessManager<Room> implements RoomCallbacks 
     }
 
     public void init(WhiteSdk sdk, RoomParams params) {
-        log.e("init");
+        Log.e(TAG, "init");
         sdk.joinRoom(params, this, promise);
     }
 
@@ -236,7 +233,7 @@ public class BoardManager extends NetlessManager<Room> implements RoomCallbacks 
 
     @Override
     void onSuccess(Room room) {
-        log.e("onSuccess");
+        Log.e(TAG, "onSuccess:");
         if (appliance != null) {
             setAppliance(appliance);
         }
@@ -263,6 +260,6 @@ public class BoardManager extends NetlessManager<Room> implements RoomCallbacks 
 
     @Override
     void onFail(SDKError error) {
-        log.e("onFail %s", error.toString());
+        Log.e(TAG, "onFail " + error.toString());
     }
 }

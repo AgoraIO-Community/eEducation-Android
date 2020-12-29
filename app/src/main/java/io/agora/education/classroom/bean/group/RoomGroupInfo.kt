@@ -83,16 +83,12 @@ class RoomGroupInfo() {
                 val memberInfo = element.value
                 memberInfo.uuid = element.key
                 if (onStageUserIds.contains(memberInfo.uuid)) {
-                    /*在台上的用户肯定在线*/
                     memberInfo.onStage()
-                    memberInfo.online()
                     memberInfo.enableVideo = streams[onStageUserIds.indexOf(memberInfo.uuid)].hasVideo
                     memberInfo.enableAudio = streams[onStageUserIds.indexOf(memberInfo.uuid)].hasAudio
-                } else {
-                    /*单独判断当前用户是否在线*/
-                    memberInfo.online = onlineUserIds.contains(memberInfo.uuid)
                 }
-//                memberInfo.reward += getGroupReward(memberInfo.uuid)
+                /*单独判断当前用户是否在线*/
+                memberInfo.online = onlineUserIds.contains(memberInfo.uuid)
                 allStudent!!.add(memberInfo)
             }
         }

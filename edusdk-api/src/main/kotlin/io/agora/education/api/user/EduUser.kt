@@ -5,7 +5,6 @@ import io.agora.education.api.EduCallback
 import io.agora.education.api.base.EduError
 import io.agora.education.api.message.EduChatMsg
 import io.agora.education.api.message.EduMsg
-import io.agora.education.api.message.GroupMemberInfoMessage
 import io.agora.education.api.stream.data.*
 import io.agora.education.api.user.data.EduLocalUserInfo
 import io.agora.education.api.user.data.EduActionConfig
@@ -100,7 +99,7 @@ interface EduUser {
      * 1:parameter XXX is invalid
      * 2:internal error：可以内部订阅具体什么错误
      * 301:network error，透传后台错误msg字段*/
-    fun setRoomProperties(properties: MutableMap<String, GroupMemberInfoMessage>,
+    fun setRoomProperties(properties: MutableMap<String, Any>,
                           cause: MutableMap<String, String>, callback: EduCallback<Unit>)
 
     /**code:message

@@ -88,6 +88,7 @@ public class TitleView extends ConstraintLayout {
     public void setTimeState(boolean start, long time) {
         ((Activity) getContext()).runOnUiThread(() -> {
             if (time_view != null) {
+                time_view.setTime(time);
                 if (start) {
                     if (!time_view.isStarted()) {
                         time_view.start();
@@ -96,7 +97,6 @@ public class TitleView extends ConstraintLayout {
                 } else {
                     time_view.stop();
                 }
-                time_view.setTime(time);
             }
         });
     }

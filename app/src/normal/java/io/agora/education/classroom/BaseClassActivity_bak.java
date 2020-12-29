@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import androidx.fragment.app.FragmentManager;
+
 import com.google.gson.Gson;
 import com.herewhite.sdk.domain.GlobalState;
 
@@ -16,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -75,6 +78,7 @@ import io.agora.education.classroom.bean.board.BoardInfo;
 import io.agora.education.classroom.bean.board.BoardState;
 import io.agora.education.classroom.bean.channel.Room;
 import io.agora.education.classroom.bean.channel.User;
+import io.agora.education.classroom.bean.group.GroupMemberInfo;
 import io.agora.education.classroom.bean.msg.ChannelMsg;
 import io.agora.education.classroom.bean.record.RecordBean;
 import io.agora.education.classroom.bean.record.RecordMsg;
@@ -97,6 +101,9 @@ import static io.agora.education.MainActivity.CODE;
 import static io.agora.education.MainActivity.REASON;
 import static io.agora.education.api.BuildConfig.API_BASE_URL;
 import static io.agora.education.classroom.bean.board.BoardBean.BOARD;
+import static io.agora.education.classroom.bean.group.MediumClassPropertyCauseType.CMD;
+import static io.agora.education.classroom.bean.group.MediumClassPropertyCauseType.STUDENTLISTCHANGED;
+import static io.agora.education.classroom.bean.group.RoomGroupInfo.STUDENTS;
 import static io.agora.education.classroom.bean.record.RecordBean.RECORD;
 import static io.agora.education.classroom.bean.record.RecordState.END;
 
@@ -540,43 +547,49 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
     }
 
     public final void showLeaveDialog() {
-        ConfirmDialog.normal(getString(R.string.confirm_leave_room_content), confirm -> {
-            if (confirm) {
-                /**退出activity之前离开eduRoom*/
-                if (getMainEduRoom() != null) {
-                    getMainEduRoom().leave(new EduCallback<Unit>() {
-                        @Override
-                        public void onSuccess(@Nullable Unit res) {
-                        }
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if(fragmentManager != null && !fragmentManager.isDestroyed()) {
+            ConfirmDialog.normal(getString(R.string.confirm_leave_room_content), confirm -> {
+                if (confirm) {
+                    /**退出activity之前离开eduRoom*/
+                    if (getMainEduRoom() != null) {
+                        getMainEduRoom().leave(new EduCallback<Unit>() {
+                            @Override
+                            public void onSuccess(@Nullable Unit res) {
+                            }
 
-                        @Override
-                        public void onFailure(@NotNull EduError error) {
-                        }
-                    });
-                    BaseClassActivity_bak.this.finish();
+                            @Override
+                            public void onFailure(@NotNull EduError error) {
+                            }
+                        });
+                        BaseClassActivity_bak.this.finish();
+                    }
                 }
-            }
-        }).show(getSupportFragmentManager(), null);
+            }).show(fragmentManager, null);
+        }
     }
 
     public final void showRemovedDialog() {
-        ConfirmDialog.single(getString(R.string.confirm_removed_from_room_content), confirm -> {
-            if (confirm) {
-                /**退出activity之前离开eduRoom*/
-                if (getMainEduRoom() != null) {
-                    getMainEduRoom().leave(new EduCallback<Unit>() {
-                        @Override
-                        public void onSuccess(@Nullable Unit res) {
-                        }
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if(fragmentManager != null && !fragmentManager.isDestroyed()) {
+            ConfirmDialog.single(getString(R.string.confirm_removed_from_room_content), confirm -> {
+                if (confirm) {
+                    /**退出activity之前离开eduRoom*/
+                    if (getMainEduRoom() != null) {
+                        getMainEduRoom().leave(new EduCallback<Unit>() {
+                            @Override
+                            public void onSuccess(@Nullable Unit res) {
+                            }
 
-                        @Override
-                        public void onFailure(@NotNull EduError error) {
-                        }
-                    });
-                    BaseClassActivity_bak.this.finish();
+                            @Override
+                            public void onFailure(@NotNull EduError error) {
+                            }
+                        });
+                        BaseClassActivity_bak.this.finish();
+                    }
                 }
-            }
-        }).show(getSupportFragmentManager(), null);
+            }).show(fragmentManager, null);
+        }
     }
 
     /**
@@ -633,7 +646,10 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
             };
             countDownTimer.start();
             finalDialog.setConfirmText(getString(R.string.confirm).concat("(10)"));
-            finalDialog.show(getSupportFragmentManager(), null);
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            if (fragmentManager != null && !fragmentManager.isDestroyed()) {
+                finalDialog.show(getSupportFragmentManager(), null);
+            }
         });
     }
 
@@ -676,13 +692,14 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
     }
 
     private final void showLogId(String logId) {
-        if (!this.isFinishing() || !this.isDestroyed()) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if (fragmentManager != null && !fragmentManager.isDestroyed()) {
             ConfirmDialog.singleWithButton(getString(R.string.uploadlog_success).concat(logId),
                     getString(R.string.copy1), confirm -> {
                         if (confirm) {
                             AppUtil.copyToClipboard(BaseClassActivity_bak.this, logId);
                         }
-                    }).show(getSupportFragmentManager(), null);
+                    }).show(fragmentManager, null);
         }
     }
 

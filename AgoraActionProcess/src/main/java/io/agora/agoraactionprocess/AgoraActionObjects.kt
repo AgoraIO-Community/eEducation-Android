@@ -1,5 +1,7 @@
 package io.agora.agoraactionprocess
 
+import com.google.gson.Gson
+
 enum class AgoraActionType(val value: Int) {
     AgoraActionTypeApply(1),
     AgoraActionTypeInvitation(2),
@@ -44,21 +46,47 @@ class AgoraActionOptions(
 class AgoraStartActionOptions(
         val toUserUuid: String,
         val processUuid: String,
-        val fromUserUuid: String?,
-        val payload: Map<String, Any>?
+        val body: AgoraStartActionMsgReq
 ) {
 }
+
+class AgoraStartActionMsgReq(
+        val fromUserUuid: String?,
+        val payload: Map<String, Any>?
+)
 
 class AgoraStopActionOptions(
         val toUserUuid: String,
         val processUuid: String,
+        val body: AgoraStopActionMsgReq) {
+}
+
+class AgoraStopActionMsgReq(
         val action: Int = AgoraActionType.AgoraActionTypeAccept.value,
         val fromUserUuid: String?,
         var payload: Map<String, Any>?,
-        var waitAck: Int = AgoraActionWaitACK.DISABLE.value) {
-}
+        var waitAck: Int = AgoraActionWaitACK.DISABLE.value
+)
 
 enum class AgoraActionWaitACK(val value: Int) {
     DISABLE(0),
     ENABLE(1)
 }
+
+class AgoraActionMsgRes(
+        val action: Int = AgoraActionType.AgoraActionTypeApply.value,
+        val processUuid: String,
+        val fromUser: AgoraActionFromUser,
+        private val payload: Map<String, Any>?
+) {
+
+    fun getPayloadJson(): String {
+        return Gson().toJson(payload ?: "")
+    }
+}
+
+class AgoraActionFromUser(
+        val uuid: String,
+        val name: String,
+        val role: String
+)

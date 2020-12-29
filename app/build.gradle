@@ -20,8 +20,8 @@ android {
         applicationId "io.agora.education"
         minSdkVersion rootProject.ext.android.minSdkVersion
         targetSdkVersion rootProject.ext.android.targetSdkVersion
-        versionCode 8
-        versionName "6.0.0"
+        versionCode 9
+        versionName "6.1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 

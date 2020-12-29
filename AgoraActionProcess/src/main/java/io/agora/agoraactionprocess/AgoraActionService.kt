@@ -26,7 +26,7 @@ interface AgoraActionService {
             @Path("roomUuid") roomUuid: String,
             @Path("toUserUuid") toUserUuid: String,
             @Path("processUuid") processUuid: String,
-            @Body actionOptions: AgoraStartActionOptions
+            @Body body: AgoraStartActionMsgReq
     ): Call<ResponseBody<String>>
 
 
@@ -36,6 +36,6 @@ interface AgoraActionService {
             @Path("roomUuid") roomUuid: String,
             @Path("toUserUuid") toUserUuid: String,
             @Path("processUuid") processUuid: String,
-            @Body actionOptions: AgoraStopActionOptions
+            @Body body: AgoraStopActionMsgReq
     ): Call<ResponseBody<String>>
 }

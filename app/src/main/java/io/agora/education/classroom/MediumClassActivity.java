@@ -28,8 +28,12 @@ import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
+import io.agora.agoraactionprocess.AgoraActionFromUser;
+import io.agora.agoraactionprocess.AgoraStartActionMsgReq;
 import io.agora.agoraactionprocess.AgoraStartActionOptions;
+import io.agora.agoraactionprocess.AgoraStopActionMsgReq;
 import io.agora.agoraactionprocess.AgoraStopActionOptions;
+import io.agora.base.ToastManager;
 import io.agora.base.callback.ThrowableCallback;
 import io.agora.base.network.ResponseBody;
 import io.agora.education.R;
@@ -38,7 +42,6 @@ import io.agora.education.api.base.EduError;
 import io.agora.education.api.message.EduActionMessage;
 import io.agora.education.api.message.EduChatMsg;
 import io.agora.education.api.message.EduMsg;
-import io.agora.education.api.message.GroupMemberInfoMessage;
 import io.agora.education.api.room.EduRoom;
 import io.agora.education.api.room.data.EduRoomChangeType;
 import io.agora.education.api.room.data.EduRoomInfo;
@@ -76,7 +79,7 @@ import io.agora.raisehand.AgoraCoVideoAction;
 import io.agora.raisehand.AgoraCoVideoFromRoom;
 import io.agora.raisehand.AgoraCoVideoListener;
 import io.agora.raisehand.AgoraCoVideoView;
-import io.agora.raisehand.AgoraCoVideoFromUser;
+import io.agora.raisehand.CoVideoActionType;
 import kotlin.Unit;
 
 import static io.agora.education.classroom.bean.group.MediumClassPropertyCauseType.CMD;
@@ -103,6 +106,7 @@ import static io.agora.education.classroom.bean.group.RoomGroupInfo.USERUUID;
 import static io.agora.education.classroom.bean.msg.PeerMsg.Cmd.UnMutePeerCMD;
 import static io.agora.education.classroom.bean.msg.PeerMsg.Cmd.ApplyInviteActionCMD;
 import static io.agora.agoraactionprocess.AgoraActionWaitACK.DISABLE;
+import static io.agora.education.classroom.bean.msg.PeerMsg.CoVideoMsg.Type.ACCEPT;
 
 public class MediumClassActivity extends BaseClassActivity_bak implements TabLayout.OnTabSelectedListener,
         AgoraCoVideoListener {
@@ -377,10 +381,12 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
             public void onSuccess(@Nullable EduUser user) {
                 if (user != null) {
                     EduUserInfo userInfo = user.getUserInfo();
+                    /*不存在于名单中时才需要更新*/
                     if (!roomGroupInfo.existsInList(userInfo.getUserUuid())) {
-                        GroupMemberInfoMessage memberInfo = new GroupMemberInfoMessage(
-                                userInfo.getUserUuid(), userInfo.getUserName(), "", 0);
-                        Map<String, GroupMemberInfoMessage> memberInfoMap = new HashMap<>();
+                        GroupMemberInfo memberInfo = new GroupMemberInfo(
+                                userInfo.getUserUuid(), userInfo.getUserName(),
+                                "", 0, true, true, userInfo.getStreamUuid(), "");
+                        Map<String, Object> memberInfoMap = new HashMap<>();
                         memberInfoMap.put(STUDENTS.concat(".").concat(memberInfo.getUuid()),
                                 memberInfo);
                         Map<String, String> cause = new HashMap<>();
@@ -710,7 +716,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                 }
             }
             if (needUpdateStudentList) {
-                studentListFragment.updateStudentList(roomGroupInfo.getAllStudent());
+                notifyUserList();
             }
             notifyStageVideoList();
         }
@@ -747,7 +753,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                 }
             }
             if (needUpdateStudentList) {
-                studentListFragment.updateStudentList(roomGroupInfo.getAllStudent());
+                notifyUserList();
             }
             notifyStageVideoList();
         }
@@ -770,7 +776,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                 }
             }
             if (needUpdateStudentList) {
-                studentListFragment.updateStudentList(roomGroupInfo.getAllStudent());
+                notifyUserList();
             }
         }
     }
@@ -854,12 +860,15 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     private void updateLocalStreamInfo(EduStreamEvent streamEvent) {
         EduStreamInfo streamInfo = streamEvent.getModifiedStream();
         updateMemberInfoList(streamInfo, streamInfo.getPublisher());
-        studentListFragment.updateStudentList(roomGroupInfo.getAllStudent());
+        /*本地流信息更新完之后需要刷新学生/分组列表*/
+        notifyUserList();
+//        studentListFragment.updateStudentList(roomGroupInfo.getAllStudent());
     }
 
     @Override
     public void onLocalStreamAdded(@NotNull EduStreamEvent streamEvent) {
         super.onLocalStreamAdded(streamEvent);
+        agoraCoVideoView.onLinkMediaChanged(true);
         roomGroupInfo.membersOnStage(Collections.singletonList(streamEvent));
         updateLocalStreamInfo(streamEvent);
         notifyStageVideoList();
@@ -868,6 +877,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     @Override
     public void onLocalStreamUpdated(@NotNull EduStreamEvent streamEvent) {
         super.onLocalStreamUpdated(streamEvent);
+        agoraCoVideoView.onLinkMediaChanged(true);
         roomGroupInfo.membersOnStage(Collections.singletonList(streamEvent));
         updateLocalStreamInfo(streamEvent);
         notifyStageVideoList();
@@ -880,8 +890,8 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
          * 1:同步状态至CoVideoView 2:刷新音视频列表*/
         agoraCoVideoView.onLinkMediaChanged(false);
         roomGroupInfo.membersOffStage(Collections.singletonList(streamEvent));
-        notifyStageVideoList();
         updateLocalStreamInfo(streamEvent);
+        notifyStageVideoList();
     }
 
     @Override
@@ -935,19 +945,19 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     @Override
     public void onAccept(@NotNull AgoraActionMsgRes actionMsgRes) {
         super.onAccept(actionMsgRes);
-        agoraCoVideoView.syncCoVideoAction(actionMsgRes.getPayloadJson());
+        agoraCoVideoView.syncCoVideoAction(actionMsgRes.getPayloadJson(), CoVideoActionType.INSTANCE.getACCEPT());
     }
 
     @Override
     public void onReject(@NotNull AgoraActionMsgRes actionMsgRes) {
         super.onReject(actionMsgRes);
-        agoraCoVideoView.syncCoVideoAction(actionMsgRes.getPayloadJson());
+        agoraCoVideoView.syncCoVideoAction(actionMsgRes.getPayloadJson(), CoVideoActionType.INSTANCE.getREJECT());
     }
 
     @Override
     public void onCancel(@NotNull AgoraActionMsgRes actionMsgRes) {
         super.onCancel(actionMsgRes);
-        agoraCoVideoView.syncCoVideoAction(actionMsgRes.getPayloadJson());
+        agoraCoVideoView.syncCoVideoAction(actionMsgRes.getPayloadJson(), CoVideoActionType.INSTANCE.getCANCEL());
     }
 
     /**
@@ -970,20 +980,22 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                                             AgoraActionConfigInfo config = actionConfigs.get(0);
                                             Map<String, Object> payload = new AgoraCoVideoAction(
                                                     AgoraActionTypeApply.getValue(),
-                                                    new AgoraCoVideoFromUser(info.getUserUuid(),
-                                                            info.getUserName(), info.getRole().name()),
                                                     new AgoraCoVideoFromRoom(roomInfo.getRoomUuid(),
                                                             roomInfo.getRoomName())).toMap();
-                                            AgoraStartActionOptions options = new AgoraStartActionOptions(teacher.getUserUuid(),
-                                                    config.processUuid, info.getUserUuid(), payload);
+                                            AgoraStartActionOptions options = new AgoraStartActionOptions(
+                                                    teacher.getUserUuid(), config.processUuid,
+                                                    new AgoraStartActionMsgReq(info.getUserUuid(),
+                                                            payload));
                                             actionProcessManager.startAgoraAction(options, new ThrowableCallback<ResponseBody<String>>() {
                                                 @Override
                                                 public void onSuccess(@Nullable ResponseBody<String> res) {
+                                                    ToastManager.showShort(R.string.handsupsuccess);
                                                     agoraCoVideoView.launchCoVideoApplySuccess();
                                                 }
 
                                                 @Override
                                                 public void onFailure(@Nullable Throwable throwable) {
+                                                    ToastManager.showShort(R.string.handsupfailed);
                                                 }
                                             });
                                         }
@@ -1028,22 +1040,24 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                                             AgoraActionConfigInfo config = actionConfigs.get(0);
                                             Map<String, Object> payload = new AgoraCoVideoAction(
                                                     AgoraActionTypeCancel.getValue(),
-                                                    new AgoraCoVideoFromUser(info.getUserUuid(),
-                                                            info.getUserName(), info.getRole().name()),
                                                     new AgoraCoVideoFromRoom(roomInfo.getRoomUuid(),
                                                             roomInfo.getRoomName())).toMap();
                                             AgoraStopActionOptions options = new AgoraStopActionOptions(
                                                     teacher.getUserUuid(), config.processUuid,
-                                                    AgoraActionTypeCancel.getValue(), info.getUserUuid(),
-                                                    payload, DISABLE.getValue());
+                                                    new AgoraStopActionMsgReq(
+                                                            AgoraActionTypeCancel.getValue(),
+                                                            info.getUserUuid(), payload,
+                                                            DISABLE.getValue()));
                                             actionProcessManager.stopAgoraAction(options, new ThrowableCallback<ResponseBody<String>>() {
                                                 @Override
                                                 public void onSuccess(@Nullable ResponseBody<String> res) {
+                                                    ToastManager.showShort(R.string.cancelhandsupsuccess);
                                                     agoraCoVideoView.launchCoVideoCancelSuccess();
                                                 }
 
                                                 @Override
                                                 public void onFailure(@Nullable Throwable throwable) {
+                                                    ToastManager.showShort(R.string.cancelhandsupfailed);
                                                 }
                                             });
                                         }

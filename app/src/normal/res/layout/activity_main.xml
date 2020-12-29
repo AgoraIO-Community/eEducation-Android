@@ -108,6 +108,7 @@
             android:background="@drawable/btn_circle_44a2fc"
             android:gravity="center"
             android:text="老师加入"
+            android:visibility="gone"
             android:textColor="@color/white"
             android:textSize="@dimen/sp_16"
             app:layout_constraintTop_toBottomOf="@id/btn_join" />

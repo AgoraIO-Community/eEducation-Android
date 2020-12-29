@@ -15,10 +15,9 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/cover_View"
-        android:layout_width="@dimen/dp_28"
-        android:layout_height="@dimen/dp_28"
-        android:alpha="0.5"
-        android:background="@color/gray_CCCCCC"
+        android:layout_width="@dimen/dp_30"
+        android:layout_height="@dimen/dp_30"
+        android:src="@drawable/ic_portraitcover"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

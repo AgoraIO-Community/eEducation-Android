@@ -104,7 +104,7 @@ class AgoraActionProcessManager(
     fun startAgoraAction(options: AgoraStartActionOptions, callback: ThrowableCallback<ResponseBody<String>>) {
         RetrofitManager.instance().getService(processConfig.baseUrl, AgoraActionService::class.java)
                 .startAgoraAction(processConfig.appId, processConfig.roomUuid, options.toUserUuid,
-                        options.processUuid, options)
+                        options.processUuid, options.body)
                 .enqueue(RetrofitManager.Callback(0, object : ThrowableCallback<ResponseBody<String>> {
                     override fun onSuccess(res: ResponseBody<String>?) {
                         callback.onSuccess(res)
@@ -120,7 +120,7 @@ class AgoraActionProcessManager(
     fun stopAgoraAction(options: AgoraStopActionOptions, callback: ThrowableCallback<ResponseBody<String>>) {
         RetrofitManager.instance().getService(processConfig.baseUrl, AgoraActionService::class.java)
                 .stopAgoraAction(processConfig.appId, processConfig.roomUuid, options.toUserUuid,
-                        options.processUuid, options)
+                        options.processUuid, options.body)
                 .enqueue(RetrofitManager.Callback(0, object : ThrowableCallback<ResponseBody<String>> {
                     override fun onSuccess(res: ResponseBody<String>?) {
                         callback.onSuccess(res)

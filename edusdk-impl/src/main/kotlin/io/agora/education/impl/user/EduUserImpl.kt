@@ -492,7 +492,7 @@ internal open class EduUserImpl(
         AgoraLog.w("$TAG->Clear all SurfaceView")
         if (surfaceViewList.size > 0) {
             surfaceViewList.forEach {
-                val parent = it.parent;
+                val parent = it.parent
                 if (parent != null && parent is ViewGroup) {
                     parent.removeView(it)
                 }

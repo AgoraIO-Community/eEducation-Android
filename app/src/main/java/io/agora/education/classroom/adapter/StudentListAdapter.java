@@ -86,8 +86,8 @@ public class StudentListAdapter extends RecyclerView.Adapter<StudentListAdapter.
         return students.size();
     }
 
-    public void updateStudentList(List<GroupMemberInfo> students) {
-        this.students = students;
+    public void updateStudentList(List<GroupMemberInfo> data) {
+        this.students = data;
         notifyDataSetChanged();
     }
 

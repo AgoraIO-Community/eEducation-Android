@@ -9,7 +9,6 @@ import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,7 +21,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.agora.education.R;
-import io.agora.education.api.user.data.EduUserInfo;
 import io.agora.education.classroom.bean.group.GroupInfo;
 import io.agora.education.classroom.bean.group.GroupMemberInfo;
 
@@ -101,9 +99,9 @@ public class StudentGroupAdapter extends RecyclerView.Adapter<StudentGroupAdapte
         return groupInfoList.size();
     }
 
-    public void updateGroupList(List<GroupInfo> groupInfos, List<GroupMemberInfo> allMembers) {
-        this.groupInfoList = groupInfos;
-        this.allMemberList = allMembers;
+    public void updateGroupList(List<GroupInfo> newGroupInfos, List<GroupMemberInfo> newAllMembers) {
+        this.groupInfoList = newGroupInfos;
+        this.allMemberList = newAllMembers;
         notifyDataSetChanged();
     }
 

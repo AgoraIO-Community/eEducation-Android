@@ -259,10 +259,8 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     private void showTeacherStream(EduStreamInfo stream, FrameLayout viewGroup) {
         switch (stream.getVideoSourceType()) {
             case CAMERA:
-                videoTeacher.setName(stream.getPublisher().getUserName());
                 renderStream(getMainEduRoom(), stream, viewGroup);
-                videoTeacher.muteVideo(!stream.getHasVideo());
-                videoTeacher.muteAudio(!stream.getHasAudio());
+                videoTeacher.update(stream);
                 break;
             case SCREEN:
                 runOnUiThread(() -> {
@@ -280,21 +278,6 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
             default:
                 break;
         }
-    }
-
-    private void initBoard(BoardBean boardBean) {
-        BoardInfo info = boardBean.getInfo();
-        getLocalUserInfo(new EduCallback<EduUserInfo>() {
-            @Override
-            public void onSuccess(@Nullable EduUserInfo userInfo) {
-                runOnUiThread(() -> whiteboardFragment.initBoardWithRoomToken(
-                        info.getBoardId(), info.getBoardToken(), userInfo.getUserUuid()));
-            }
-
-            @Override
-            public void onFailure(@NotNull EduError error) {
-            }
-        });
     }
 
     private void syncRoomGroupProperty(Map<String, Object> roomProperties) {
@@ -341,32 +324,6 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
 
             @Override
             public void onFailure(@NotNull EduError error) {
-            }
-        });
-    }
-
-    private void getCurAllStudentUser(EduCallback<List<EduUserInfo>> callback) {
-        getCurFullUser(new EduCallback<List<EduUserInfo>>() {
-            @Override
-            public void onSuccess(@Nullable List<EduUserInfo> res) {
-                if (res != null) {
-                    List<EduUserInfo> students = new ArrayList<>();
-                    Iterator<EduUserInfo> iterator = res.iterator();
-                    while (iterator.hasNext()) {
-                        EduUserInfo element = iterator.next();
-                        if (element.getRole().equals(EduUserRole.STUDENT)) {
-                            students.add(element);
-                        }
-                    }
-                    callback.onSuccess(students);
-                } else {
-                    callback.onFailure(EduError.Companion.customMsgError("current room no user!"));
-                }
-            }
-
-            @Override
-            public void onFailure(@NotNull EduError error) {
-                callback.onFailure(error);
             }
         });
     }
@@ -434,24 +391,22 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     }
 
     private void notifyStageVideoByReward(String uuid, boolean isGroup) {
+        List<String> stageUuidsOne = new ArrayList<>();
+        List<String> stageUuidsTwo = new ArrayList<>();
+        for (StageStreamInfo stream : stageStreamInfosOne) {
+            stageUuidsOne.add(stream.getStreamInfo().getPublisher().getUserUuid());
+        }
+        for (StageStreamInfo stream : stageStreamInfosTwo) {
+            stageUuidsTwo.add(stream.getStreamInfo().getPublisher().getUserUuid());
+        }
         if (!isGroup) {
             /*个人奖励*/
-            List<String> stageUuidsOne = new ArrayList<>();
-            for (StageStreamInfo stream : stageStreamInfosOne) {
-                stageUuidsOne.add(stream.getStreamInfo().getPublisher().getUserUuid());
-            }
             if (stageUuidsOne.contains(uuid)) {
                 /*刷新stageOne中的某一个item*/
                 stageVideoAdapterOne.notifyRewardByUser(uuid);
-            } else {
-                List<String> stageUuidsTwo = new ArrayList<>();
-                for (StageStreamInfo stream : stageStreamInfosTwo) {
-                    stageUuidsTwo.add(stream.getStreamInfo().getPublisher().getUserUuid());
-                }
-                if (stageUuidsTwo.contains(uuid)) {
-                    /*刷新stageTwo中的某一个item*/
-                    stageVideoAdapterTwo.notifyRewardByUser(uuid);
-                }
+            } else if (stageUuidsTwo.contains(uuid)) {
+                /*刷新stageTwo中的某一个item*/
+                stageVideoAdapterTwo.notifyRewardByUser(uuid);
             }
         } else {
             /*整组奖励包括:整组上台后的整组奖励和组内成员单一上台后的整组奖励*/
@@ -493,7 +448,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
         getCurFullUser(new EduCallback<List<EduUserInfo>>() {
             @Override
             public void onSuccess(@Nullable List<EduUserInfo> curFullUsers) {
-                if(curFullUsers != null && curFullUsers.size() > 0) {
+                if (curFullUsers != null && curFullUsers.size() > 0) {
                     getCurFullStream(new EduCallback<List<EduStreamInfo>>() {
                         @Override
                         public void onSuccess(@Nullable List<EduStreamInfo> curFullStreams) {
@@ -502,10 +457,10 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                             while (it.hasNext()) {
                                 EduStreamInfo streamInfo = it.next();
                                 EduBaseUserInfo userInfo = streamInfo.getPublisher();
-                                if(!curFullUsers.contains(userInfo)) {
+                                if (!curFullUsers.contains(userInfo)) {
                                     it.remove();
                                 }
-                                if(userInfo.getUserUuid().equals("pixel2")) {
+                                if (userInfo.getUserUuid().equals("pixel2")) {
                                     Log.e(TAG, "错误:" + new Gson().toJson(streamInfo));
                                 }
                             }
@@ -619,7 +574,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
 
     private void notifyStageVideoListOne() {
         List<StageStreamInfo> old = stageVideoAdapterOne.getData();
-        if(!old.equals(stageStreamInfosOne)) {
+        if (!old.equals(stageStreamInfosOne)) {
             getLocalUserInfo(new EduCallback<EduUserInfo>() {
                 @Override
                 public void onSuccess(@Nullable EduUserInfo res) {
@@ -640,7 +595,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
 
     private void notifyStageVideoListTwo() {
         List<StageStreamInfo> old = stageVideoAdapterTwo.getData();
-        if(!old.equals(stageStreamInfosTwo)) {
+        if (!old.equals(stageStreamInfosTwo)) {
             getLocalUserInfo(new EduCallback<EduUserInfo>() {
                 @Override
                 public void onSuccess(@Nullable EduUserInfo res) {
@@ -712,7 +667,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
     public void onRemoteStreamsInitialized(@NotNull List<? extends EduStreamInfo> streams, @NotNull EduRoom classRoom) {
         if (classRoom.equals(getMainEduRoom())) {
             /*显示老师的流*/
-            getMainEduRoom().getFullStreamList(new EduCallback<List<EduStreamInfo>>() {
+            getMyMediaRoom().getFullStreamList(new EduCallback<List<EduStreamInfo>>() {
                 @Override
                 public void onSuccess(@Nullable List<EduStreamInfo> res) {
                     if (res != null) {
@@ -849,14 +804,14 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                         /*整组奖励，刷新分组列表*/
                         String groupUUid = String.valueOf(cause.get(GROUPUUID));
                         notifyUserList();
-                        notifyStageVideoList();
+//                        notifyStageVideoList();
                         notifyStageVideoByReward(groupUUid, true);
                         break;
                     case STUDENTREWARD:
                         /*学生个人奖励，刷新分组列表*/
                         String userUuid = String.valueOf(cause.get(USERUUID));
                         notifyUserList();
-                        notifyStageVideoList();
+//                        notifyStageVideoList();
                         notifyStageVideoByReward(userUuid, false);
                         break;
                     case GROUPMEDIA:

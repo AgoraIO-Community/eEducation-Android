@@ -483,10 +483,8 @@ public class LargeClassActivity extends BaseClassActivity_bak implements TabLayo
             runOnUiThread(() -> viewGroup.removeAllViews());
         }
         video_student.setViewVisibility((viewGroup == null) ? View.GONE : View.VISIBLE);
-        video_student.setName(streamInfo.getPublisher().getUserName());
         renderStream(getMainEduRoom(), streamInfo, viewGroup);
-        video_student.muteVideo(!streamInfo.getHasVideo());
-        video_student.muteAudio(!streamInfo.getHasAudio());
+        video_student.update(streamInfo);
     }
 
     /**
@@ -556,10 +554,8 @@ public class LargeClassActivity extends BaseClassActivity_bak implements TabLayo
                         if (publisher.getRole().equals(EduUserRole.TEACHER)) {
                             switch (streamInfo.getVideoSourceType()) {
                                 case CAMERA:
-                                    video_teacher.setName(publisher.getUserName());
                                     renderStream(getMainEduRoom(), streamInfo, video_teacher.getVideoLayout());
-                                    video_teacher.muteVideo(!streamInfo.getHasVideo());
-                                    video_teacher.muteAudio(!streamInfo.getHasAudio());
+                                    video_teacher.update(streamInfo);
                                     break;
                                 case SCREEN:
                                     runOnUiThread(() -> {
@@ -667,10 +663,8 @@ public class LargeClassActivity extends BaseClassActivity_bak implements TabLayo
                 switch (streamInfo.getVideoSourceType()) {
                     case CAMERA:
                         /**老师的远端流*/
-                        video_teacher.setName(userInfo.getUserName());
                         renderStream(getMainEduRoom(), streamInfo, video_teacher.getVideoLayout());
-                        video_teacher.muteVideo(!streamInfo.getHasVideo());
-                        video_teacher.muteAudio(!streamInfo.getHasAudio());
+                        video_teacher.update(streamInfo);
                         /**刷新学生的流的显示层级*/
                         refreshStudentVideoZOrder();
                         break;
@@ -696,10 +690,8 @@ public class LargeClassActivity extends BaseClassActivity_bak implements TabLayo
             if (userInfo.getRole().equals(EduUserRole.TEACHER)) {
                 switch (streamInfo.getVideoSourceType()) {
                     case CAMERA:
-                        video_teacher.setName(userInfo.getUserName());
                         renderStream(getMainEduRoom(), streamInfo, video_teacher.getVideoLayout());
-                        video_teacher.muteVideo(!streamInfo.getHasVideo());
-                        video_teacher.muteAudio(!streamInfo.getHasAudio());
+                        video_teacher.update(streamInfo);
                         /**刷新学生的流的显示层级*/
                         refreshStudentVideoZOrder();
                         break;
@@ -723,10 +715,8 @@ public class LargeClassActivity extends BaseClassActivity_bak implements TabLayo
             EduBaseUserInfo userInfo = streamInfo.getPublisher();
             if (userInfo.getRole().equals(EduUserRole.TEACHER) &&
                     streamInfo.getVideoSourceType().equals(VideoSourceType.CAMERA)) {
-                video_teacher.setName(streamInfo.getPublisher().getUserName());
                 renderStream(getMainEduRoom(), streamInfo, null);
-                video_teacher.muteVideo(!streamInfo.getHasVideo());
-                video_teacher.muteAudio(!streamInfo.getHasAudio());
+                video_teacher.update(streamInfo);
             } else {
                 renderStudentStream(streamInfo, null);
                 if (curLinkedUser != null && curLinkedUser.equals(streamInfo.getPublisher())) {

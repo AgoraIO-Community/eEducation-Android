@@ -96,15 +96,15 @@ public class StageVideoAdapter extends BaseQuickAdapter<StageStreamInfo, StageVi
 //        if (payloads.size() > 0) {
 //            viewHolder.convert(item);
 //        }
-        if(payloads.isEmpty()) {
+        if (payloads.isEmpty()) {
             viewHolder.convert(item);
         } else {
             /*判断是否需要播放奖励动画，同时动画播放完成后就把播放标志置空*/
             boolean a = !TextUtils.isEmpty(item.getGroupUuid()) && item.getGroupUuid().equals(rewardUuid);
-            if(a || item.getStreamInfo().getPublisher().getUserUuid().equals(rewardUuid)) {
+            if (a || item.getStreamInfo().getPublisher().getUserUuid().equals(rewardUuid)) {
                 viewHolder.rewardAnim();
             }
-            if(getItemPosition(item) == getData().size() - 1) {
+            if (getItemPosition(item) == getData().size() - 1) {
                 this.rewardUuid = null;
             }
         }
@@ -122,41 +122,7 @@ public class StageVideoAdapter extends BaseQuickAdapter<StageStreamInfo, StageVi
     }
 
     public void setNewList(@Nullable List<StageStreamInfo> newData, String localUserUuid) {
-        Log.e(TAG, "视频:" + new Gson().toJson(newData));
         this.localUserUuid = localUserUuid;
-        List<String> oldStreamId = new ArrayList<>(getData().size());
-        for (StageStreamInfo element : getData()) {
-            oldStreamId.add(element.getStreamInfo().getStreamUuid());
-        }
-        List<Integer> changed = new ArrayList<>();
-        List<Integer> added = new ArrayList<>();
-        List<Integer> removed = new ArrayList<>();
-        for (int i = 0; i < newData.size(); i++) {
-            StageStreamInfo element = newData.get(i);
-            int pos = oldStreamId.indexOf(element.getStreamInfo().getStreamUuid());
-            if (pos > -1) {
-                StageStreamInfo old = getData().get(pos);
-                if (!old.equals(element)) {
-                    changed.add(i);
-                }
-            }
-        }
-        for (int i = 0; i < newData.size(); i++) {
-            StageStreamInfo element = newData.get(i);
-            if (!oldStreamId.contains(element.getStreamInfo().getStreamUuid())) {
-                added.add(i);
-            }
-        }
-        List<String> newStreamId = new ArrayList<>(newData.size());
-        for (StageStreamInfo element : newData) {
-            newStreamId.add(element.getStreamInfo().getStreamUuid());
-        }
-        for (int i = 0; i < getData().size(); i++) {
-            StageStreamInfo element = getData().get(i);
-            if (!newStreamId.contains(element.getStreamInfo().getStreamUuid())) {
-                removed.add(i);
-            }
-        }
         List<StageStreamInfo> list = new ArrayList<>();
         list.addAll(newData);
         ((Activity) getContext()).runOnUiThread(() -> {
@@ -170,7 +136,7 @@ public class StageVideoAdapter extends BaseQuickAdapter<StageStreamInfo, StageVi
             String uuid = streamInfos.get(i).getStreamInfo().getPublisher().getUserUuid();
             if (uuid.equals(userUuid)) {
                 this.rewardUuid = uuid;
-                int finalI = i;
+                final int finalI = i;
                 ((Activity) getContext()).runOnUiThread(() -> notifyItemChanged(finalI, "notifyRewardByUser"));
             }
         }
@@ -181,7 +147,7 @@ public class StageVideoAdapter extends BaseQuickAdapter<StageStreamInfo, StageVi
         int size = 0;
         List<StageStreamInfo> stageStreams = getData();
         for (int i = 0; i < stageStreams.size(); i++) {
-            if(stageStreams.get(i).getGroupUuid().equals(groupUuid)) {
+            if (stageStreams.get(i).getGroupUuid().equals(groupUuid)) {
                 size++;
             }
         }

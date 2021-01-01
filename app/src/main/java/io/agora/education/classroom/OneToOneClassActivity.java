@@ -108,10 +108,8 @@ public class OneToOneClassActivity extends BaseClassActivity_bak {
                         if (streamInfo.getPublisher().getRole().equals(EduUserRole.TEACHER)) {
                             switch (streamInfo.getVideoSourceType()) {
                                 case CAMERA:
-                                    video_teacher.setName(streamInfo.getPublisher().getUserName());
                                     renderStream(getMainEduRoom(), streamInfo, video_teacher.getVideoLayout());
-                                    video_teacher.muteVideo(!streamInfo.getHasVideo());
-                                    video_teacher.muteAudio(!streamInfo.getHasAudio());
+                                    video_teacher.update(streamInfo);
                                     break;
                                 case SCREEN:
                                     /**有屏幕分享的流进入，说明是老师打开了屏幕分享，此时把这个流渲染出来*/
@@ -206,10 +204,8 @@ public class OneToOneClassActivity extends BaseClassActivity_bak {
             /**一对一场景下，远端流就是老师的流*/
             switch (streamInfo.getVideoSourceType()) {
                 case CAMERA:
-                    video_teacher.setName(streamInfo.getPublisher().getUserName());
                     renderStream(getMainEduRoom(), streamInfo, video_teacher.getVideoLayout());
-                    video_teacher.muteVideo(!streamInfo.getHasVideo());
-                    video_teacher.muteAudio(!streamInfo.getHasAudio());
+                    video_teacher.update(streamInfo);
                     break;
                 default:
                     break;
@@ -225,10 +221,8 @@ public class OneToOneClassActivity extends BaseClassActivity_bak {
             /**一对一场景下，远端流就是老师的流*/
             switch (streamInfo.getVideoSourceType()) {
                 case CAMERA:
-                    video_teacher.setName(streamInfo.getPublisher().getUserName());
                     renderStream(getMainEduRoom(), streamInfo, video_teacher.getVideoLayout());
-                    video_teacher.muteVideo(!streamInfo.getHasVideo());
-                    video_teacher.muteAudio(!streamInfo.getHasAudio());
+                    video_teacher.update(streamInfo);
                     break;
                 default:
                     break;
@@ -244,10 +238,8 @@ public class OneToOneClassActivity extends BaseClassActivity_bak {
             EduStreamInfo streamInfo = streamEvent.getModifiedStream();
             switch (streamInfo.getVideoSourceType()) {
                 case CAMERA:
-                    video_teacher.setName(streamInfo.getPublisher().getUserName());
                     renderStream(getMainEduRoom(), streamInfo, null);
-                    video_teacher.muteVideo(!streamInfo.getHasVideo());
-                    video_teacher.muteAudio(!streamInfo.getHasAudio());
+                    video_teacher.update(streamInfo);
                     break;
                 default:
                     break;
@@ -292,8 +284,7 @@ public class OneToOneClassActivity extends BaseClassActivity_bak {
         super.onLocalStreamAdded(streamEvent);
         EduStreamInfo streamInfo = streamEvent.getModifiedStream();
         renderStream(getMainEduRoom(), streamInfo, video_student.getVideoLayout());
-        video_student.muteVideo(!streamInfo.getHasVideo());
-        video_student.muteAudio(!streamInfo.getHasAudio());
+        video_student.muteMedia(streamInfo);
         Log.e(TAG, "本地流被添加：" + getLocalCameraStream().getHasAudio() + "," + streamInfo.getHasVideo());
     }
 
@@ -301,8 +292,7 @@ public class OneToOneClassActivity extends BaseClassActivity_bak {
     public void onLocalStreamUpdated(@NotNull EduStreamEvent streamEvent) {
         super.onLocalStreamUpdated(streamEvent);
         EduStreamInfo streamInfo = streamEvent.getModifiedStream();
-        video_student.muteVideo(!streamInfo.getHasVideo());
-        video_student.muteAudio(!streamInfo.getHasAudio());
+        video_student.muteMedia(streamInfo);
         Log.e(TAG, "本地流被修改：" + streamInfo.getHasAudio() + "," + streamInfo.getHasVideo());
     }
 
@@ -312,13 +302,11 @@ public class OneToOneClassActivity extends BaseClassActivity_bak {
         /**一对一场景下，此回调被调用就说明classroom结束，人员退出；所以此回调可以不处理*/
         EduStreamInfo streamInfo = streamEvent.getModifiedStream();
         renderStream(getMainEduRoom(), streamInfo, null);
-        video_student.muteVideo(true);
-        video_student.muteAudio(true);
+        video_student.muteMedia(true, true);
         Log.e(TAG, "本地流被移除");
     }
 
     @Override
     public void onLocalUserLeft(@NotNull EduUserEvent userEvent, @NotNull EduUserLeftType leftType) {
-
     }
 }

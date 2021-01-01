@@ -116,9 +116,7 @@ public class ClassVideoAdapter extends BaseQuickAdapter<EduStreamInfo, ClassVide
         }
 
         void convert(EduStreamInfo item) {
-            view.muteVideo(!item.getHasVideo());
-            view.muteAudio(!item.getHasAudio());
-            view.setName(item.getPublisher().getUserName());
+            view.update(item);
         }
     }
 

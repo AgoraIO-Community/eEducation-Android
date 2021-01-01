@@ -865,20 +865,6 @@ public abstract class BaseClassActivity_bak extends BaseActivity implements EduR
                 }));
     }
 
-    protected void setTitleClassName() {
-        getMediaRoomName(new EduCallback<String>() {
-            @Override
-            public void onSuccess(@Nullable String roomName) {
-                title_view.setTitle(String.format(Locale.getDefault(), "%s", roomName));
-            }
-
-            @Override
-            public void onFailure(@NotNull EduError error) {
-
-            }
-        });
-    }
-
     protected void initTitleTimeState() {
         getMediaRoomStatus(new EduCallback<EduRoomStatus>() {
             @Override

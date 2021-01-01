@@ -16,6 +16,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.agora.education.R;
+import io.agora.education.api.stream.data.EduStreamInfo;
 
 public class RtcVideoView extends ConstraintLayout {
 
@@ -55,6 +56,13 @@ public class RtcVideoView extends ConstraintLayout {
         ((Activity) getContext()).runOnUiThread(() -> setVisibility(visibility));
     }
 
+    public void update(EduStreamInfo streamInfo) {
+        ((Activity) getContext()).runOnUiThread(() -> {
+            tv_name.setText(streamInfo.getPublisher().getUserName());
+            muteMedia(streamInfo);
+        });
+    }
+
     public void setName(String name) {
         ((Activity) getContext()).runOnUiThread(() -> tv_name.setText(name));
     }
@@ -63,7 +71,6 @@ public class RtcVideoView extends ConstraintLayout {
         ((Activity) getContext()).runOnUiThread(() -> {
             ic_audio.setState(muted ? RtcAudioView.State.CLOSED : RtcAudioView.State.OPENED);
         });
-
     }
 
     public boolean isAudioMuted() {
@@ -86,6 +93,25 @@ public class RtcVideoView extends ConstraintLayout {
             return !ic_video.isSelected();
         }
         return true;
+    }
+
+    public void muteMedia(EduStreamInfo streamInfo) {
+        ((Activity) getContext()).runOnUiThread(() -> {
+            muteMedia(!streamInfo.getHasAudio(), !streamInfo.getHasVideo());
+        });
+    }
+
+    public void muteMedia(boolean audioMuted, boolean videoMuted) {
+        ((Activity) getContext()).runOnUiThread(() -> {
+            ic_audio.setState(audioMuted ? RtcAudioView.State.CLOSED : RtcAudioView.State.OPENED);
+            Log.e("RtcVideoView", "muteAudio：" + audioMuted);
+            if (ic_video != null) {
+                ic_video.setSelected(!videoMuted);
+            }
+            layout_video.setVisibility(videoMuted ? GONE : VISIBLE);
+            layout_place_holder.setVisibility(videoMuted ? VISIBLE : GONE);
+            Log.e("RtcVideoView", "muteVideo：" + videoMuted);
+        });
     }
 
     public FrameLayout getVideoLayout() {

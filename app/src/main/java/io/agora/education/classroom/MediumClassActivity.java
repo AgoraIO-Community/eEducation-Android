@@ -500,9 +500,13 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                             /*过滤掉不在线的人的流(分组之后学生下线，然后所在组整体上线就会出现有流无人的情况)*/
                             Iterator<EduStreamInfo> it = curFullStreams.iterator();
                             while (it.hasNext()) {
-                                EduBaseUserInfo userInfo = it.next().getPublisher();
+                                EduStreamInfo streamInfo = it.next();
+                                EduBaseUserInfo userInfo = streamInfo.getPublisher();
                                 if(!curFullUsers.contains(userInfo)) {
                                     it.remove();
+                                }
+                                if(userInfo.getUserUuid().equals("pixel2")) {
+                                    Log.e(TAG, "错误:" + new Gson().toJson(streamInfo));
                                 }
                             }
                             stageStreamInfosOne.clear();
@@ -556,6 +560,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
                                     }
                                 }
                             }
+//                            Log.e(TAG, "错误stageStreamInfosOne:" + new Gson().toJson(stageStreamInfosOne));
                             /*尝试获取单个上台(举手，邀请)的台上用户*/
                             List<EduStreamInfo> curStageStreams = new ArrayList<>();
                             if (roomGroupInfo.getAllStudent() != null) {
@@ -894,6 +899,7 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
 
     @Override
     public void onLocalStreamAdded(@NotNull EduStreamEvent streamEvent) {
+        Log.e(TAG, "错误onLocalStreamAdded:" + new Gson().toJson(streamEvent.getModifiedStream()));
         super.onLocalStreamAdded(streamEvent);
         agoraCoVideoView.onLinkMediaChanged(true);
         roomGroupInfo.membersOnStage(Collections.singletonList(streamEvent));

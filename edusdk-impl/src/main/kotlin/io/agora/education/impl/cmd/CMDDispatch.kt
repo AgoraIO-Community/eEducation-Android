@@ -180,7 +180,7 @@ internal class CMDDispatch(private val eduRoom: EduRoom) {
                         item.userUuid == eduRoom.getCurLocalUser().userInfo.userUuid
                     }!!.type)
                 }
-                validOfflineUsers.let {
+                validOfflineUsers?.let {
                     AgoraLog.i("$TAG->onRemoteUsersLeft:${Gson().toJson(it)}")
                     cmdCallbackManager.onRemoteUsersLeft(it, eduRoom)
                 }
@@ -189,7 +189,7 @@ internal class CMDDispatch(private val eduRoom: EduRoom) {
                     cmdCallbackManager.onRemoteStreamsRemoved(validRemovedStreams, eduRoom)
                 }
                 validAddedLocalStream?.let {
-                    AgoraLog.i("$TAG->onLocalStreamAdded:${Gson().toJson(it)}")
+                    AgoraLog.i("$TAG->错误onLocalStreamAdded:${Gson().toJson(it)}")
                     cmdCallbackManager.onLocalStreamAdded(it, eduRoom.getCurLocalUser())
                 }
                 validRemovedLocalStream?.let {
@@ -341,6 +341,7 @@ internal class CMDDispatch(private val eduRoom: EduRoom) {
                 /**回调有效数据*/
                 if (validAddedLocalStreams.size > 0) {
                     AgoraLog.e(TAG, "Callback the newly added localStream to upper layer")
+                    AgoraLog.e(TAG, "错误onLocalStreamAdded:${Gson().toJson(validAddedLocalStreams)}")
                     validAddedLocalStreams.forEach {
                         cmdCallbackManager.onLocalStreamAdded(it, eduRoom.getCurLocalUser())
                     }

@@ -369,6 +369,7 @@ internal class EduRoomImpl(
                         RteEngineImpl.updateLocalStream(streamInfo.hasAudio, streamInfo.hasVideo)
                         RteEngineImpl.publish(getCurRoomUuid())
                         AgoraLog.i("$TAG->Join success，callback the added localStream to upper layer")
+                        AgoraLog.i("$TAG->onLocalStreamAdded:${Gson().toJson(element)}")
                         syncSession.localUser.eventListener?.onLocalStreamAdded(element)
                         /**把本地流*/
                         addedStreamsIterable.remove()

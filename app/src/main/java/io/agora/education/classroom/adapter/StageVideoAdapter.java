@@ -2,6 +2,7 @@ package io.agora.education.classroom.adapter;
 
 import android.app.Activity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -10,10 +11,12 @@ import androidx.recyclerview.widget.DiffUtil;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import io.agora.education.R;
 import io.agora.education.api.stream.data.EduStreamInfo;
@@ -22,6 +25,7 @@ import io.agora.education.classroom.bean.group.StageStreamInfo;
 import io.agora.education.classroom.widget.StageVideoView;
 
 public class StageVideoAdapter extends BaseQuickAdapter<StageStreamInfo, StageVideoAdapter.ViewHolder> {
+    private static final String TAG = "StageVideoAdapter";
 
     private static String localUserUuid;
     private String rewardUuid;
@@ -98,10 +102,14 @@ public class StageVideoAdapter extends BaseQuickAdapter<StageStreamInfo, StageVi
     protected void convert(@NonNull ViewHolder viewHolder, StageStreamInfo item) {
         viewHolder.convert(item);
         Activity activity = (Activity) viewHolder.view.getContext();
-        if (item.getStreamInfo().getHasVideo() && activity instanceof BaseClassActivity_bak)
+        if (item.getStreamInfo().getHasVideo() && activity instanceof BaseClassActivity_bak) {
+//            Log.e(TAG, "有视频:" + new Gson().toJson(item));
             ((BaseClassActivity_bak) activity).renderStream(
                     ((BaseClassActivity_bak) activity).getMainEduRoom(), item.getStreamInfo(),
                     viewHolder.view.getVideoLayout());
+        } else {
+//            Log.e(TAG, "无视频:" + new Gson().toJson(item));
+        }
         if (!TextUtils.isEmpty(rewardUuid)) {
             boolean a = !TextUtils.isEmpty(item.getGroupUuid()) && item.getGroupUuid().equals(rewardUuid);
             if (a || item.getStreamInfo().getPublisher().getUserUuid().equals(rewardUuid)) {
@@ -114,13 +122,46 @@ public class StageVideoAdapter extends BaseQuickAdapter<StageStreamInfo, StageVi
         }
     }
 
-    public void setNewList(@Nullable List<StageStreamInfo> data, String localUserUuid) {
+    public void setNewList(@Nullable List<StageStreamInfo> newData, String localUserUuid) {
+        Log.e(TAG, "视频:" + new Gson().toJson(newData));
         this.localUserUuid = localUserUuid;
+        List<String> oldStreamId = new ArrayList<>(getData().size());
+        for (StageStreamInfo element : getData()) {
+            oldStreamId.add(element.getStreamInfo().getStreamUuid());
+        }
+        List<Integer> changed = new ArrayList<>();
+        List<Integer> added = new ArrayList<>();
+        List<Integer> removed = new ArrayList<>();
+        for (int i = 0; i < newData.size(); i++) {
+            StageStreamInfo element = newData.get(i);
+            int pos = oldStreamId.indexOf(element.getStreamInfo().getStreamUuid());
+            if(pos > -1) {
+                StageStreamInfo old = getData().get(pos);
+                if(!old.equals(element)) {
+                    changed.add(i);
+                }
+            }
+        }
+        for (int i = 0; i < newData.size(); i++) {
+            StageStreamInfo element = newData.get(i);
+            if(!oldStreamId.contains(element.getStreamInfo().getStreamUuid())) {
+                added.add(i);
+            }
+        }
+        List<String> newStreamId = new ArrayList<>(newData.size());
+        for (StageStreamInfo element : newData) {
+            newStreamId.add(element.getStreamInfo().getStreamUuid());
+        }
+        for (int i = 0; i < getData().size(); i++) {
+            StageStreamInfo element = getData().get(i);
+            if(!newStreamId.contains(element.getStreamInfo().getStreamUuid())) {
+                removed.add(i);
+            }
+        }
+        List<StageStreamInfo> list = new ArrayList<>();
+        list.addAll(newData);
         ((Activity) getContext()).runOnUiThread(() -> {
-            List<StageStreamInfo> list = new ArrayList<>();
-            list.addAll(data);
             setNewData(list);
-            notifyDataSetChanged();
         });
     }
 

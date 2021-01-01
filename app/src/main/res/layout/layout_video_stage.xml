@@ -73,7 +73,7 @@
         android:layout_width="@dimen/dp_14"
         android:layout_height="@dimen/dp_14"
         android:layout_marginEnd="@dimen/dp_2"
-        android:src="@drawable/ic_integral_1"
+        android:src="@drawable/ic_integral_2"
         app:layout_constraintBottom_toBottomOf="@id/view_bg_info"
         app:layout_constraintEnd_toStartOf="@id/reward_TextView"
         app:layout_constraintTop_toTopOf="@id/view_bg_info" />

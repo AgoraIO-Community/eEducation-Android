@@ -7,7 +7,7 @@ data class StageStreamInfo(var streamInfo: EduStreamInfo, val groupUuid: String?
         if (other == null || other !is StageStreamInfo) {
             return false
         }
-        return this.streamInfo == other && this.groupUuid == other.groupUuid &&
+        return this.streamInfo == other.streamInfo && this.groupUuid == other.groupUuid &&
                 this.reward == other.reward
     }
 }

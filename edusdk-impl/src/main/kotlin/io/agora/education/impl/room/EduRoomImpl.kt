@@ -303,11 +303,15 @@ internal class EduRoomImpl(
         syncSession.localUser.initOrUpdateLocalStream(localStreamInitOptions, object : EduCallback<EduStreamInfo> {
             override fun onSuccess(streamInfo: EduStreamInfo?) {
                 AgoraLog.i("$TAG->initOrUpdateLocalStream success")
-                /**判断是否需要更新本地的流信息(因为当前流信息在本地可能已经存在)*/
-                val pos = Convert.streamExistsInList(streamInfo!!, getCurStreamList())
-                if (pos > -1) {
-                    getCurStreamList()[pos] = streamInfo!!
-                }
+                /*本地流的更新完全依赖于RTM通知*/
+//                /**判断是否需要更新本地的流信息(因为当前流信息在本地可能已经存在)*/
+//                val pos = Convert.streamExistsInList(streamInfo!!, getCurStreamList())
+//                if (pos > -1) {
+//                    getCurStreamList()[pos] = streamInfo!!
+//                }
+//                if (pos < 0) {
+//                    getCurStreamList().add(streamInfo!!)
+//                }
                 /**如果当前用户是观众则什么都不做(即不发流)*/
                 val role = Convert.convertUserRole(syncSession.localUser.userInfo.role, getCurRoomType())
                 if (role == EduUserRoleStr.audience.value) {

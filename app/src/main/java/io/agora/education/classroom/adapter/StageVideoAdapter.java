@@ -102,6 +102,7 @@ public class StageVideoAdapter extends BaseQuickAdapter<StageStreamInfo, StageVi
             /*判断是否需要播放奖励动画，同时动画播放完成后就把播放标志置空*/
             boolean a = !TextUtils.isEmpty(item.getGroupUuid()) && item.getGroupUuid().equals(rewardUuid);
             if (a || item.getStreamInfo().getPublisher().getUserUuid().equals(rewardUuid)) {
+                viewHolder.view.setReward(item.getReward());
                 viewHolder.rewardAnim();
             }
             if (getItemPosition(item) == getData().size() - 1) {
@@ -130,11 +131,14 @@ public class StageVideoAdapter extends BaseQuickAdapter<StageStreamInfo, StageVi
         });
     }
 
+    /**调用一次，奖励加一*/
     public void notifyRewardByUser(String userUuid) {
-        List<StageStreamInfo> streamInfos = getData();
-        for (int i = 0; i < streamInfos.size(); i++) {
-            String uuid = streamInfos.get(i).getStreamInfo().getPublisher().getUserUuid();
+        List<StageStreamInfo> stageStreams = getData();
+        for (int i = 0; i < stageStreams.size(); i++) {
+            StageStreamInfo element = stageStreams.get(i);
+            String uuid = element.getStreamInfo().getPublisher().getUserUuid();
             if (uuid.equals(userUuid)) {
+                element.setReward(element.getReward() + 1);
                 this.rewardUuid = uuid;
                 final int finalI = i;
                 ((Activity) getContext()).runOnUiThread(() -> notifyItemChanged(finalI, "notifyRewardByUser"));
@@ -142,12 +146,15 @@ public class StageVideoAdapter extends BaseQuickAdapter<StageStreamInfo, StageVi
         }
     }
 
+    /**调用一次，奖励加一*/
     public void notifyRewardByGroup(String groupUuid) {
         this.rewardUuid = groupUuid;
         int size = 0;
         List<StageStreamInfo> stageStreams = getData();
         for (int i = 0; i < stageStreams.size(); i++) {
-            if (stageStreams.get(i).getGroupUuid().equals(groupUuid)) {
+            StageStreamInfo element = stageStreams.get(i);
+            if (element.getGroupUuid().equals(groupUuid)) {
+                element.setReward(element.getReward() + 1);
                 size++;
             }
         }

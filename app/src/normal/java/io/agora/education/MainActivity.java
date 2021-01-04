@@ -38,7 +38,6 @@ import io.agora.education.classroom.MediumClassActivity;
 import io.agora.education.classroom.LargeClassActivity;
 import io.agora.education.classroom.OneToOneClassActivity;
 import io.agora.education.classroom.SmallClassActivity;
-import io.agora.education.classroom.SmallClassActivity_Teacher;
 import io.agora.education.classroom.bean.channel.Room;
 import io.agora.education.service.CommonService;
 import io.agora.education.service.bean.ResponseBody;
@@ -291,9 +290,10 @@ public class MainActivity extends BaseActivity {
         } else if (roomType == RoomType.SMALL_CLASS.getValue()) {
             if (curRole == EduUserRole.STUDENT) {
                 intent.setClass(this, SmallClassActivity.class);
-            } else if (curRole == EduUserRole.TEACHER) {
-                intent.setClass(this, SmallClassActivity_Teacher.class);
             }
+//            else if (curRole == EduUserRole.TEACHER) {
+//                intent.setClass(this, SmallClassActivity_Teacher.class);
+//            }
         } else if (roomType == RoomType.LARGE_CLASS.getValue()) {
             intent.setClass(this, LargeClassActivity.class);
         } else if (roomType == RoomType.BREAKOUT_CLASS.getValue()) {
@@ -307,7 +307,7 @@ public class MainActivity extends BaseActivity {
 
     private void notifyBtnJoinEnable(boolean enable) {
         runOnUiThread(() -> {
-            if(btnJoin != null) {
+            if (btnJoin != null) {
                 btnJoin.setEnabled(enable);
             }
         });

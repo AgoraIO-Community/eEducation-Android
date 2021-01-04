@@ -1,5 +1,6 @@
 package io.agora.education.classroom;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -411,18 +412,61 @@ public class MediumClassActivity extends BaseClassActivity_bak implements TabLay
         } else {
             /*整组奖励包括:整组上台后的整组奖励和组内成员单一上台后的整组奖励*/
             Map<String, String> map = roomGroupInfo.getInteractOutGroups();
-            if (map != null) {
+            if (map != null && map.size() > 0) {
                 Iterator<Map.Entry<String, String>> iterator = map.entrySet().iterator();
                 while (iterator.hasNext()) {
                     Map.Entry<String, String> element = iterator.next();
-                    if (element.getKey().equals(G1) && element.getValue().equals(uuid)) {
-                        /*奖励属于stageOne,刷新stageOne中部分item*/
-                        stageVideoAdapterOne.notifyRewardByGroup(uuid);
-                    } else if (element.getKey().equals(G2) && element.getValue().equals(uuid)) {
-                        /*奖励属于stageTwo,刷新整个stageTwo*/
-                        stageVideoAdapterTwo.notifyRewardByGroup(uuid);
+                    if (element.getKey().equals(G1)) {
+                        /*整组奖励属于g1台上的组*/
+                        if (element.getValue().equals(uuid)) {
+                            /*g1有对应的组上台，刷新stageOne中部分属于此组的item*/
+                            stageVideoAdapterOne.notifyRewardByGroup(uuid);
+                        } else if (TextUtils.isEmpty(element.getValue())) {
+                            /*g1无组上台，查询g1台上是否存在属于当前组的流，存在则刷新*/
+                            checkNotifyRewardOnG1(uuid);
+                        }
+                    } else if (element.getKey().equals(G2)) {
+                        /*整组奖励属于g2台上的组*/
+                        if (element.getValue().equals(uuid)) {
+                            /*g2有对应的组上台，刷新stageTwo中部分属于此组的item*/
+                            stageVideoAdapterTwo.notifyRewardByGroup(uuid);
+                        } else if (TextUtils.isEmpty(element.getValue())) {
+                            /*g2无组上台，查询g2台上是否存在属于当前组的流，存在则刷新*/
+                            checkNotifyRewardOnG2(uuid);
+                        }
                     }
                 }
+            } else {
+                if (!checkNotifyRewardOnG1(uuid)) {
+                    checkNotifyRewardOnG2(uuid);
+                }
+            }
+        }
+    }
+
+    /**
+     * 检查g1台上是否存在属于当前组{$groupUuid}的流,存在则刷新g1
+     */
+    private boolean checkNotifyRewardOnG1(String groupUuid) {
+        for (StageStreamInfo stageStream : stageStreamInfosOne) {
+            if (stageStream.getGroupUuid().equals(groupUuid)) {
+                stageVideoAdapterOne.notifyRewardByUser(stageStream.
+                        getStreamInfo().getPublisher().getUserUuid());
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 检查g2台上是否存在属于当前组{$groupUuid}的流,存在则刷新g2
+     */
+    private void checkNotifyRewardOnG2(String groupUuid) {
+        for (StageStreamInfo stageStream : stageStreamInfosTwo) {
+            if (stageStream.getGroupUuid().equals(groupUuid)) {
+                stageVideoAdapterTwo.notifyRewardByUser(stageStream.
+                        getStreamInfo().getPublisher().getUserUuid());
+                break;
             }
         }
     }

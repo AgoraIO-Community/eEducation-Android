@@ -20,7 +20,7 @@ android {
 
         consumerProguardFiles 'consumer-rules.pro'
 
-        buildConfigField 'String', 'API_BASE_URL', '"https://cloudcapiv4.herewhite.com/"'
+        buildConfigField 'String', 'NETLESS_API_BASE_URL', '"https://cloudcapiv4.herewhite.com/"'
     }
 
     compileOptions {
@@ -30,8 +30,7 @@ android {
 }
 
 dependencies {
-    implementation project(':base')
     implementation project(':log')
 
-    api "com.github.duty-os:white-sdk-android:${safeExtGet('dependencies', 'com.github.duty-os:white-sdk-android', '2.6.4')}"
+    api "com.github.duty-os:white-sdk-android:${safeExtGet('dependencies', 'com.github.duty-os:white-sdk-android', '2.9.14')}"
 }

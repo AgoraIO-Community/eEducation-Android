@@ -1,7 +1,7 @@
 package io.agora.education.impl.user
 
 import android.text.TextUtils
-import io.agora.Constants.Companion.APPID
+import io.agora.education.impl.Constants.Companion.APPID
 import io.agora.base.callback.ThrowableCallback
 import io.agora.base.network.BusinessException
 import io.agora.base.network.ResponseBody

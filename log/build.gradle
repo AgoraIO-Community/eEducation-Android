@@ -28,7 +28,7 @@ android {
 }
 
 dependencies {
-    implementation project(':base')
+    api project(':base')
 
     implementation "com.elvishew:xlog:${safeExtGet('dependencies', 'com.elvishew:xlog', '1.6.1')}"
     implementation "com.aliyun.dpa:oss-android-sdk:${safeExtGet('dependencies', 'com.aliyun.dpa:oss-android-sdk', '2.9.4')}"

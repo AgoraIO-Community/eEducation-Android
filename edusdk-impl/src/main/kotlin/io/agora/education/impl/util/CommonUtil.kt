@@ -2,11 +2,8 @@ package io.agora.education.impl.util
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import io.agora.education.api.room.EduRoom
 import io.agora.education.api.room.data.RoomType
 import io.agora.education.impl.BuildConfig
-import io.agora.education.impl.room.EduRoomImpl
-import io.agora.education.impl.room.data.EduRoomInfoImpl
 
 internal class CommonUtil {
     companion object {
@@ -27,7 +24,7 @@ internal class CommonUtil {
                     RoomType.BREAKOUT_CLASS.value -> {
                         info.addProperty("demo_scenario", "Breakout Classroom")
                     }
-                    RoomType.INTERMEDIATE_CLASS.value -> {
+                    RoomType.MEDIUM_CLASS.value -> {
                         info.addProperty("demo_scenario", "Intermediate Classroom")
                     }
                 }

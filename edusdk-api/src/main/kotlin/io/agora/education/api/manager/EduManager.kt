@@ -41,7 +41,6 @@ abstract class EduManager(
                         callback.onFailure(EduError.parameterError("context"))
                     }
                 } else if (options.context is Service) {
-
                 }
             }
             if (TextUtils.isEmpty(options.appId)) {

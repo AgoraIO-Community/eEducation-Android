@@ -5,8 +5,8 @@ import android.util.Log
 import androidx.annotation.NonNull
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import io.agora.Constants.Companion.APPID
-import io.agora.Constants.Companion.AgoraLog
+import io.agora.education.impl.Constants.Companion.APPID
+import io.agora.education.impl.Constants.Companion.AgoraLog
 import io.agora.base.callback.ThrowableCallback
 import io.agora.base.network.BusinessException
 import io.agora.education.api.BuildConfig.API_BASE_URL
@@ -22,7 +22,6 @@ import io.agora.education.api.room.EduRoom
 import io.agora.education.api.room.data.*
 import io.agora.education.api.statistics.NetworkQuality
 import io.agora.education.api.stream.data.*
-import io.agora.education.api.user.EduStudent
 import io.agora.education.api.user.EduUser
 import io.agora.education.api.user.data.EduChatState
 import io.agora.education.api.user.data.EduUserInfo

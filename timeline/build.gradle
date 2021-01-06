@@ -28,5 +28,5 @@ android {
 }
 
 dependencies {
-    api "androidx.annotation:annotation:${safeExtGet('dependencies', 'androidx.annotation:annotation', '1.1.0')}"
+    implementation "androidx.annotation:annotation:${safeExtGet('dependencies', 'androidx.annotation:annotation', '1.1.0')}"
 }

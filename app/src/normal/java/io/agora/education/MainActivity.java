@@ -20,45 +20,28 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import butterknife.OnTouch;
 import io.agora.base.ToastManager;
-import io.agora.base.callback.ThrowableCallback;
-import io.agora.base.network.BusinessException;
-import io.agora.base.network.RetrofitManager;
+import io.agora.edu.classroom.BaseClassActivity;
 import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
-import io.agora.education.api.manager.EduManager;
-import io.agora.education.api.manager.EduManagerOptions;
-import io.agora.education.api.room.data.RoomCreateOptions;
 import io.agora.education.api.room.data.RoomType;
-import io.agora.education.api.statistics.AgoraError;
 import io.agora.education.api.user.data.EduUserRole;
-import io.agora.education.base.BaseActivity;
-import io.agora.education.classroom.BaseClassActivity_bak;
-import io.agora.education.classroom.BreakoutClassActivity;
-import io.agora.education.classroom.MediumClassActivity;
-import io.agora.education.classroom.LargeClassActivity;
-import io.agora.education.classroom.OneToOneClassActivity;
-import io.agora.education.classroom.SmallClassActivity;
-import io.agora.education.classroom.bean.channel.Room;
-import io.agora.education.service.CommonService;
-import io.agora.education.service.bean.ResponseBody;
-import io.agora.education.service.bean.request.RoomCreateOptionsReq;
-import io.agora.education.util.AppUtil;
-import io.agora.education.widget.PolicyDialog;
+import io.agora.edu.base.BaseActivity;
+import io.agora.edu.classroom.bean.channel.Room;
+import io.agora.edu.launch.EduLaunch;
+import io.agora.edu.launch.LaunchConfig;
+import io.agora.edu.util.AppUtil;
+import io.agora.edu.widget.PolicyDialog;
 
 import static io.agora.education.EduApplication.getAppId;
 import static io.agora.education.EduApplication.getCustomerCer;
 import static io.agora.education.EduApplication.getCustomerId;
-import static io.agora.education.EduApplication.setManager;
-import static io.agora.education.api.BuildConfig.API_BASE_URL;
-import static io.agora.education.classroom.BaseClassActivity_bak.RESULT_CODE;
+import static io.agora.edu.launch.EduLaunch.CODE;
+import static io.agora.edu.launch.EduLaunch.REASON;
+import static io.agora.edu.launch.EduLaunch.REQUEST_CODE_RTC;
+import static io.agora.edu.launch.EduLaunch.REQUEST_CODE_RTE;
 
 public class MainActivity extends BaseActivity {
     private static final String TAG = "MainActivity";
-
-    private final int REQUEST_CODE_RTC = 101;
-    public final static int REQUEST_CODE_RTE = 909;
-    public static final String CODE = "code";
-    public static final String REASON = "reason";
 
     @BindView(R.id.et_room_name)
     protected EditText et_room_name;
@@ -70,8 +53,6 @@ public class MainActivity extends BaseActivity {
     protected CardView card_room_type;
     @BindView(R.id.btn_join)
     protected Button btnJoin;
-
-    private EduUserRole curRole = EduUserRole.STUDENT;
 
     @Override
     protected int getLayoutResId() {
@@ -108,7 +89,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (data != null && requestCode == REQUEST_CODE_RTE && resultCode == RESULT_CODE) {
+        if (data != null && requestCode == REQUEST_CODE_RTE && resultCode == BaseClassActivity.RESULT_CODE) {
             int code = data.getIntExtra(CODE, -1);
             String reason = data.getStringExtra(REASON);
             ToastManager.showShort(String.format(getString(R.string.function_error), code, reason));
@@ -116,15 +97,13 @@ public class MainActivity extends BaseActivity {
     }
 
     @OnClick({R.id.iv_setting, R.id.et_room_type, R.id.btn_join, R.id.tv_one2one, R.id.tv_small_class,
-            R.id.tv_large_class, R.id.tv_breakout_class, R.id.tv_intermediate_class,
-            R.id.btn_teacherJoin})
+            R.id.tv_large_class, R.id.tv_breakout_class, R.id.tv_intermediate_class})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.iv_setting:
                 startActivity(new Intent(this, SettingActivity.class));
                 break;
             case R.id.btn_join:
-                curRole = EduUserRole.STUDENT;
                 if (AppUtil.isFastClick()) {
                     return;
                 }
@@ -155,10 +134,6 @@ public class MainActivity extends BaseActivity {
             case R.id.tv_intermediate_class:
                 et_room_type.setText(R.string.intermediate);
                 card_room_type.setVisibility(View.GONE);
-                break;
-            case R.id.btn_teacherJoin:
-                curRole = EduUserRole.TEACHER;
-                start();
                 break;
             default:
                 break;
@@ -199,29 +174,24 @@ public class MainActivity extends BaseActivity {
 
         /**userUuid和roomUuid需用户自己指定，并保证唯一性*/
         int roomType = getClassType(roomTypeStr);
-        String userUuid = yourNameStr + curRole.getValue();
+        String userUuid = yourNameStr + EduUserRole.STUDENT;
         String roomUuid = roomNameStr + roomType;
 
         assert getAppId() != null;
         assert getCustomerId() != null;
         assert getCustomerCer() != null;
-        EduManagerOptions options = new EduManagerOptions(this, getAppId(), getCustomerId(),
-                getCustomerCer(), userUuid, yourNameStr);
-        options.setLogFileDir(getCacheDir().getAbsolutePath());
-        EduManager.init(options, new EduCallback<EduManager>() {
+        LaunchConfig launchConfig = new LaunchConfig(this, yourNameStr, userUuid, roomNameStr, roomUuid,
+                roomType, getAppId(), getCustomerId(), getCustomerCer(), getString(R.string.whiteboard_app_id));
+        EduLaunch.launch(launchConfig, new EduCallback<Void>() {
             @Override
-            public void onSuccess(@Nullable EduManager res) {
-                if (res != null) {
-                    Log.e(TAG, "初始化EduManager成功");
-                    setManager(res);
-                    createRoom(yourNameStr, userUuid, roomNameStr, roomUuid, roomType);
-                }
+            public void onSuccess(@Nullable Void res) {
+                notifyBtnJoinEnable(true);
             }
 
             @Override
             public void onFailure(@NotNull EduError error) {
                 notifyBtnJoinEnable(true);
-                Log.e(TAG, "初始化EduManager失败->code:" + error.getType() + ",reason:" + error.getMsg());
+                Log.e(TAG, "启动课堂失败->code:" + error.getType() + ",reason:" + error.getMsg());
             }
         });
     }
@@ -237,72 +207,8 @@ public class MainActivity extends BaseActivity {
         } else if (roomTypeStr.equals(getString(R.string.breakout))) {
             return RoomType.BREAKOUT_CLASS.getValue();
         } else {
-            return RoomType.INTERMEDIATE_CLASS.getValue();
-//            return RoomType.LARGE_CLASS.getValue();
+            return RoomType.MEDIUM_CLASS.getValue();
         }
-    }
-
-    private void createRoom(String yourNameStr, String yourUuid, String roomNameStr, String roomUuid, int roomType) {
-        /**createClassroom时，room不存在则新建，存在则返回room信息(此接口非必须调用)，
-         * 只要保证在调用joinClassroom之前，classroom在服务端存在即可*/
-        RoomCreateOptions options = new RoomCreateOptions(roomUuid, roomNameStr, roomType);
-        Log.e(TAG, "调用scheduleClass函数");
-        RoomCreateOptionsReq optionsReq = RoomCreateOptionsReq.convertRoomCreateOptions(options);
-        RetrofitManager.instance().getService(API_BASE_URL, CommonService.class)
-                .createClassroom(getAppId(), options.getRoomUuid(), optionsReq)
-                .enqueue(new RetrofitManager.Callback<>(0, new ThrowableCallback<ResponseBody<String>>() {
-                    @Override
-                    public void onSuccess(@Nullable ResponseBody<String> res) {
-                        notifyBtnJoinEnable(true);
-                        Log.e(TAG, "调用scheduleClass函数成功");
-                        Intent intent = createIntent(yourNameStr, yourUuid, roomNameStr, roomUuid, roomType);
-                        startActivityForResult(intent, REQUEST_CODE_RTE);
-                    }
-
-                    @Override
-                    public void onFailure(@Nullable Throwable throwable) {
-                        notifyBtnJoinEnable(true);
-                        BusinessException error;
-                        if (throwable instanceof BusinessException) {
-                            error = (BusinessException) throwable;
-                        } else {
-                            error = new BusinessException(throwable.getMessage());
-                        }
-                        Log.e(TAG, "调用scheduleClass函数失败->" + error.getCode() + ", reason:" +
-                                error.getMessage());
-                        if (error.getCode() == AgoraError.ROOM_ALREADY_EXISTS.getValue()) {
-                            Intent intent = createIntent(yourNameStr, yourUuid, roomNameStr, roomUuid, roomType);
-                            startActivityForResult(intent, REQUEST_CODE_RTE);
-                        } else {
-                            Log.e(TAG, "排课失败");
-                        }
-                    }
-                }));
-    }
-
-    private Intent createIntent(String yourNameStr, String yourUuid, String roomNameStr,
-                                String roomUuid, @Room.Type int roomType) {
-        RoomEntry roomEntry = new RoomEntry(yourNameStr, yourUuid, roomNameStr, roomUuid, roomType);
-
-        Intent intent = new Intent();
-        if (roomType == RoomType.ONE_ON_ONE.getValue()) {
-            intent.setClass(this, OneToOneClassActivity.class);
-        } else if (roomType == RoomType.SMALL_CLASS.getValue()) {
-            if (curRole == EduUserRole.STUDENT) {
-                intent.setClass(this, SmallClassActivity.class);
-            }
-//            else if (curRole == EduUserRole.TEACHER) {
-//                intent.setClass(this, SmallClassActivity_Teacher.class);
-//            }
-        } else if (roomType == RoomType.LARGE_CLASS.getValue()) {
-            intent.setClass(this, LargeClassActivity.class);
-        } else if (roomType == RoomType.BREAKOUT_CLASS.getValue()) {
-            intent.setClass(this, BreakoutClassActivity.class);
-        } else if (roomType == RoomType.INTERMEDIATE_CLASS.getValue()) {
-            intent.setClass(this, MediumClassActivity.class);
-        }
-        intent.putExtra(BaseClassActivity_bak.ROOMENTRY, roomEntry);
-        return intent;
     }
 
     private void notifyBtnJoinEnable(boolean enable) {

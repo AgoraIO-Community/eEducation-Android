@@ -4,10 +4,9 @@ import android.os.Build
 import android.text.TextUtils
 import android.util.Base64
 import com.google.gson.Gson
-import io.agora.Constants.Companion.APPID
-import io.agora.Constants.Companion.AgoraLog
-import io.agora.Constants.Companion.LOGS_DIR_NAME
-import io.agora.Constants.Companion.LOG_APPSECRET
+import io.agora.education.impl.Constants.Companion.APPID
+import io.agora.education.impl.Constants.Companion.AgoraLog
+import io.agora.education.impl.Constants.Companion.LOGS_DIR_NAME
 import io.agora.base.callback.ThrowableCallback
 import io.agora.base.network.BusinessException
 import io.agora.education.api.BuildConfig
@@ -35,7 +34,6 @@ import io.agora.education.impl.util.Convert
 import io.agora.education.impl.util.UnCatchExceptionHandler
 import io.agora.log.LogManager
 import io.agora.log.UploadManager
-import io.agora.rtc.RtcEngine
 import io.agora.rte.RteCallback
 import io.agora.rte.RteEngineImpl
 import io.agora.rte.data.RteError

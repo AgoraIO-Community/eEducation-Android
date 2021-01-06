@@ -2,8 +2,8 @@ package io.agora.education.impl.sync
 
 import android.util.Log
 import com.google.gson.Gson
-import io.agora.Constants.Companion.APPID
-import io.agora.Constants.Companion.AgoraLog
+import io.agora.education.impl.Constants.Companion.APPID
+import io.agora.education.impl.Constants.Companion.AgoraLog
 import io.agora.education.impl.util.Convert
 import io.agora.base.callback.ThrowableCallback
 import io.agora.base.network.BusinessException

@@ -1,6 +1,6 @@
 package io.agora.education.impl.board
 
-import io.agora.Constants
+import io.agora.education.impl.Constants
 import io.agora.base.callback.ThrowableCallback
 import io.agora.base.network.RetrofitManager
 import io.agora.education.api.BuildConfig.API_BASE_URL

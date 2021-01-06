@@ -6,8 +6,8 @@ import android.view.SurfaceView
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.google.gson.Gson
-import io.agora.Constants.Companion.APPID
-import io.agora.Constants.Companion.AgoraLog
+import io.agora.education.impl.Constants.Companion.APPID
+import io.agora.education.impl.Constants.Companion.AgoraLog
 import io.agora.base.callback.ThrowableCallback
 import io.agora.base.network.BusinessException
 import io.agora.base.network.ResponseBody

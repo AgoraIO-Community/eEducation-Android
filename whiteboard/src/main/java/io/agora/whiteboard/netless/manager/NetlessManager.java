@@ -33,7 +33,7 @@ abstract class NetlessManager<T> {
     abstract void onFail(SDKError error);
 
     public void roomJoin(String uuid, String sdkToken, @NonNull Callback<RoomJoin> callback) {
-        RetrofitManager.instance().getService(BuildConfig.API_BASE_URL, NetlessService.class)
+        RetrofitManager.instance().getService(BuildConfig.NETLESS_API_BASE_URL, NetlessService.class)
                 .roomJoin(uuid, sdkToken).enqueue(new RetrofitManager.Callback<>(200, new ThrowableCallback<ResponseBody>() {
             @Override
             public void onSuccess(ResponseBody res) {

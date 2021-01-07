@@ -57,7 +57,6 @@
 
 
 
--keep public interface io.agora.education.api.EduCallback { *; }
 
 -keep public class io.agora.education.impl.manager.EduManagerImpl { *; }
 
@@ -67,12 +66,14 @@
      public static final int REQUEST_CODE_RTE;
      public static final java.lang.String CODE;
      public static final java.lang.String REASON;
-     public static io.agora.education.api.EduCallback launchCallback;
-     public static void launch(io.agora.edu.launch.EduLaunchConfig, io.agora.education.api.EduCallback);
+     public static io.agora.edu.launch.LaunchCallback launchCallback;
+     public static void launch(io.agora.edu.launch.EduLaunchConfig, io.agora.edu.launch.LaunchCallback);
 }
 -keep public class io.agora.edu.launch.EduLaunchConfig { *; }
 
--keep public class io.agora.edu.launch.ReplayLaunchConfig { *; }
+-keep public interface io.agora.edu.launch.LaunchCallback { *; }
+
 -keep public class io.agora.edu.launch.ReplayLaunch { *; }
+-keep public class io.agora.edu.launch.ReplayLaunchConfig { *; }
 
 -keep class io.agora.record.** { *; }

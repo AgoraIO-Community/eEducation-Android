@@ -71,7 +71,7 @@ public class SmallClassActivity extends BaseClassActivity implements TabLayout.O
     @Override
     protected void initData() {
         super.initData();
-        joinRoomAsStudent(getMainEduRoom(), launchConfig.getUserName(), launchConfig.getUserUuid(), true, true, true,
+        joinRoomAsStudent(getMainEduRoom(), eduLaunchConfig.getUserName(), eduLaunchConfig.getUserUuid(), true, true, true,
                 new EduCallback<EduStudent>() {
                     @Override
                     public void onSuccess(@Nullable EduStudent res) {

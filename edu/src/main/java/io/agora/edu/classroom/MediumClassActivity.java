@@ -144,7 +144,7 @@ public class MediumClassActivity extends BaseClassActivity implements TabLayout.
     @Override
     protected void initData() {
         super.initData();
-        joinRoomAsStudent(getMainEduRoom(), launchConfig.getUserName(), launchConfig.getUserUuid(), true, false, true,
+        joinRoomAsStudent(getMainEduRoom(), eduLaunchConfig.getUserName(), eduLaunchConfig.getUserUuid(), true, false, true,
                 new EduCallback<EduStudent>() {
                     @Override
                     public void onSuccess(@org.jetbrains.annotations.Nullable EduStudent res) {
@@ -188,7 +188,7 @@ public class MediumClassActivity extends BaseClassActivity implements TabLayout.
         removeFromParent(videoTeacher);
         layoutVideoTeacher.addView(videoTeacher, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
-        studentListFragment = new StudentListFragment(launchConfig.getUserUuid());
+        studentListFragment = new StudentListFragment(eduLaunchConfig.getUserUuid());
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.layout_chat_room, studentListFragment)
                 .show(studentListFragment)

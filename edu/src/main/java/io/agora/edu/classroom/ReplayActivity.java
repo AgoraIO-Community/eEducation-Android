@@ -16,17 +16,17 @@ import io.agora.edu.R;
 import io.agora.edu.base.BaseActivity;
 import io.agora.edu.classroom.fragment.ReplayBoardFragment;
 
+import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_APP_ID;
+import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_END_TIME;
+import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_ID;
+import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_ROOM_ID;
+import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_START_TIME;
+import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_TOKEN;
+import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_URL;
+
 
 public class ReplayActivity extends BaseActivity {
     private static final String TAG = "ReplayActivity";
-
-    public static final String WHITEBOARD_APP_ID = "whiteboardAppId";
-    public static final String WHITEBOARD_ROOM_ID = "whiteboardRoomId";
-    public static final String WHITEBOARD_START_TIME = "whiteboardStartTime";
-    public static final String WHITEBOARD_END_TIME = "whiteboardEndTime";
-    public static final String WHITEBOARD_URL = "whiteboardUrl";
-    public static final String WHITEBOARD_ID = "whiteboardId";
-    public static final String WHITEBOARD_TOKEN = "whiteboardToken";
 
     @BindView(R2.id.video_view)
     protected PlayerView video_view;

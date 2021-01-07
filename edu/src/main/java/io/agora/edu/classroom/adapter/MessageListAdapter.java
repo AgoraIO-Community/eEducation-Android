@@ -19,7 +19,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.agora.edu.R;
 import io.agora.edu.classroom.bean.msg.ChannelMsg;
-import io.agora.edu.classroom.bean.record.RecordMsg;
+import io.agora.record.bean.RecordMsg;
 import io.agora.edu.R2;
 
 /**

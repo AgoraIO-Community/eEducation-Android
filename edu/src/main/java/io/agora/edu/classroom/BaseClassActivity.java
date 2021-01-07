@@ -77,12 +77,12 @@ import io.agora.edu.classroom.bean.board.BoardState;
 import io.agora.edu.classroom.bean.channel.Room;
 import io.agora.edu.classroom.bean.channel.User;
 import io.agora.edu.classroom.bean.msg.ChannelMsg;
-import io.agora.edu.classroom.bean.record.RecordBean;
-import io.agora.edu.classroom.bean.record.RecordMsg;
+import io.agora.record.bean.RecordBean;
+import io.agora.record.bean.RecordMsg;
 import io.agora.edu.classroom.fragment.ChatRoomFragment;
 import io.agora.edu.classroom.fragment.WhiteBoardFragment;
 import io.agora.edu.classroom.widget.TitleView;
-import io.agora.edu.launch.LaunchConfig;
+import io.agora.edu.launch.EduLaunchConfig;
 import io.agora.edu.service.BoardService;
 import io.agora.edu.service.bean.ResponseBody;
 import io.agora.edu.util.AppUtil;
@@ -95,8 +95,9 @@ import static io.agora.edu.launch.EduLaunch.CODE;
 import static io.agora.edu.launch.EduLaunch.REASON;
 import static io.agora.edu.BuildConfig.API_BASE_URL;
 import static io.agora.edu.classroom.bean.board.BoardBean.BOARD;
-import static io.agora.edu.classroom.bean.record.RecordBean.RECORD;
-import static io.agora.edu.classroom.bean.record.RecordState.END;
+import static io.agora.edu.launch.EduLaunch.launchCallback;
+import static io.agora.record.bean.RecordBean.RECORD;
+import static io.agora.record.bean.RecordState.END;
 
 public abstract class BaseClassActivity extends BaseActivity implements EduRoomEventListener, EduUserEventListener,
         EduManagerEventListener, GlobalStateChangeListener, AgoraActionListener {
@@ -117,7 +118,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
     protected ChatRoomFragment chatRoomFragment = new ChatRoomFragment();
 
     private static EduManager eduManager;
-    protected LaunchConfig launchConfig;
+    protected EduLaunchConfig eduLaunchConfig;
     private volatile boolean isJoining = false, joinSuccess = false;
     private EduRoom mainEduRoom;
     private EduStreamInfo localCameraStream, localScreenStream;
@@ -140,11 +141,11 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         if(eduManager != null) {
             eduManager.setEduManagerEventListener(this);
         }
-        launchConfig = getIntent().getParcelableExtra(LAUNCHCONFIG);
-        whiteboardFragment.setWhiteBoardAppId(launchConfig.getWhiteBoardAppId());
-        chatRoomFragment.setAppId(launchConfig.getAppId(), launchConfig.getWhiteBoardAppId());
-        RoomCreateOptions createOptions = new RoomCreateOptions(launchConfig.getRoomUuid(),
-                launchConfig.getRoomName(), launchConfig.getRoomType());
+        eduLaunchConfig = getIntent().getParcelableExtra(LAUNCHCONFIG);
+        whiteboardFragment.setWhiteBoardAppId(eduLaunchConfig.getWhiteBoardAppId());
+        chatRoomFragment.setAppId(eduLaunchConfig.getAppId(), eduLaunchConfig.getWhiteBoardAppId());
+        RoomCreateOptions createOptions = new RoomCreateOptions(eduLaunchConfig.getRoomUuid(),
+                eduLaunchConfig.getRoomName(), eduLaunchConfig.getRoomType());
         try {
             mainEduRoom = buildEduRoom(createOptions, null);
         } catch (NullPointerException e) {
@@ -164,7 +165,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
     }
 
     protected void showFragmentWithJoinSuccess() {
-        title_view.setTitle(launchConfig.getRoomName());
+        title_view.setTitle(eduLaunchConfig.getRoomName());
         getSupportFragmentManager().beginTransaction()
                 .remove(whiteboardFragment)
                 .remove(chatRoomFragment)
@@ -206,7 +207,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         }
         isJoining = true;
         RoomJoinOptions options = new RoomJoinOptions(yourUuid, yourNameStr, EduUserRole.STUDENT,
-                new RoomMediaOptions(autoSubscribe, autoPublish), launchConfig.getRoomType());
+                new RoomMediaOptions(autoSubscribe, autoPublish), eduLaunchConfig.getRoomType());
         eduRoom.joinClassroom(options, new EduCallback<EduUser>() {
             @Override
             public void onSuccess(@Nullable EduUser user) {
@@ -220,8 +221,12 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
                     }
                     EduStudent student = (EduStudent) user;
                     callback.onSuccess(student);
+                    /*把launch成功的信息回调出去*/
+                    launchCallback.onSuccess(null);
                 } else {
-                    callback.onFailure(EduError.Companion.internalError("localUser is null"));
+                    EduError error = EduError.Companion.internalError("join failed: localUser is null");
+                    callback.onFailure(error);
+                    launchCallback.onFailure(error);
                 }
             }
 
@@ -240,7 +245,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         }
         isJoining = true;
         RoomJoinOptions options = new RoomJoinOptions(yourUuid, yourNameStr, EduUserRole.TEACHER,
-                new RoomMediaOptions(autoSubscribe, autoPublish), launchConfig.getRoomType());
+                new RoomMediaOptions(autoSubscribe, autoPublish), eduLaunchConfig.getRoomType());
         eduRoom.joinClassroom(options, new EduCallback<EduUser>() {
             @Override
             public void onSuccess(@Nullable EduUser user) {
@@ -274,7 +279,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         }
         isJoining = true;
         RoomJoinOptions options = new RoomJoinOptions(yourUuid, yourNameStr, EduUserRole.ASSISTANT,
-                new RoomMediaOptions(autoSubscribe, autoPublish), launchConfig.getRoomType());
+                new RoomMediaOptions(autoSubscribe, autoPublish), eduLaunchConfig.getRoomType());
         eduRoom.joinClassroom(options, new EduCallback<EduUser>() {
             @Override
             public void onSuccess(@Nullable EduUser user) {
@@ -305,8 +310,11 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
      * 加入失败，回传数据并结束当前页面
      */
     protected void joinFailed(int code, String reason) {
-        Intent intent = getIntent().putExtra(CODE, code).putExtra(REASON, reason);
-        setResult(RESULT_CODE, intent);
+//        Intent intent = getIntent().putExtra(CODE, code).putExtra(REASON, reason);
+//        setResult(RESULT_CODE, intent);
+//        finish();
+        /*把launch失败的信息回调出去*/
+        launchCallback.onFailure(new EduError(code, reason));
         finish();
     }
 
@@ -518,7 +526,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
                         public void onSuccess(@Nullable EduUserInfo userInfo) {
                             EduFromUserInfo fromUser = new EduFromUserInfo(userInfo.getUserUuid(),
                                     userInfo.getUserName(), userInfo.getRole());
-                            RecordMsg recordMsg = new RecordMsg(launchConfig.getRoomUuid(), fromUser,
+                            RecordMsg recordMsg = new RecordMsg(eduLaunchConfig.getRoomUuid(), fromUser,
                                     getString(R.string.replay_link), System.currentTimeMillis(),
                                     EduChatMsgType.Text.getValue());
                             recordMsg.isMe = true;
@@ -900,8 +908,8 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
             @Override
             public void onSuccess(@Nullable EduUserInfo userInfo) {
                 if (TextUtils.isEmpty(boardJson) && mainBoardBean == null) {
-                    requestBoardInfo(((EduLocalUserInfo) userInfo).getUserToken(), launchConfig.getAppId(),
-                            launchConfig.getRoomUuid());
+                    requestBoardInfo(((EduLocalUserInfo) userInfo).getUserToken(), eduLaunchConfig.getAppId(),
+                            eduLaunchConfig.getRoomUuid());
                 } else {
                     mainBoardBean = new Gson().fromJson(boardJson, BoardBean.class);
                     BoardInfo info = mainBoardBean.getInfo();
@@ -927,9 +935,9 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
             public void onSuccess(@Nullable EduUser localUser) {
                 if (localUser != null) {
                     EduLocalUserInfo localUserInfo = localUser.getUserInfo();
-                    AgoraActionProcessConfig config = new AgoraActionProcessConfig(launchConfig.getAppId(),
-                            launchConfig.getRoomUuid(), localUserInfo.getUserToken(), launchConfig.getCustomerId(),
-                            launchConfig.getCustomerCer(), API_BASE_URL);
+                    AgoraActionProcessConfig config = new AgoraActionProcessConfig(eduLaunchConfig.getAppId(),
+                            eduLaunchConfig.getRoomUuid(), localUserInfo.getUserToken(), eduLaunchConfig.getCustomerId(),
+                            eduLaunchConfig.getCustomerCer(), API_BASE_URL);
                     actionProcessManager = new AgoraActionProcessManager(config, BaseClassActivity.this);
                 }
             }

@@ -4,25 +4,44 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.jetbrains.annotations.NotNull;
+
+import io.agora.education.api.user.data.EduUserRole;
+
 /**
  * @author cjw
  */
-public class LaunchConfig implements Parcelable {
-    /**不参与序列化，只作为启动Activity时所用*/
+public class EduLaunchConfig implements Parcelable {
+    /**
+     * 不参与序列化，只作为启动Activity时所用
+     */
+    @NotNull
     private Context context;
+    @NotNull
     private String userName;
+    @NotNull
     private String userUuid;
+    @NotNull
     private String roomName;
+    @NotNull
     private String roomUuid;
+    private int roleType = EduUserRole.STUDENT.getValue();
     private int roomType;
+    @NotNull
     private String appId;
+    @NotNull
     private String customerId;
+    @NotNull
     private String customerCer;
+    @NotNull
     private String whiteBoardAppId;
+    @NotNull
+    private String token;
 
-    public LaunchConfig(Context context, String userName, String userUuid, String roomName,
-                        String roomUuid, int roomType, String appId, String customerId,
-                        String customerCer, String whiteBoardAppId) {
+    public EduLaunchConfig(@NotNull Context context, @NotNull String userName, @NotNull String userUuid,
+                           @NotNull String roomName, @NotNull String roomUuid, int roomType,
+                           @NotNull String appId, @NotNull String customerId, @NotNull String customerCer,
+                           @NotNull String whiteBoardAppId, @NotNull String token) {
         this.context = context;
         this.userName = userName;
         this.userUuid = userUuid;
@@ -33,6 +52,25 @@ public class LaunchConfig implements Parcelable {
         this.customerId = customerId;
         this.customerCer = customerCer;
         this.whiteBoardAppId = whiteBoardAppId;
+        this.token = token;
+    }
+
+    public EduLaunchConfig(@NotNull Context context, @NotNull String userName, @NotNull String userUuid,
+                           @NotNull String roomName, @NotNull String roomUuid, int roleType, int roomType,
+                           @NotNull String appId, @NotNull String customerId, @NotNull String customerCer,
+                           @NotNull String whiteBoardAppId, @NotNull String token) {
+        this.context = context;
+        this.userName = userName;
+        this.userUuid = userUuid;
+        this.roomName = roomName;
+        this.roomUuid = roomUuid;
+        this.roleType = roleType;
+        this.roomType = roomType;
+        this.appId = appId;
+        this.customerId = customerId;
+        this.customerCer = customerCer;
+        this.whiteBoardAppId = whiteBoardAppId;
+        this.token = token;
     }
 
     public Context getContext() {
@@ -115,6 +153,26 @@ public class LaunchConfig implements Parcelable {
         this.whiteBoardAppId = whiteBoardAppId;
     }
 
+    public int getRoleType() {
+        return roleType;
+    }
+
+    public void setRoleType(int roleType) {
+        this.roleType = roleType;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public static Creator<EduLaunchConfig> getCREATOR() {
+        return CREATOR;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -126,34 +184,38 @@ public class LaunchConfig implements Parcelable {
         dest.writeString(this.userUuid);
         dest.writeString(this.roomName);
         dest.writeString(this.roomUuid);
+        dest.writeInt(this.roleType);
         dest.writeInt(this.roomType);
         dest.writeString(this.appId);
         dest.writeString(this.customerId);
         dest.writeString(this.customerCer);
         dest.writeString(this.whiteBoardAppId);
+        dest.writeString(this.token);
     }
 
-    protected LaunchConfig(Parcel in) {
+    protected EduLaunchConfig(Parcel in) {
         this.userName = in.readString();
         this.userUuid = in.readString();
         this.roomName = in.readString();
         this.roomUuid = in.readString();
+        this.roleType = in.readInt();
         this.roomType = in.readInt();
         this.appId = in.readString();
         this.customerId = in.readString();
         this.customerCer = in.readString();
         this.whiteBoardAppId = in.readString();
+        this.token = in.readString();
     }
 
-    public static final Creator<LaunchConfig> CREATOR = new Creator<LaunchConfig>() {
+    public static final Creator<EduLaunchConfig> CREATOR = new Creator<EduLaunchConfig>() {
         @Override
-        public LaunchConfig createFromParcel(Parcel source) {
-            return new LaunchConfig(source);
+        public EduLaunchConfig createFromParcel(Parcel source) {
+            return new EduLaunchConfig(source);
         }
 
         @Override
-        public LaunchConfig[] newArray(int size) {
-            return new LaunchConfig[size];
+        public EduLaunchConfig[] newArray(int size) {
+            return new EduLaunchConfig[size];
         }
     };
 }

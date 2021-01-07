@@ -2,6 +2,7 @@ package io.agora.edu.classroom.fragment;
 
 import android.content.Intent;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -11,19 +12,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemChildClickListener;
+import com.google.gson.Gson;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import io.agora.base.ToastManager;
-import io.agora.base.callback.Callback;
-import io.agora.base.network.RetrofitManager;
 import io.agora.edu.R;
-import io.agora.edu.service.bean.ResponseBody;
+import io.agora.edu.launch.ReplayLaunch;
+import io.agora.edu.launch.ReplayLaunchConfig;
 import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
 import io.agora.education.api.message.EduChatMsg;
@@ -35,12 +35,11 @@ import io.agora.edu.classroom.BaseClassActivity;
 import io.agora.edu.classroom.ReplayActivity;
 import io.agora.edu.classroom.adapter.MessageListAdapter;
 import io.agora.edu.classroom.bean.msg.ChannelMsg;
-import io.agora.edu.classroom.bean.record.RecordMsg;
+import io.agora.record.Replay;
+import io.agora.record.ReplayImpl;
+import io.agora.record.bean.RecordMsg;
 import io.agora.edu.R2;
-import io.agora.edu.service.RecordService;
-import io.agora.edu.service.bean.response.RecordRes;
-
-import static io.agora.edu.BuildConfig.API_BASE_URL;
+import io.agora.record.ReplayRes;
 
 public class ChatRoomFragment extends BaseFragment implements OnItemChildClickListener, View.OnKeyListener {
     public static final String TAG = ChatRoomFragment.class.getSimpleName();
@@ -54,6 +53,7 @@ public class ChatRoomFragment extends BaseFragment implements OnItemChildClickLi
     private boolean isMuteAll = false;
     private boolean isMuteLocal;
     private String appId, whiteBoardAppId;
+    private Replay replay = new ReplayImpl();
 
     @Override
     protected int getLayoutResId() {
@@ -121,65 +121,43 @@ public class ChatRoomFragment extends BaseFragment implements OnItemChildClickLi
             if (object instanceof RecordMsg) {
                 RecordMsg msg = (RecordMsg) object;
                 if (context instanceof BaseClassActivity) {
-                    fetchRecordList(appId, msg.getRoomUuid(), nextId,
-                            new EduCallback<RecordRes.RecordDetail>() {
-                                @Override
-                                public void onSuccess(@Nullable RecordRes.RecordDetail recordDetail) {
-                                    if (recordDetail.isFinished()) {
-                                        String url = recordDetail.url;
-                                        if (!TextUtils.isEmpty(url)) {
-                                            Intent intent = new Intent(context, ReplayActivity.class);
-                                            intent.putExtra(ReplayActivity.WHITEBOARD_APP_ID, whiteBoardAppId);
-                                            intent.putExtra(ReplayActivity.WHITEBOARD_ROOM_ID, recordDetail.roomUuid);
-                                            intent.putExtra(ReplayActivity.WHITEBOARD_START_TIME, recordDetail.startTime);
-                                            intent.putExtra(ReplayActivity.WHITEBOARD_END_TIME, recordDetail.endTime);
-                                            intent.putExtra(ReplayActivity.WHITEBOARD_URL, url);
-                                            intent.putExtra(ReplayActivity.WHITEBOARD_ID, recordDetail.boardId);
-                                            intent.putExtra(ReplayActivity.WHITEBOARD_TOKEN, recordDetail.boardToken);
-                                            startActivity(intent);
-                                        }
-                                    } else {
-                                        ToastManager.showShort(R.string.wait_record);
+                    replay.allReplayList(appId, msg.getRoomUuid(), 0, new EduCallback<List<ReplayRes.RecordDetail>>() {
+                        @Override
+                        public void onSuccess(@Nullable List<ReplayRes.RecordDetail> res) {
+                            if (res != null && res.size() > 0) {
+                                /*find latest record*/
+                                long max = 0;
+                                ReplayRes.RecordDetail recordDetail = null;
+                                for (ReplayRes.RecordDetail detail : res) {
+                                    if (detail.startTime > max) {
+                                        max = detail.startTime;
+                                        recordDetail = detail;
                                     }
                                 }
-
-                                @Override
-                                public void onFailure(@NotNull EduError error) {
+                                if (recordDetail.isFinished()) {
+                                    String url = recordDetail.url;
+                                    if (!TextUtils.isEmpty(url)) {
+                                        ReplayLaunchConfig config = new ReplayLaunchConfig(
+                                                ChatRoomFragment.this.getContext(),
+                                                recordDetail.roomUuid, whiteBoardAppId,
+                                                recordDetail.startTime, recordDetail.endTime, url,
+                                                recordDetail.boardId, recordDetail.boardToken);
+                                        ReplayLaunch.replay(config);
+                                    }
+                                } else {
+                                    ToastManager.showShort(R.string.wait_record);
                                 }
-                            });
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(@NotNull EduError error) {
+                            Log.e(TAG, error.getMsg());
+                        }
+                    });
                 }
             }
         }
-    }
-
-    private int nextId = 0, total = 0;
-    private List<RecordRes.RecordDetail> recordDetails = new ArrayList<>();
-
-    private void fetchRecordList(String appId, String roomId, int next, EduCallback<RecordRes.RecordDetail> callback) {
-        RetrofitManager.instance().getService(API_BASE_URL, RecordService.class)
-                .record(appId, roomId, next)
-                .enqueue(new RetrofitManager.Callback(0, (Callback<ResponseBody<RecordRes>>) res -> {
-                    if(res != null && res.data != null) {
-                        total = res.data.total;
-                        nextId = res.data.nextId;
-                        recordDetails.addAll(res.data.list);
-                        if (recordDetails.size() < total) {
-                            fetchRecordList(appId, roomId, nextId, callback);
-                        } else {
-                            nextId = total = 0;
-                            long max = 0;
-                            RecordRes.RecordDetail recordDetail = null;
-                            for (RecordRes.RecordDetail detail : recordDetails) {
-                                if (detail.startTime > max) {
-                                    max = detail.startTime;
-                                    recordDetail = detail;
-                                }
-                            }
-                            recordDetails.clear();
-                            callback.onSuccess(recordDetail);
-                        }
-                    }
-                }));
     }
 
     @Override
@@ -190,35 +168,6 @@ public class ChatRoomFragment extends BaseFragment implements OnItemChildClickLi
         String text = edit_send_msg.getText().toString();
         if (KeyEvent.KEYCODE_ENTER == keyCode && KeyEvent.ACTION_DOWN == event.getAction() && text.trim().length() > 0) {
             if (context instanceof BaseClassActivity) {
-                edit_send_msg.setText("");
-                BaseClassActivity activity = (BaseClassActivity) getActivity();
-                activity.getLocalUserInfo(new EduCallback<EduUserInfo>() {
-                    @Override
-                    public void onSuccess(@Nullable EduUserInfo userInfo) {
-                        /*本地消息直接添加*/
-                        EduFromUserInfo fromUser = new EduFromUserInfo(userInfo.getUserUuid(),
-                                userInfo.getUserName(), userInfo.getRole());
-                        ChannelMsg.ChatMsg msg = new ChannelMsg.ChatMsg(fromUser, text,
-                                System.currentTimeMillis(),
-                                EduChatMsgType.Text.getValue());
-                        msg.isMe = true;
-                        addMessage(msg);
-                        activity.sendRoomChatMsg(text, new EduCallback<EduChatMsg>() {
-                            @Override
-                            public void onSuccess(@Nullable EduChatMsg res) {
-                            }
-
-                            @Override
-                            public void onFailure(@NotNull EduError error) {
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onFailure(@NotNull EduError error) {
-                    }
-                });
-            } else if (context instanceof BaseClassActivity) {
                 edit_send_msg.setText("");
                 BaseClassActivity activity = (BaseClassActivity) getActivity();
                 activity.getLocalUserInfo(new EduCallback<EduUserInfo>() {

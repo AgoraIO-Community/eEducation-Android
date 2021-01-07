@@ -1,11 +1,10 @@
-package io.agora.edu.classroom.bean.record;
+package io.agora.record.bean;
 
 import androidx.annotation.NonNull;
 
 import org.jetbrains.annotations.NotNull;
 
 import io.agora.education.api.message.EduFromUserInfo;
-import io.agora.education.api.user.data.EduUserInfo;
 import io.agora.edu.classroom.bean.msg.ChannelMsg;
 
 public class RecordMsg extends ChannelMsg.ChatMsg {

@@ -38,7 +38,10 @@ public class EduLaunch {
     public static final String CODE = "code";
     public static final String REASON = "reason";
 
-    public static void launch(LaunchConfig config, EduCallback<Void> callback) {
+    public static EduCallback<Void> launchCallback;
+
+    public static void launch(EduLaunchConfig config, EduCallback<Void> callback) {
+        launchCallback = callback;
         EduManagerOptions options = new EduManagerOptions(config.getContext(), config.getAppId(),
                 config.getCustomerId(), config.getCustomerCer(), config.getUserUuid(),
                 config.getUserName());
@@ -49,20 +52,19 @@ public class EduLaunch {
                 if (res != null) {
                     Log.e(TAG, "初始化EduManager成功");
                     setEduManager(res);
-                    createRoom(config);
-                    callback.onSuccess(null);
+                    createRoom(config, launchCallback);
                 }
             }
 
             @Override
             public void onFailure(@NotNull EduError error) {
-                callback.onFailure(error);
                 Log.e(TAG, "初始化EduManager失败->code:" + error.getType() + ",reason:" + error.getMsg());
+                launchCallback.onFailure(error);
             }
         });
     }
 
-    private static void createRoom(LaunchConfig config) {
+    private static void createRoom(EduLaunchConfig config, EduCallback<Void> callback) {
         /**createClassroom时，room不存在则新建，存在则返回room信息(此接口非必须调用)，
          * 只要保证在调用joinClassroom之前，classroom在服务端存在即可*/
         RoomCreateOptions options = new RoomCreateOptions(config.getRoomUuid(), config.getRoomName(),
@@ -94,12 +96,13 @@ public class EduLaunch {
                             ((Activity) config.getContext()).startActivityForResult(intent, REQUEST_CODE_RTE);
                         } else {
                             Log.e(TAG, "排课失败");
+                            callback.onFailure(new EduError(error.getCode(), error.getMessage()));
                         }
                     }
                 }));
     }
 
-    private static Intent createIntent(LaunchConfig config) {
+    private static Intent createIntent(EduLaunchConfig config) {
         Intent intent = new Intent();
         int roomType = config.getRoomType();
         if (roomType == RoomType.ONE_ON_ONE.getValue()) {

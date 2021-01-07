@@ -1,13 +1,11 @@
 package io.agora.edu.service;
 
-import io.agora.edu.BuildConfig;
 import io.agora.edu.service.bean.ResponseBody;
 import io.agora.edu.service.bean.request.AllocateGroupReq;
 import io.agora.edu.service.bean.request.RoomCreateOptionsReq;
 import io.agora.edu.service.bean.response.EduRoomInfoRes;
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 

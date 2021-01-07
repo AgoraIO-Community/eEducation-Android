@@ -1,4 +1,4 @@
-package io.agora.edu.classroom.bean.record;
+package io.agora.record.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;

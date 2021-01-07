@@ -24,6 +24,9 @@ import io.agora.edu.classroom.widget.player.ReplayControlView;
 import io.agora.whiteboard.netless.listener.ReplayEventListener;
 import io.agora.whiteboard.netless.manager.ReplayManager;
 
+import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_END_TIME;
+import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_START_TIME;
+
 public class ReplayBoardFragment extends BaseFragment implements ReplayEventListener {
 
     @BindView(R2.id.white_board_view)
@@ -54,8 +57,8 @@ public class ReplayBoardFragment extends BaseFragment implements ReplayEventList
     protected void initData() {
         Bundle bundle = getArguments();
         if (bundle != null) {
-            startTime = bundle.getLong(ReplayActivity.WHITEBOARD_START_TIME, 0);
-            endTime = bundle.getLong(ReplayActivity.WHITEBOARD_END_TIME, 0);
+            startTime = bundle.getLong(WHITEBOARD_START_TIME, 0);
+            endTime = bundle.getLong(WHITEBOARD_END_TIME, 0);
         }
     }
 

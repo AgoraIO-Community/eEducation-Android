@@ -111,7 +111,7 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
     @Override
     protected void initData() {
         super.initData();
-        joinRoomAsStudent(getMainEduRoom(), launchConfig.getUserName(), launchConfig.getUserUuid(), true, false, true,
+        joinRoomAsStudent(getMainEduRoom(), eduLaunchConfig.getUserName(), eduLaunchConfig.getUserUuid(), true, false, true,
                 new EduCallback<EduStudent>() {
                     @Override
                     public void onSuccess(@Nullable EduStudent res) {

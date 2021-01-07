@@ -99,7 +99,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
     protected void initData() {
         super.initData();
         /**needUserListener为false,将不会收到大班级中的任何local回调*/
-        joinRoomAsStudent(getMainEduRoom(), launchConfig.getUserName(), launchConfig.getUserUuid(), true, false, true,
+        joinRoomAsStudent(getMainEduRoom(), eduLaunchConfig.getUserName(), eduLaunchConfig.getUserUuid(), true, false, true,
                 new EduCallback<EduStudent>() {
                     @Override
                     public void onSuccess(@Nullable EduStudent res) {
@@ -112,7 +112,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
                             mainBoardBean = new Gson().fromJson(boardJson, BoardBean.class);
                         }
                         renderTeacherStream();
-                        joinSubEduRoom(getMainEduRoom(), launchConfig.getUserUuid(), launchConfig.getUserName());
+                        joinSubEduRoom(getMainEduRoom(), eduLaunchConfig.getUserUuid(), eduLaunchConfig.getUserName());
                     }
 
                     @Override
@@ -129,7 +129,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
     private void allocateGroup(String roomUuid, String userUuid, EduCallback<EduRoomInfo> callback) {
         AllocateGroupReq req = new AllocateGroupReq();
         RetrofitManager.instance().getService(API_BASE_URL, CommonService.class)
-                .allocateGroup(launchConfig.getAppId(), roomUuid, req)
+                .allocateGroup(eduLaunchConfig.getAppId(), roomUuid, req)
                 .enqueue(new RetrofitManager.Callback<>(0, new ThrowableCallback<ResponseBody<EduRoomInfoRes>>() {
                     @Override
                     public void onFailure(@Nullable Throwable throwable) {
@@ -163,7 +163,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
      * @param userUuid 学生uuid
      */
     private void joinSubEduRoom(EduRoom mainRoom, String userUuid, String userName) {
-        allocateGroup(launchConfig.getRoomUuid(), userUuid, new EduCallback<EduRoomInfo>() {
+        allocateGroup(eduLaunchConfig.getRoomUuid(), userUuid, new EduCallback<EduRoomInfo>() {
             @Override
             public void onSuccess(@Nullable EduRoomInfo res) {
                 if (res != null) {
@@ -195,7 +195,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
                                     @Override
                                     public void onSuccess(@Nullable EduUserInfo userInfo) {
                                         requestBoardInfo(((EduLocalUserInfo) userInfo).getUserToken(),
-                                                launchConfig.getAppId(), launchConfig.getRoomUuid());
+                                                eduLaunchConfig.getAppId(), eduLaunchConfig.getRoomUuid());
                                     }
 
                                     @Override
@@ -580,7 +580,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
                     @Override
                     public void onSuccess(@Nullable EduUserInfo userInfo) {
                         requestBoardInfo(((EduLocalUserInfo) userInfo).getUserToken(),
-                                launchConfig.getAppId(), launchConfig.getRoomUuid());
+                                eduLaunchConfig.getAppId(), eduLaunchConfig.getRoomUuid());
                     }
 
                     @Override
@@ -805,7 +805,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
                 public void onSuccess(@Nullable EduRoomStatus roomStatus) {
                     switch (event) {
                         case CourseState:
-                            Log.e(TAG, "班级:" + launchConfig.getRoomUuid() + "内的课堂状态->"
+                            Log.e(TAG, "班级:" + eduLaunchConfig.getRoomUuid() + "内的课堂状态->"
                                     + roomStatus.getCourseState());
                             title_view.setTimeState(roomStatus.getCourseState() == EduRoomState.START,
                                     System.currentTimeMillis() - roomStatus.getStartTime());

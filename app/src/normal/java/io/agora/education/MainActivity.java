@@ -28,7 +28,7 @@ import io.agora.education.api.user.data.EduUserRole;
 import io.agora.edu.base.BaseActivity;
 import io.agora.edu.classroom.bean.channel.Room;
 import io.agora.edu.launch.EduLaunch;
-import io.agora.edu.launch.LaunchConfig;
+import io.agora.edu.launch.EduLaunchConfig;
 import io.agora.edu.util.AppUtil;
 import io.agora.edu.widget.PolicyDialog;
 
@@ -92,7 +92,9 @@ public class MainActivity extends BaseActivity {
         if (data != null && requestCode == REQUEST_CODE_RTE && resultCode == BaseClassActivity.RESULT_CODE) {
             int code = data.getIntExtra(CODE, -1);
             String reason = data.getStringExtra(REASON);
-            ToastManager.showShort(String.format(getString(R.string.function_error), code, reason));
+            String msg = String.format(getString(R.string.function_error), code, reason);
+            Log.e(TAG, msg);
+            ToastManager.showShort(msg);
         }
     }
 
@@ -180,11 +182,12 @@ public class MainActivity extends BaseActivity {
         assert getAppId() != null;
         assert getCustomerId() != null;
         assert getCustomerCer() != null;
-        LaunchConfig launchConfig = new LaunchConfig(this, yourNameStr, userUuid, roomNameStr, roomUuid,
-                roomType, getAppId(), getCustomerId(), getCustomerCer(), getString(R.string.whiteboard_app_id));
-        EduLaunch.launch(launchConfig, new EduCallback<Void>() {
+        EduLaunchConfig eduLaunchConfig = new EduLaunchConfig(this, yourNameStr, userUuid, roomNameStr, roomUuid,
+                roomType, getAppId(), getCustomerId(), getCustomerCer(), getString(R.string.whiteboard_app_id), "");
+        EduLaunch.launch(eduLaunchConfig, new EduCallback<Void>() {
             @Override
             public void onSuccess(@Nullable Void res) {
+                Log.e(TAG, "启动课堂成功");
                 notifyBtnJoinEnable(true);
             }
 

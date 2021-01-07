@@ -12,8 +12,12 @@ public class ToastManager {
     private static Handler sHandler;
 
     public static void init(@NonNull Context context) {
-        sContext = context.getApplicationContext();
-        sHandler = new Handler();
+        if(sContext == null) {
+            sContext = context.getApplicationContext();
+        }
+        if(sHandler == null) {
+            sHandler = new Handler();
+        }
     }
 
     public static void showShort(@StringRes int resId) {

@@ -1,4 +1,4 @@
-package io.agora.base;
+package io.agora.education;
 
 import android.content.Context;
 import android.content.SharedPreferences;

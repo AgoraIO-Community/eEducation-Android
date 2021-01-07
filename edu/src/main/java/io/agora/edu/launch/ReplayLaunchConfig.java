@@ -6,13 +6,7 @@ import android.os.Parcelable;
 
 import org.jetbrains.annotations.NotNull;
 
-public class ReplayLaunchConfig implements Parcelable {
-    @NotNull
-    private Context context;
-    @NotNull
-    private String roomUuid;
-    @NotNull
-    private String whiteBoardAppId;
+public class ReplayLaunchConfig extends LaunchConfig implements Parcelable {
     private long startTime;
     private long endTime;
     @NotNull
@@ -22,42 +16,16 @@ public class ReplayLaunchConfig implements Parcelable {
     @NotNull
     private String whiteBoardToken;
 
-    public ReplayLaunchConfig(@NotNull Context context, @NotNull String roomUuid,
-                              @NotNull String whiteBoardAppId, long startTime,
-                              long endTime, @NotNull String whiteBoardUrl,
-                              @NotNull String whiteBoardId, @NotNull String whiteBoardToken) {
-        this.context = context;
-        this.roomUuid = roomUuid;
-        this.whiteBoardAppId = whiteBoardAppId;
+    public ReplayLaunchConfig(@NotNull Context context, @NotNull String whiteBoardAppId,
+                              int eyeProtect, long startTime, long endTime,
+                              @NotNull String whiteBoardUrl, @NotNull String whiteBoardId,
+                              @NotNull String whiteBoardToken) {
+        super(context, whiteBoardAppId, eyeProtect);
         this.startTime = startTime;
         this.endTime = endTime;
         this.whiteBoardUrl = whiteBoardUrl;
         this.whiteBoardId = whiteBoardId;
         this.whiteBoardToken = whiteBoardToken;
-    }
-
-    public Context getContext() {
-        return context;
-    }
-
-    public void setContext(Context context) {
-        this.context = context;
-    }
-
-    public String getRoomUuid() {
-        return roomUuid;
-    }
-
-    public void setRoomUuid(String roomUuid) {
-        this.roomUuid = roomUuid;
-    }
-
-    public String getWhiteBoardAppId() {
-        return whiteBoardAppId;
-    }
-
-    public void setWhiteBoardAppId(String whiteBoardAppId) {
-        this.whiteBoardAppId = whiteBoardAppId;
     }
 
     public long getStartTime() {
@@ -100,10 +68,6 @@ public class ReplayLaunchConfig implements Parcelable {
         this.whiteBoardToken = whiteBoardToken;
     }
 
-    public static Creator<ReplayLaunchConfig> getCREATOR() {
-        return CREATOR;
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -111,8 +75,7 @@ public class ReplayLaunchConfig implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.roomUuid);
-        dest.writeString(this.whiteBoardAppId);
+        super.writeToParcel(dest, flags);
         dest.writeLong(this.startTime);
         dest.writeLong(this.endTime);
         dest.writeString(this.whiteBoardUrl);
@@ -121,8 +84,7 @@ public class ReplayLaunchConfig implements Parcelable {
     }
 
     protected ReplayLaunchConfig(Parcel in) {
-        this.roomUuid = in.readString();
-        this.whiteBoardAppId = in.readString();
+        super(in);
         this.startTime = in.readLong();
         this.endTime = in.readLong();
         this.whiteBoardUrl = in.readString();

@@ -11,12 +11,7 @@ import io.agora.education.api.user.data.EduUserRole;
 /**
  * @author cjw
  */
-public class EduLaunchConfig implements Parcelable {
-    /**
-     * 不参与序列化，只作为启动Activity时所用
-     */
-    @NotNull
-    private Context context;
+public class EduLaunchConfig extends LaunchConfig implements Parcelable {
     @NotNull
     private String userName;
     @NotNull
@@ -34,15 +29,14 @@ public class EduLaunchConfig implements Parcelable {
     @NotNull
     private String customerCer;
     @NotNull
-    private String whiteBoardAppId;
-    @NotNull
     private String token;
 
-    public EduLaunchConfig(@NotNull Context context, @NotNull String userName, @NotNull String userUuid,
+    public EduLaunchConfig(@NotNull Context context, @NotNull String whiteBoardAppId,
+                           int eyeProtect, @NotNull String userName, @NotNull String userUuid,
                            @NotNull String roomName, @NotNull String roomUuid, int roomType,
-                           @NotNull String appId, @NotNull String customerId, @NotNull String customerCer,
-                           @NotNull String whiteBoardAppId, @NotNull String token) {
-        this.context = context;
+                           @NotNull String appId, @NotNull String customerId,
+                           @NotNull String customerCer, @NotNull String token) {
+        super(context, whiteBoardAppId, eyeProtect);
         this.userName = userName;
         this.userUuid = userUuid;
         this.roomName = roomName;
@@ -51,15 +45,15 @@ public class EduLaunchConfig implements Parcelable {
         this.appId = appId;
         this.customerId = customerId;
         this.customerCer = customerCer;
-        this.whiteBoardAppId = whiteBoardAppId;
         this.token = token;
     }
 
-    public EduLaunchConfig(@NotNull Context context, @NotNull String userName, @NotNull String userUuid,
-                           @NotNull String roomName, @NotNull String roomUuid, int roleType, int roomType,
-                           @NotNull String appId, @NotNull String customerId, @NotNull String customerCer,
-                           @NotNull String whiteBoardAppId, @NotNull String token) {
-        this.context = context;
+    public EduLaunchConfig(@NotNull Context context, @NotNull String whiteBoardAppId,
+                           int eyeProtect, @NotNull String userName, @NotNull String userUuid,
+                           @NotNull String roomName, @NotNull String roomUuid, int roleType,
+                           int roomType, @NotNull String appId, @NotNull String customerId,
+                           @NotNull String customerCer, @NotNull String token) {
+        super(context, whiteBoardAppId, eyeProtect);
         this.userName = userName;
         this.userUuid = userUuid;
         this.roomName = roomName;
@@ -69,16 +63,7 @@ public class EduLaunchConfig implements Parcelable {
         this.appId = appId;
         this.customerId = customerId;
         this.customerCer = customerCer;
-        this.whiteBoardAppId = whiteBoardAppId;
         this.token = token;
-    }
-
-    public Context getContext() {
-        return context;
-    }
-
-    public void setContext(Context context) {
-        this.context = context;
     }
 
     public String getUserName() {
@@ -145,14 +130,6 @@ public class EduLaunchConfig implements Parcelable {
         this.customerCer = customerCer;
     }
 
-    public String getWhiteBoardAppId() {
-        return whiteBoardAppId;
-    }
-
-    public void setWhiteBoardAppId(String whiteBoardAppId) {
-        this.whiteBoardAppId = whiteBoardAppId;
-    }
-
     public int getRoleType() {
         return roleType;
     }
@@ -169,10 +146,6 @@ public class EduLaunchConfig implements Parcelable {
         this.token = token;
     }
 
-    public static Creator<EduLaunchConfig> getCREATOR() {
-        return CREATOR;
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -180,6 +153,7 @@ public class EduLaunchConfig implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
         dest.writeString(this.userName);
         dest.writeString(this.userUuid);
         dest.writeString(this.roomName);
@@ -189,11 +163,11 @@ public class EduLaunchConfig implements Parcelable {
         dest.writeString(this.appId);
         dest.writeString(this.customerId);
         dest.writeString(this.customerCer);
-        dest.writeString(this.whiteBoardAppId);
         dest.writeString(this.token);
     }
 
     protected EduLaunchConfig(Parcel in) {
+        super(in);
         this.userName = in.readString();
         this.userUuid = in.readString();
         this.roomName = in.readString();
@@ -203,7 +177,6 @@ public class EduLaunchConfig implements Parcelable {
         this.appId = in.readString();
         this.customerId = in.readString();
         this.customerCer = in.readString();
-        this.whiteBoardAppId = in.readString();
         this.token = in.readString();
     }
 

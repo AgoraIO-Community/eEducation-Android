@@ -2,36 +2,36 @@ package io.agora.education;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
-import io.agora.edu.base.BaseActivity;
-import io.agora.edu.widget.EyeProtection;
-import io.agora.edu.BuildConfig;
+import io.agora.base.PreferenceManager;
 
-public class SettingActivity extends BaseActivity {
+import static io.agora.education.Constants.KEY_SP;
+import static io.agora.education.Constants.POLICYURL;
+
+public class SettingActivity extends AppCompatActivity {
     private static final String TAG = SettingActivity.class.getSimpleName();
 
     @BindView(R.id.switch_eye_care)
     protected Switch switch_eye_care;
 
     @Override
-    protected int getLayoutResId() {
-        return R.layout.activity_setting;
-    }
-
-    @Override
-    protected void initData() {
-    }
-
-    @Override
-    protected void initView() {
-        switch_eye_care.setChecked(EyeProtection.isNeedShow());
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_setting);
+        ButterKnife.bind(this);
+        switch_eye_care.setChecked(PreferenceManager.get(KEY_SP, false));
     }
 
     @OnClick({R.id.iv_back, R.id.layout_policy})
@@ -41,7 +41,7 @@ public class SettingActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.layout_policy:
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(BuildConfig.POLICY_URL));
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(POLICYURL));
                 startActivity(intent);
                 break;
             case R.id.layout_log:
@@ -64,12 +64,7 @@ public class SettingActivity extends BaseActivity {
 
     @OnCheckedChanged(R.id.switch_eye_care)
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        EyeProtection.setNeedShow(isChecked);
-        if (isChecked) {
-            showEyeProtection();
-        } else {
-            dismissEyeProtection();
-        }
+        PreferenceManager.put(KEY_SP, isChecked);
     }
 
 }

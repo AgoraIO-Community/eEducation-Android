@@ -32,6 +32,7 @@ import io.agora.base.ToastManager;
 import io.agora.base.callback.ThrowableCallback;
 import io.agora.base.network.RetrofitManager;
 import io.agora.edu.R;
+import io.agora.edu.widget.EyeProtection;
 import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
 import io.agora.education.api.logger.DebugItem;
@@ -91,10 +92,10 @@ import io.agora.raisehand.AgoraCoVideoAction;
 import io.agora.whiteboard.netless.listener.GlobalStateChangeListener;
 import kotlin.Unit;
 
-import static io.agora.edu.launch.EduLaunch.CODE;
-import static io.agora.edu.launch.EduLaunch.REASON;
 import static io.agora.edu.BuildConfig.API_BASE_URL;
 import static io.agora.edu.classroom.bean.board.BoardBean.BOARD;
+import static io.agora.edu.launch.EduLaunch.CODE;
+import static io.agora.edu.launch.EduLaunch.REASON;
 import static io.agora.edu.launch.EduLaunch.launchCallback;
 import static io.agora.record.bean.RecordBean.RECORD;
 import static io.agora.record.bean.RecordState.END;
@@ -160,6 +161,12 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         }
     }
 
+    @Override
+    protected void onStart() {
+        EyeProtection.setNeedShow(eduLaunchConfig.isEyeProtect());
+        super.onStart();
+    }
+
     public static void setEduManager(EduManager eduManager) {
         BaseClassActivity.eduManager = eduManager;
     }
@@ -221,12 +228,11 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
                     }
                     EduStudent student = (EduStudent) user;
                     callback.onSuccess(student);
-                    /*把launch成功的信息回调出去*/
-                    launchCallback.onSuccess(null);
+                    /*join完成的信息回调出去*/
+                    launchCallback.onComplete();
                 } else {
                     EduError error = EduError.Companion.internalError("join failed: localUser is null");
                     callback.onFailure(error);
-                    launchCallback.onFailure(error);
                 }
             }
 
@@ -260,7 +266,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
                     EduTeacher teacher = (EduTeacher) user;
                     callback.onSuccess(teacher);
                 } else {
-                    callback.onFailure(EduError.Companion.internalError("localUser is null"));
+                    callback.onFailure(EduError.Companion.internalError("join failed: localUser is null"));
                 }
             }
 
@@ -294,7 +300,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
                     EduAssistant assistant = (EduAssistant) user;
                     callback.onSuccess(assistant);
                 } else {
-                    callback.onFailure(EduError.Companion.internalError("localUser is null"));
+                    callback.onFailure(EduError.Companion.internalError("join failed: localUser is null"));
                 }
             }
 
@@ -310,11 +316,11 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
      * 加入失败，回传数据并结束当前页面
      */
     protected void joinFailed(int code, String reason) {
-//        Intent intent = getIntent().putExtra(CODE, code).putExtra(REASON, reason);
-//        setResult(RESULT_CODE, intent);
-//        finish();
-        /*把launch失败的信息回调出去*/
-        launchCallback.onFailure(new EduError(code, reason));
+        /*join完成的信息回调出去*/
+        launchCallback.onComplete();
+        /*回传错误信息*/
+        Intent intent = getIntent().putExtra(CODE, code).putExtra(REASON, reason);
+        setResult(RESULT_CODE, intent);
         finish();
     }
 

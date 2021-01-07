@@ -3,44 +3,39 @@ package io.agora.education;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTouch;
-import io.agora.base.ToastManager;
-import io.agora.edu.classroom.BaseClassActivity;
+import io.agora.edu.launch.LaunchCallback;
 import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
-import io.agora.education.api.room.data.RoomType;
-import io.agora.education.api.user.data.EduUserRole;
-import io.agora.edu.base.BaseActivity;
-import io.agora.edu.classroom.bean.channel.Room;
 import io.agora.edu.launch.EduLaunch;
 import io.agora.edu.launch.EduLaunchConfig;
-import io.agora.edu.util.AppUtil;
-import io.agora.edu.widget.PolicyDialog;
 
+import static io.agora.edu.launch.EduLaunch.REQUEST_CODE_RTC;
+import static io.agora.education.Constants.KEY_SP;
 import static io.agora.education.EduApplication.getAppId;
 import static io.agora.education.EduApplication.getCustomerCer;
 import static io.agora.education.EduApplication.getCustomerId;
-import static io.agora.edu.launch.EduLaunch.CODE;
-import static io.agora.edu.launch.EduLaunch.REASON;
-import static io.agora.edu.launch.EduLaunch.REQUEST_CODE_RTC;
-import static io.agora.edu.launch.EduLaunch.REQUEST_CODE_RTE;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     @BindView(R.id.et_room_name)
@@ -55,17 +50,10 @@ public class MainActivity extends BaseActivity {
     protected Button btnJoin;
 
     @Override
-    protected int getLayoutResId() {
-        return R.layout.activity_main;
-    }
-
-    @Override
-    protected void initData() {
-    }
-
-    @Override
-    protected void initView() {
-        new PolicyDialog().show(getSupportFragmentManager(), null);
+    protected void onCreate(@androidx.annotation.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
     }
 
     @Override
@@ -73,7 +61,7 @@ public class MainActivity extends BaseActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         for (int result : grantResults) {
             if (result != PackageManager.PERMISSION_GRANTED) {
-                ToastManager.showShort(R.string.no_enough_permissions);
+                Toast.makeText(this, R.string.no_enough_permissions, Toast.LENGTH_SHORT).show();
                 return;
             }
         }
@@ -86,17 +74,17 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (data != null && requestCode == REQUEST_CODE_RTE && resultCode == BaseClassActivity.RESULT_CODE) {
-            int code = data.getIntExtra(CODE, -1);
-            String reason = data.getStringExtra(REASON);
-            String msg = String.format(getString(R.string.function_error), code, reason);
-            Log.e(TAG, msg);
-            ToastManager.showShort(msg);
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (data != null && requestCode == REQUEST_CODE_RTE && resultCode == BaseClassActivity.RESULT_CODE) {
+//            int code = data.getIntExtra(CODE, -1);
+//            String reason = data.getStringExtra(REASON);
+//            String msg = String.format(getString(R.string.function_error), code, reason);
+//            Log.e(TAG, msg);
+//            ToastManager.showShort(msg);
+//        }
+//    }
 
     @OnClick({R.id.iv_setting, R.id.et_room_type, R.id.btn_join, R.id.tv_one2one, R.id.tv_small_class,
             R.id.tv_large_class, R.id.tv_breakout_class, R.id.tv_intermediate_class})
@@ -158,48 +146,43 @@ public class MainActivity extends BaseActivity {
 
         String roomNameStr = et_room_name.getText().toString();
         if (TextUtils.isEmpty(roomNameStr)) {
-            ToastManager.showShort(R.string.room_name_should_not_be_empty);
+            Toast.makeText(this, R.string.room_name_should_not_be_empty, Toast.LENGTH_SHORT).show();
             return;
         }
 
         String yourNameStr = et_your_name.getText().toString();
         if (TextUtils.isEmpty(yourNameStr)) {
-            ToastManager.showShort(R.string.your_name_should_not_be_empty);
+            Toast.makeText(this, R.string.your_name_should_not_be_empty, Toast.LENGTH_SHORT).show();
             return;
         }
 
         String roomTypeStr = et_room_type.getText().toString();
         if (TextUtils.isEmpty(roomTypeStr)) {
-            ToastManager.showShort(R.string.room_type_should_not_be_empty);
+            Toast.makeText(this, R.string.room_type_should_not_be_empty, Toast.LENGTH_SHORT).show();
             return;
         }
 
         /**userUuid和roomUuid需用户自己指定，并保证唯一性*/
         int roomType = getClassType(roomTypeStr);
-        String userUuid = yourNameStr + EduUserRole.STUDENT;
+        String userUuid = yourNameStr + UserRole.STUDENT;
         String roomUuid = roomNameStr + roomType;
+
+        int eyeProtect = PreferenceManager.get(KEY_SP, false) ? 1 : 0;
+        String whiteBoardAppId = getString(R.string.whiteboard_app_id);
 
         assert getAppId() != null;
         assert getCustomerId() != null;
         assert getCustomerCer() != null;
-        EduLaunchConfig eduLaunchConfig = new EduLaunchConfig(this, yourNameStr, userUuid, roomNameStr, roomUuid,
-                roomType, getAppId(), getCustomerId(), getCustomerCer(), getString(R.string.whiteboard_app_id), "");
-        EduLaunch.launch(eduLaunchConfig, new EduCallback<Void>() {
-            @Override
-            public void onSuccess(@Nullable Void res) {
-                Log.e(TAG, "启动课堂成功");
-                notifyBtnJoinEnable(true);
-            }
-
-            @Override
-            public void onFailure(@NotNull EduError error) {
-                notifyBtnJoinEnable(true);
-                Log.e(TAG, "启动课堂失败->code:" + error.getType() + ",reason:" + error.getMsg());
-            }
+        assert !TextUtils.isEmpty(whiteBoardAppId);
+        EduLaunchConfig eduLaunchConfig = new EduLaunchConfig(this, whiteBoardAppId, eyeProtect,
+                yourNameStr, userUuid, roomNameStr, roomUuid, roomType, getAppId(), getCustomerId(),
+                getCustomerCer(), "");
+        EduLaunch.launch(eduLaunchConfig, () -> {
+            Log.e(TAG, "启动课堂完成");
+            notifyBtnJoinEnable(true);
         });
     }
 
-    @Room.Type
     private int getClassType(String roomTypeStr) {
         if (roomTypeStr.equals(getString(R.string.one2one_class))) {
             return RoomType.ONE_ON_ONE.getValue();

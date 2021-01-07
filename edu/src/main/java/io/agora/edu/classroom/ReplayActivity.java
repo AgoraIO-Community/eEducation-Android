@@ -16,13 +16,12 @@ import io.agora.edu.R;
 import io.agora.edu.base.BaseActivity;
 import io.agora.edu.classroom.fragment.ReplayBoardFragment;
 
+import static io.agora.edu.launch.ReplayLaunch.VIDEO_URL;
 import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_APP_ID;
 import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_END_TIME;
 import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_ID;
-import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_ROOM_ID;
 import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_START_TIME;
 import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_TOKEN;
-import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_URL;
 
 
 public class ReplayActivity extends BaseActivity {
@@ -33,7 +32,7 @@ public class ReplayActivity extends BaseActivity {
 
     private String whiteBoardAppId;
     private ReplayBoardFragment replayBoardFragment;
-    private String url, roomId;
+    private String url;
     private long startTime, endTime;
     private String boardId, boardToken;
     private boolean isInit;
@@ -47,12 +46,11 @@ public class ReplayActivity extends BaseActivity {
     protected void initData() {
         Intent intent = getIntent();
         whiteBoardAppId = intent.getStringExtra(WHITEBOARD_APP_ID);
-        url = intent.getStringExtra(WHITEBOARD_URL);
+        url = intent.getStringExtra(VIDEO_URL);
         if (!url.startsWith("http")) {
             url = BuildConfig.REPLAY_BASE_URL.concat("/").concat(url);
         }
         Log.e(TAG, "回放链接:" + url);
-        roomId = intent.getStringExtra(WHITEBOARD_ROOM_ID);
         startTime = intent.getLongExtra(WHITEBOARD_START_TIME, 0);
         endTime = intent.getLongExtra(WHITEBOARD_END_TIME, 0);
         boardId = intent.getStringExtra(WHITEBOARD_ID);

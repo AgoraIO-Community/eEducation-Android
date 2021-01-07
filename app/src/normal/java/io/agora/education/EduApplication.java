@@ -1,36 +1,26 @@
 package io.agora.education;
 
 import android.app.Application;
-import android.util.Base64;
 
 import androidx.annotation.Nullable;
 
 import com.tencent.bugly.crashreport.CrashReport;
-
-import java.util.Map;
-
-import io.agora.base.PreferenceManager;
-import io.agora.base.ToastManager;
-import io.agora.base.network.RetrofitManager;
-import io.agora.base.util.CryptoUtil;
-import io.agora.edu.service.bean.response.AppConfigRes;
-import kotlin.text.Charsets;
 
 public class EduApplication extends Application {
     private static final String TAG = "EduApplication";
 
     public static EduApplication instance;
 
-    private AppConfigRes config;
+    private AppConfig config;
 
     @Override
     public void onCreate() {
         super.onCreate();
         instance = this;
 
-        CrashReport.initCrashReport(getApplicationContext(), "04948355be", true);
         PreferenceManager.init(this);
-        ToastManager.init(this);
+
+        CrashReport.initCrashReport(getApplicationContext(), "04948355be", true);
 
         String appId, customerId, customerCertificate;
         appId = getString(R.string.agora_app_id);
@@ -39,10 +29,6 @@ public class EduApplication extends Application {
         setAppId(appId);
         setCustomerId(customerId);
         setCustomerCer(customerCertificate);
-        /**为OKHttp添加Authorization的header*/
-        String auth = Base64.encodeToString((customerId + ":" + customerCertificate)
-                .getBytes(Charsets.UTF_8), Base64.DEFAULT).replace("\n", "").trim();
-        RetrofitManager.instance().addHeader("Authorization", CryptoUtil.getAuth(auth));
     }
 
     @Nullable
@@ -71,31 +57,23 @@ public class EduApplication extends Application {
 
     public static void setAppId(String appId) {
         if (instance.config == null) {
-            instance.config = new AppConfigRes();
+            instance.config = new AppConfig();
         }
         instance.config.appId = appId;
     }
 
     public static void setCustomerId(String customerId) {
         if (instance.config == null) {
-            instance.config = new AppConfigRes();
+            instance.config = new AppConfig();
         }
         instance.config.customerId = customerId;
     }
 
     public static void setCustomerCer(String customerCer) {
         if (instance.config == null) {
-            instance.config = new AppConfigRes();
+            instance.config = new AppConfig();
         }
         instance.config.customerCer = customerCer;
-    }
-
-    @Nullable
-    public static Map<String, Map<Integer, String>> getMultiLanguage() {
-        if (instance.config == null) {
-            return null;
-        }
-        return instance.config.multiLanguage;
     }
 
 }

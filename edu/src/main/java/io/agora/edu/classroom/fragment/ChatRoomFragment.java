@@ -24,6 +24,7 @@ import io.agora.base.ToastManager;
 import io.agora.edu.R;
 import io.agora.edu.launch.ReplayLaunch;
 import io.agora.edu.launch.ReplayLaunchConfig;
+import io.agora.edu.widget.EyeProtection;
 import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
 import io.agora.education.api.message.EduChatMsg;
@@ -138,8 +139,8 @@ public class ChatRoomFragment extends BaseFragment implements OnItemChildClickLi
                                     String url = recordDetail.url;
                                     if (!TextUtils.isEmpty(url)) {
                                         ReplayLaunchConfig config = new ReplayLaunchConfig(
-                                                ChatRoomFragment.this.getContext(),
-                                                recordDetail.roomUuid, whiteBoardAppId,
+                                                ChatRoomFragment.this.getContext(), whiteBoardAppId,
+                                                EyeProtection.isNeedShow() ? 1 : 0,
                                                 recordDetail.startTime, recordDetail.endTime, url,
                                                 recordDetail.boardId, recordDetail.boardToken);
                                         ReplayLaunch.replay(config);

@@ -17,8 +17,8 @@ public class ReplayLaunch {
         Intent intent = new Intent(config.getContext(), ReplayActivity.class);
         intent.putExtra(WHITEBOARD_APP_ID, config.getWhiteBoardAppId());
         intent.putExtra(WHITEBOARD_ROOM_ID, config.getRoomUuid());
-        intent.putExtra(WHITEBOARD_START_TIME, config.getWhiteBoardStartTime());
-        intent.putExtra(WHITEBOARD_END_TIME, config.getWhiteBoardEndTime());
+        intent.putExtra(WHITEBOARD_START_TIME, config.getStartTime());
+        intent.putExtra(WHITEBOARD_END_TIME, config.getEndTime());
         intent.putExtra(WHITEBOARD_URL, config.getWhiteBoardUrl());
         intent.putExtra(WHITEBOARD_ID, config.getWhiteBoardId());
         intent.putExtra(WHITEBOARD_TOKEN, config.getWhiteBoardToken());

@@ -37,7 +37,6 @@ public class EduLaunch {
     public static final int REQUEST_CODE_RTE = 909;
     public static final String CODE = "code";
     public static final String REASON = "reason";
-
     public static EduCallback<Void> launchCallback;
 
     public static void launch(EduLaunchConfig config, EduCallback<Void> callback) {

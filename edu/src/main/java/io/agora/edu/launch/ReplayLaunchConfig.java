@@ -13,8 +13,8 @@ public class ReplayLaunchConfig implements Parcelable {
     private String roomUuid;
     @NotNull
     private String whiteBoardAppId;
-    private long whiteBoardStartTime;
-    private long whiteBoardEndTime;
+    private long startTime;
+    private long endTime;
     @NotNull
     private String whiteBoardUrl;
     @NotNull
@@ -23,14 +23,14 @@ public class ReplayLaunchConfig implements Parcelable {
     private String whiteBoardToken;
 
     public ReplayLaunchConfig(@NotNull Context context, @NotNull String roomUuid,
-                              @NotNull String whiteBoardAppId, long whiteBoardStartTime,
-                              long whiteBoardEndTime, @NotNull String whiteBoardUrl,
+                              @NotNull String whiteBoardAppId, long startTime,
+                              long endTime, @NotNull String whiteBoardUrl,
                               @NotNull String whiteBoardId, @NotNull String whiteBoardToken) {
         this.context = context;
         this.roomUuid = roomUuid;
         this.whiteBoardAppId = whiteBoardAppId;
-        this.whiteBoardStartTime = whiteBoardStartTime;
-        this.whiteBoardEndTime = whiteBoardEndTime;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.whiteBoardUrl = whiteBoardUrl;
         this.whiteBoardId = whiteBoardId;
         this.whiteBoardToken = whiteBoardToken;
@@ -60,20 +60,20 @@ public class ReplayLaunchConfig implements Parcelable {
         this.whiteBoardAppId = whiteBoardAppId;
     }
 
-    public long getWhiteBoardStartTime() {
-        return whiteBoardStartTime;
+    public long getStartTime() {
+        return startTime;
     }
 
-    public void setWhiteBoardStartTime(long whiteBoardStartTime) {
-        this.whiteBoardStartTime = whiteBoardStartTime;
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
     }
 
-    public long getWhiteBoardEndTime() {
-        return whiteBoardEndTime;
+    public long getEndTime() {
+        return endTime;
     }
 
-    public void setWhiteBoardEndTime(long whiteBoardEndTime) {
-        this.whiteBoardEndTime = whiteBoardEndTime;
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
     }
 
     public String getWhiteBoardUrl() {
@@ -113,8 +113,8 @@ public class ReplayLaunchConfig implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.roomUuid);
         dest.writeString(this.whiteBoardAppId);
-        dest.writeLong(this.whiteBoardStartTime);
-        dest.writeLong(this.whiteBoardEndTime);
+        dest.writeLong(this.startTime);
+        dest.writeLong(this.endTime);
         dest.writeString(this.whiteBoardUrl);
         dest.writeString(this.whiteBoardId);
         dest.writeString(this.whiteBoardToken);
@@ -123,8 +123,8 @@ public class ReplayLaunchConfig implements Parcelable {
     protected ReplayLaunchConfig(Parcel in) {
         this.roomUuid = in.readString();
         this.whiteBoardAppId = in.readString();
-        this.whiteBoardStartTime = in.readLong();
-        this.whiteBoardEndTime = in.readLong();
+        this.startTime = in.readLong();
+        this.endTime = in.readLong();
         this.whiteBoardUrl = in.readString();
         this.whiteBoardId = in.readString();
         this.whiteBoardToken = in.readString();

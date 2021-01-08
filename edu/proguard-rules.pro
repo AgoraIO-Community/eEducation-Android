@@ -61,6 +61,18 @@
 *;
 }
 
+#------BaseQuickAdapter混淆文件------
+-keep class com.chad.library.adapter.** {
+*;
+}
+-keep public class * extends com.chad.library.adapter.base.BaseQuickAdapter
+-keep public class * extends com.chad.library.adapter.base.BaseViewHolder
+-keep public class * extends com.chad.library.adapter.base.entity.MultiItemEntity
+-keepclassmembers  class **$** extends com.chad.library.adapter.base.BaseViewHolder {
+ <init>(...);
+}
+#------BaseQuickAdapter混淆文件------
+
 -keep class io.agora.base.bean.** { *; }
 
 -keep class io.agora.base.network.** { *; }

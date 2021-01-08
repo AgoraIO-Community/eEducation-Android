@@ -1,6 +1,8 @@
 package io.agora.edu.classroom.adapter;
 
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -8,6 +10,8 @@ import androidx.annotation.NonNull;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import io.agora.edu.R2;
@@ -50,8 +54,15 @@ public class UserListAdapter extends BaseQuickAdapter<EduStreamInfo, UserListAda
     }
 
     public UserListAdapter() {
-        super(R.layout.item_user_list);
+        super(0);
         addChildClickViewIds(R.id.iv_btn_mute_audio, R.id.iv_btn_mute_video);
+    }
+
+    @NotNull
+    @Override
+    protected ViewHolder onCreateDefViewHolder(@NotNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_user_list, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override

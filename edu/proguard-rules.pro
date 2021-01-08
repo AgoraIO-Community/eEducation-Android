@@ -55,10 +55,17 @@
 ##Fragment不需要在AndroidManifest.xml中注册，需要额外保护下
 #-keep public class * extends androidx.fragment.app.Fragment
 
+-keepattributes Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,Annotation,EnclosingMethod,MethodParameters
 
+-keep class *.R$ {
+*;
+}
 
+-keep class io.agora.base.bean.** { *; }
 
--keep public class io.agora.education.impl.manager.EduManagerImpl { *; }
+-keep class io.agora.base.network.** { *; }
+
+-keep class io.agora.edu.classroom.bean.** { *; }
 
 -keep public class io.agora.edu.launch.EduLaunch
 -keepclassmembers class io.agora.edu.launch.EduLaunch {
@@ -76,4 +83,34 @@
 -keep public class io.agora.edu.launch.ReplayLaunch { *; }
 -keep public class io.agora.edu.launch.ReplayLaunchConfig { *; }
 
+-keep class io.agora.edu.service.bean.base.** { *; }
+-keep class io.agora.edu.service.bean.request.** { *; }
+-keep class io.agora.edu.service.bean.response.** { *; }
+-keep public class io.agora.edu.service.bean.ResponseBody { *; }
+
+-keep class io.agora.education.api.base.** { *; }
+-keep class io.agora.education.api.board.data.** { *; }
+-keep class io.agora.education.api.message.** { *; }
+-keep class io.agora.education.api.room.data.** { *; }
+-keep class io.agora.education.api.stream.data.** { *; }
+-keep class io.agora.education.api.user.data.** { *; }
+
+-keep class io.agora.education.impl.board.data.** { *; }
+-keep class io.agora.education.impl.cmd.bean.** { *; }
+-keep class io.agora.education.impl.room.data.** { *; }
+-keep class io.agora.education.impl.stream.data.** { *; }
+-keep class io.agora.education.impl.user.data.** { *; }
+-keep class io.agora.education.impl.ResponseBody { *; }
+
+-keep class io.agora.log.service.bean.** { *; }
+
+-keep public class io.agora.education.impl.manager.EduManagerImpl { *; }
+
 -keep class io.agora.record.** { *; }
+
+-keep class io.agora.rte.data.** { *; }
+
+-keep class io.agora.whiteboard.netless.service.bean.** { *; }
+
+
+

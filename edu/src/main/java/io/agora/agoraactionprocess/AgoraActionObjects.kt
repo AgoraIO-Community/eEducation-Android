@@ -1,7 +1,9 @@
 package io.agora.agoraactionprocess
 
+import androidx.annotation.Keep
 import com.google.gson.Gson
 
+@Keep
 enum class AgoraActionType(val value: Int) {
     AgoraActionTypeApply(1),
     AgoraActionTypeInvitation(2),
@@ -10,6 +12,7 @@ enum class AgoraActionType(val value: Int) {
     AgoraActionTypeCancel(5)
 }
 
+@Keep
 class AgoraActionProcessConfig(
         val appId: String,
         val roomUuid: String,
@@ -20,6 +23,7 @@ class AgoraActionProcessConfig(
 )
 
 /**config */
+@Keep
 class AgoraActionConfigInfo(
         val maxWait: Int,
         val maxAccept: Int,
@@ -34,6 +38,7 @@ class AgoraActionConfigInfo(
 }
 
 /**for set action*/
+@Keep
 class AgoraActionOptions(
         val actionType: AgoraActionType = AgoraActionType.AgoraActionTypeApply,
         val maxWait: Int = 4,
@@ -43,6 +48,7 @@ class AgoraActionOptions(
 )
 
 
+@Keep
 class AgoraStartActionOptions(
         val toUserUuid: String,
         val processUuid: String,
@@ -50,17 +56,20 @@ class AgoraStartActionOptions(
 ) {
 }
 
+@Keep
 class AgoraStartActionMsgReq(
         val fromUserUuid: String?,
         val payload: Map<String, Any>?
 )
 
+@Keep
 class AgoraStopActionOptions(
         val toUserUuid: String,
         val processUuid: String,
         val body: AgoraStopActionMsgReq) {
 }
 
+@Keep
 class AgoraStopActionMsgReq(
         val action: Int = AgoraActionType.AgoraActionTypeAccept.value,
         val fromUserUuid: String?,
@@ -68,11 +77,13 @@ class AgoraStopActionMsgReq(
         var waitAck: Int = AgoraActionWaitACK.DISABLE.value
 )
 
+@Keep
 enum class AgoraActionWaitACK(val value: Int) {
     DISABLE(0),
     ENABLE(1)
 }
 
+@Keep
 class AgoraActionMsgRes(
         val action: Int = AgoraActionType.AgoraActionTypeApply.value,
         val processUuid: String,

@@ -16,24 +16,22 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTouch;
-import io.agora.edu.launch.LaunchCallback;
-import io.agora.education.api.EduCallback;
-import io.agora.education.api.base.EduError;
-import io.agora.edu.launch.EduLaunch;
-import io.agora.edu.launch.EduLaunchConfig;
+import io.agora.edu.launch.AgoraEduClassRoom;
+import io.agora.edu.launch.AgoraEduReplay;
+import io.agora.edu.launch.AgoraEduReplayConfig;
+import io.agora.edu.launch.AgoraEduRoleType;
+import io.agora.edu.launch.AgoraEduRoomType;
+import io.agora.edu.launch.AgoraEduSDK;
+import io.agora.edu.launch.AgoraEduLaunchConfig;
+import io.agora.edu.launch.AgoraEduSDKConfig;
 
-import static io.agora.edu.launch.EduLaunch.REQUEST_CODE_RTC;
+import static io.agora.edu.launch.AgoraEduSDK.REQUEST_CODE_RTC;
 import static io.agora.education.Constants.KEY_SP;
 import static io.agora.education.EduApplication.getAppId;
-import static io.agora.education.EduApplication.getCustomerCer;
-import static io.agora.education.EduApplication.getCustomerId;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -54,6 +52,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        int eyeProtect = PreferenceManager.get(KEY_SP, false) ? 1 : 0;
+        AgoraEduSDK.setAgoraEduSDKConfig(new AgoraEduSDKConfig(getAppId(), eyeProtect));
     }
 
     @Override
@@ -94,16 +99,32 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, SettingActivity.class));
                 break;
             case R.id.btn_join:
-                if (AppUtil.isFastClick()) {
-                    return;
-                }
-                if (AppUtil.checkAndRequestAppPermission(this, new String[]{
-                        Manifest.permission.RECORD_AUDIO,
-                        Manifest.permission.CAMERA,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                }, REQUEST_CODE_RTC)) {
-                    start();
-                }
+                AgoraEduReplayConfig config = new AgoraEduReplayConfig(this, 1610194790798L, 1610194828584L,
+                        "scenario/recording/f488493d1886435f963dfb3d95984fd4/5ff99f6612c83b045ed90495/6b6c425515445a49a26e29aa7a828f33_1235542.m3u8",
+                        "646/P8Kb7e_DJZVAQw", "4c25df50526f11eb881eb12e7d1eca69", "WHITEcGFydG5lcl9pZD0xTnd5aDBsMW9ZazhaRWNuZG1kaWgwcmJjVWVsQnE1UkpPMVMmc2lnPTcwODlkYzdjNzA2YTFmMjZkZDdlMmEyYWI0YjFhMzQ4MDQ4YzY2N2Y6YWs9MU53eWgwbDFvWWs4WkVjbmRtZGloMHJiY1VlbEJxNVJKTzFTJmNyZWF0ZV90aW1lPTE2MTAxOTIzNTM5OTAmZXhwaXJlX3RpbWU9MTY0MTcyODM1Mzk5MCZub25jZT0xNjEwMTkyMzUzOTkwMDAmcm9sZT1yb29tJnJvb21JZD00YzI1ZGY1MDUyNmYxMWViODgxZWIxMmU3ZDFlY2E2OSZ0ZWFtSWQ9NjQ2");
+                AgoraEduReplay replay = AgoraEduSDK.replay(config, state -> {
+                    Log.e(TAG, "replay-课堂状态:" + state.name());
+                });
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(10000);
+                        Log.e(TAG, "replay-主动自动结束课堂");
+                        replay.destroy();
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+//                if (AppUtil.isFastClick()) {
+//                    return;
+//                }
+//                if (AppUtil.checkAndRequestAppPermission(this, new String[]{
+//                        Manifest.permission.RECORD_AUDIO,
+//                        Manifest.permission.CAMERA,
+//                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+//                }, REQUEST_CODE_RTC)) {
+//                    start();
+//                }
                 break;
             case R.id.tv_one2one:
                 et_room_type.setText(R.string.one2one_class);
@@ -164,36 +185,34 @@ public class MainActivity extends AppCompatActivity {
 
         /**userUuid和roomUuid需用户自己指定，并保证唯一性*/
         int roomType = getClassType(roomTypeStr);
-        String userUuid = yourNameStr + UserRole.STUDENT;
+        String userUuid = yourNameStr + AgoraEduRoleType.AgoraEduRoleTypeStudent.getValue();
         String roomUuid = roomNameStr + roomType;
 
-        int eyeProtect = PreferenceManager.get(KEY_SP, false) ? 1 : 0;
-        String whiteBoardAppId = getString(R.string.whiteboard_app_id);
-
-        assert getAppId() != null;
-        assert getCustomerId() != null;
-        assert getCustomerCer() != null;
-        assert !TextUtils.isEmpty(whiteBoardAppId);
-        EduLaunchConfig eduLaunchConfig = new EduLaunchConfig(this, whiteBoardAppId, eyeProtect,
-                yourNameStr, userUuid, roomNameStr, roomUuid, roomType, getAppId(), getCustomerId(),
-                getCustomerCer(), "");
-        EduLaunch.launch(eduLaunchConfig, () -> {
-            Log.e(TAG, "启动课堂完成");
+        AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(this, yourNameStr, userUuid,
+                roomNameStr, roomUuid, roomType, "");
+        AgoraEduClassRoom classRoom = AgoraEduSDK.launch(agoraEduLaunchConfig, (state) -> {
+            Log.e(TAG, "launch-课堂状态:" + state.name());
             notifyBtnJoinEnable(true);
         });
+//        new Thread(() -> {
+//            try {
+//                Thread.sleep(10000);
+//                Log.e(TAG, "launch-主动自动结束课堂");
+//                classRoom.destroy();
+//            }
+//            catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }).start();
     }
 
     private int getClassType(String roomTypeStr) {
         if (roomTypeStr.equals(getString(R.string.one2one_class))) {
-            return RoomType.ONE_ON_ONE.getValue();
+            return AgoraEduRoomType.AgoraEduRoomType1V1.getValue();
         } else if (roomTypeStr.equals(getString(R.string.small_class))) {
-            return RoomType.SMALL_CLASS.getValue();
-        } else if (roomTypeStr.equals(getString(R.string.large_class))) {
-            return RoomType.LARGE_CLASS.getValue();
-        } else if (roomTypeStr.equals(getString(R.string.breakout))) {
-            return RoomType.BREAKOUT_CLASS.getValue();
+            return AgoraEduRoomType.AgoraEduRoomTypeSmall.getValue();
         } else {
-            return RoomType.MEDIUM_CLASS.getValue();
+            return AgoraEduRoomType.AgoraEduRoomTypeBig.getValue();
         }
     }
 

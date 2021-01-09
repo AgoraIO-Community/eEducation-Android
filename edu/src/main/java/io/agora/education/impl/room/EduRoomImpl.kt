@@ -521,7 +521,6 @@ internal class EduRoomImpl(
             AgoraLog.e("$TAG->Leave eduRoom[${getCurRoomUuid()}] error:${error.msg}")
             callback.onFailure(error)
         } else {
-            AgoraLog.w("$TAG->Leave eduRoom[${getCurRoomUuid()}] success")
             clearData()
             if (!leaveRoom) {
                 AgoraLog.w("$TAG->Ready to leave the RTE channel:${getCurRoomUuid()}")
@@ -541,6 +540,7 @@ internal class EduRoomImpl(
             syncSession.localUser.eventListener = null
             joinCallback = null
             (getCurLocalUser() as EduUserImpl).removeAllSurfaceView()
+            AgoraLog.w("$TAG->Leave eduRoom[${getCurRoomUuid()}] success")
             /*移除掉当前room*/
             val rtn = EduManagerImpl.removeRoom(this)
             AgoraLog.w("$TAG->Remove this eduRoom from eduManager:$rtn")

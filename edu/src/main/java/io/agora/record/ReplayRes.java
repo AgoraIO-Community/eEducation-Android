@@ -10,8 +10,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 
-import io.agora.edu.launch.EduLaunchConfig;
-
 public class ReplayRes {
 
     public int count;

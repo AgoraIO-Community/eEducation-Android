@@ -79,26 +79,26 @@
 
 -keep class io.agora.edu.classroom.bean.** { *; }
 
--keep public class io.agora.edu.launch.EduLaunch
--keepclassmembers class io.agora.edu.launch.EduLaunch {
+-keep public class io.agora.edu.launch.AgoraEduSDK
+-keepclassmembers class io.agora.edu.launch.AgoraEduSDK {
      public static final int REQUEST_CODE_RTC;
      public static final int REQUEST_CODE_RTE;
      public static final java.lang.String CODE;
      public static final java.lang.String REASON;
-     public static io.agora.edu.launch.LaunchCallback launchCallback;
-     public static void launch(io.agora.edu.launch.EduLaunchConfig, io.agora.edu.launch.LaunchCallback);
+     public static io.agora.edu.launch.AgoraEduLaunchCallback agoraEduLaunchCallback;
+     public static void launch(io.agora.edu.launch.AgoraEduLaunchConfig, io.agora.edu.launch.AgoraEduLaunchCallback);
 }
--keep public class io.agora.edu.launch.EduLaunchConfig { *; }
+-keep public class io.agora.edu.launch.AgoraEduLaunchConfig { *; }
 
--keep public interface io.agora.edu.launch.LaunchCallback { *; }
+-keep public interface io.agora.edu.launch.AgoraEduLaunchCallback { *; }
 
 -keep public class io.agora.edu.launch.ReplayLaunch { *; }
--keep public class io.agora.edu.launch.ReplayLaunchConfig { *; }
+-keep public class io.agora.edu.launch.AgoraEduReplayConfig { *; }
 
--keep class io.agora.edu.service.bean.base.** { *; }
--keep class io.agora.edu.service.bean.request.** { *; }
--keep class io.agora.edu.service.bean.response.** { *; }
--keep public class io.agora.edu.service.bean.ResponseBody { *; }
+-keep class io.agora.edu.common.bean.roompre.** { *; }
+-keep class io.agora.edu.common.bean.request.** { *; }
+-keep class io.agora.edu.common.bean.response.** { *; }
+-keep public class io.agora.edu.common.bean.ResponseBody { *; }
 
 -keep class io.agora.education.api.base.** { *; }
 -keep class io.agora.education.api.board.data.** { *; }

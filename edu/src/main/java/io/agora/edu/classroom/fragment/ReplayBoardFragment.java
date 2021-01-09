@@ -19,13 +19,12 @@ import butterknife.BindView;
 import butterknife.OnTouch;
 import io.agora.edu.R;
 import io.agora.edu.base.BaseFragment;
-import io.agora.edu.classroom.ReplayActivity;
 import io.agora.edu.classroom.widget.player.ReplayControlView;
 import io.agora.whiteboard.netless.listener.ReplayEventListener;
 import io.agora.whiteboard.netless.manager.ReplayManager;
 
-import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_END_TIME;
-import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_START_TIME;
+import static io.agora.edu.launch.AgoraEduSDK.WHITEBOARD_END_TIME;
+import static io.agora.edu.launch.AgoraEduSDK.WHITEBOARD_START_TIME;
 
 public class ReplayBoardFragment extends BaseFragment implements ReplayEventListener {
 

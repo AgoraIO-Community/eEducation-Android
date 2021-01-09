@@ -1,6 +1,6 @@
 package io.agora.record;
 
-import io.agora.edu.service.bean.ResponseBody;
+import io.agora.edu.common.bean.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;

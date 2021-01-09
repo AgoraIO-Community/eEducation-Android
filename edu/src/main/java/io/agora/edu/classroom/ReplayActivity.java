@@ -16,13 +16,12 @@ import io.agora.edu.R;
 import io.agora.edu.base.BaseActivity;
 import io.agora.edu.classroom.fragment.ReplayBoardFragment;
 
-import static io.agora.edu.launch.ReplayLaunch.VIDEO_URL;
-import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_APP_ID;
-import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_END_TIME;
-import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_ID;
-import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_START_TIME;
-import static io.agora.edu.launch.ReplayLaunch.WHITEBOARD_TOKEN;
-
+import static io.agora.edu.launch.AgoraEduSDK.VIDEO_URL;
+import static io.agora.edu.launch.AgoraEduSDK.WHITEBOARD_APP_ID;
+import static io.agora.edu.launch.AgoraEduSDK.WHITEBOARD_END_TIME;
+import static io.agora.edu.launch.AgoraEduSDK.WHITEBOARD_ID;
+import static io.agora.edu.launch.AgoraEduSDK.WHITEBOARD_START_TIME;
+import static io.agora.edu.launch.AgoraEduSDK.WHITEBOARD_TOKEN;
 
 public class ReplayActivity extends BaseActivity {
     private static final String TAG = "ReplayActivity";

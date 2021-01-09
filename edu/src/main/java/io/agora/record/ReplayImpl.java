@@ -7,7 +7,7 @@ import java.util.List;
 
 import io.agora.base.callback.ThrowableCallback;
 import io.agora.base.network.RetrofitManager;
-import io.agora.edu.service.bean.ResponseBody;
+import io.agora.edu.common.bean.ResponseBody;
 import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
 

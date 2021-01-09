@@ -1,6 +1,5 @@
 package io.agora.edu.classroom.fragment;
 
-import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -12,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemChildClickListener;
-import com.google.gson.Gson;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,9 +20,10 @@ import java.util.List;
 import butterknife.BindView;
 import io.agora.base.ToastManager;
 import io.agora.edu.R;
-import io.agora.edu.launch.ReplayLaunch;
-import io.agora.edu.launch.ReplayLaunchConfig;
-import io.agora.edu.widget.EyeProtection;
+import io.agora.edu.launch.AgoraEduEvent;
+import io.agora.edu.launch.AgoraEduLaunchCallback;
+import io.agora.edu.launch.AgoraEduSDK;
+import io.agora.edu.launch.AgoraEduReplayConfig;
 import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
 import io.agora.education.api.message.EduChatMsg;
@@ -33,7 +32,6 @@ import io.agora.education.api.message.EduFromUserInfo;
 import io.agora.education.api.user.data.EduUserInfo;
 import io.agora.edu.base.BaseFragment;
 import io.agora.edu.classroom.BaseClassActivity;
-import io.agora.edu.classroom.ReplayActivity;
 import io.agora.edu.classroom.adapter.MessageListAdapter;
 import io.agora.edu.classroom.bean.msg.ChannelMsg;
 import io.agora.record.Replay;
@@ -138,12 +136,13 @@ public class ChatRoomFragment extends BaseFragment implements OnItemChildClickLi
                                 if (recordDetail.isFinished()) {
                                     String url = recordDetail.url;
                                     if (!TextUtils.isEmpty(url)) {
-                                        ReplayLaunchConfig config = new ReplayLaunchConfig(
-                                                ChatRoomFragment.this.getContext(), whiteBoardAppId,
-                                                EyeProtection.isNeedShow() ? 1 : 0,
+                                        AgoraEduReplayConfig config = new AgoraEduReplayConfig(
+                                                ChatRoomFragment.this.getContext(),
                                                 recordDetail.startTime, recordDetail.endTime, url,
-                                                recordDetail.boardId, recordDetail.boardToken);
-                                        ReplayLaunch.replay(config);
+                                                whiteBoardAppId, recordDetail.boardId,
+                                                recordDetail.boardToken);
+                                        AgoraEduSDK.replay(config, state -> {
+                                        });
                                     }
                                 } else {
                                     ToastManager.showShort(R.string.wait_record);

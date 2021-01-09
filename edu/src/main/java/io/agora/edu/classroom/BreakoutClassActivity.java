@@ -57,20 +57,20 @@ import io.agora.education.api.user.data.EduUserLeftType;
 import io.agora.education.api.user.data.EduUserRole;
 import io.agora.education.api.user.data.EduUserStateChangeType;
 import io.agora.edu.classroom.adapter.ClassVideoAdapter;
-import io.agora.edu.classroom.bean.board.BoardBean;
-import io.agora.edu.classroom.bean.board.BoardInfo;
+import io.agora.edu.common.bean.board.BoardBean;
+import io.agora.edu.common.bean.board.BoardInfo;
 import io.agora.edu.classroom.bean.channel.Room;
 import io.agora.edu.classroom.bean.msg.ChannelMsg;
 import io.agora.edu.classroom.fragment.UserListFragment;
-import io.agora.edu.service.CommonService;
-import io.agora.edu.service.bean.ResponseBody;
-import io.agora.edu.service.bean.request.AllocateGroupReq;
-import io.agora.edu.service.bean.response.EduRoomInfoRes;
+import io.agora.edu.common.service.RoomPreService;
+import io.agora.edu.common.bean.ResponseBody;
+import io.agora.edu.common.bean.request.AllocateGroupReq;
+import io.agora.edu.common.bean.response.EduRoomInfoRes;
 import kotlin.Unit;
 import io.agora.edu.R2;
 
 import static io.agora.edu.BuildConfig.API_BASE_URL;
-import static io.agora.edu.classroom.bean.board.BoardBean.BOARD;
+import static io.agora.edu.common.bean.board.BoardBean.BOARD;
 
 public class BreakoutClassActivity extends BaseClassActivity implements TabLayout.OnTabSelectedListener {
     private static final String TAG = "BreakoutClassActivity";
@@ -99,7 +99,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
     protected void initData() {
         super.initData();
         /**needUserListener为false,将不会收到大班级中的任何local回调*/
-        joinRoomAsStudent(getMainEduRoom(), eduLaunchConfig.getUserName(), eduLaunchConfig.getUserUuid(), true, false, true,
+        joinRoomAsStudent(getMainEduRoom(), agoraEduLaunchConfig.getUserName(), agoraEduLaunchConfig.getUserUuid(), true, false, true,
                 new EduCallback<EduStudent>() {
                     @Override
                     public void onSuccess(@Nullable EduStudent res) {
@@ -112,7 +112,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
                             mainBoardBean = new Gson().fromJson(boardJson, BoardBean.class);
                         }
                         renderTeacherStream();
-                        joinSubEduRoom(getMainEduRoom(), eduLaunchConfig.getUserUuid(), eduLaunchConfig.getUserName());
+                        joinSubEduRoom(getMainEduRoom(), agoraEduLaunchConfig.getUserUuid(), agoraEduLaunchConfig.getUserName());
                     }
 
                     @Override
@@ -126,10 +126,10 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
     /**
      * @param roomUuid 大班的roomUuid
      */
-    private void allocateGroup(String roomUuid, String userUuid, EduCallback<EduRoomInfo> callback) {
+    private void allocateGroup(String roomUuid, EduCallback<EduRoomInfo> callback) {
         AllocateGroupReq req = new AllocateGroupReq();
-        RetrofitManager.instance().getService(API_BASE_URL, CommonService.class)
-                .allocateGroup(eduLaunchConfig.getAppId(), roomUuid, req)
+        RetrofitManager.instance().getService(API_BASE_URL, RoomPreService.class)
+                .allocateGroup(agoraEduLaunchConfig.getAppId(), roomUuid, req)
                 .enqueue(new RetrofitManager.Callback<>(0, new ThrowableCallback<ResponseBody<EduRoomInfoRes>>() {
                     @Override
                     public void onFailure(@Nullable Throwable throwable) {
@@ -163,7 +163,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
      * @param userUuid 学生uuid
      */
     private void joinSubEduRoom(EduRoom mainRoom, String userUuid, String userName) {
-        allocateGroup(eduLaunchConfig.getRoomUuid(), userUuid, new EduCallback<EduRoomInfo>() {
+        allocateGroup(agoraEduLaunchConfig.getRoomUuid(), new EduCallback<EduRoomInfo>() {
             @Override
             public void onSuccess(@Nullable EduRoomInfo res) {
                 if (res != null) {
@@ -195,7 +195,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
                                     @Override
                                     public void onSuccess(@Nullable EduUserInfo userInfo) {
                                         requestBoardInfo(((EduLocalUserInfo) userInfo).getUserToken(),
-                                                eduLaunchConfig.getAppId(), eduLaunchConfig.getRoomUuid());
+                                                agoraEduLaunchConfig.getAppId(), agoraEduLaunchConfig.getRoomUuid());
                                     }
 
                                     @Override
@@ -580,7 +580,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
                     @Override
                     public void onSuccess(@Nullable EduUserInfo userInfo) {
                         requestBoardInfo(((EduLocalUserInfo) userInfo).getUserToken(),
-                                eduLaunchConfig.getAppId(), eduLaunchConfig.getRoomUuid());
+                                agoraEduLaunchConfig.getAppId(), agoraEduLaunchConfig.getRoomUuid());
                     }
 
                     @Override
@@ -805,7 +805,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
                 public void onSuccess(@Nullable EduRoomStatus roomStatus) {
                     switch (event) {
                         case CourseState:
-                            Log.e(TAG, "班级:" + eduLaunchConfig.getRoomUuid() + "内的课堂状态->"
+                            Log.e(TAG, "班级:" + agoraEduLaunchConfig.getRoomUuid() + "内的课堂状态->"
                                     + roomStatus.getCourseState());
                             title_view.setTimeState(roomStatus.getCourseState() == EduRoomState.START,
                                     System.currentTimeMillis() - roomStatus.getStartTime());

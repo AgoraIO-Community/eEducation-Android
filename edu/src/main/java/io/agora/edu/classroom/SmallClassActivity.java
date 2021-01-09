@@ -42,7 +42,7 @@ import io.agora.education.api.user.data.EduUserLeftType;
 import io.agora.education.api.user.data.EduUserRole;
 import io.agora.education.api.user.data.EduUserStateChangeType;
 import io.agora.edu.classroom.adapter.ClassVideoAdapter;
-import io.agora.edu.classroom.bean.board.BoardState;
+import io.agora.edu.common.bean.board.BoardState;
 import io.agora.edu.classroom.bean.channel.Room;
 import io.agora.edu.R2;
 import io.agora.edu.classroom.fragment.UserListFragment;
@@ -71,7 +71,7 @@ public class SmallClassActivity extends BaseClassActivity implements TabLayout.O
     @Override
     protected void initData() {
         super.initData();
-        joinRoomAsStudent(getMainEduRoom(), eduLaunchConfig.getUserName(), eduLaunchConfig.getUserUuid(), true, true, true,
+        joinRoomAsStudent(getMainEduRoom(), agoraEduLaunchConfig.getUserName(), agoraEduLaunchConfig.getUserUuid(), true, true, true,
                 new EduCallback<EduStudent>() {
                     @Override
                     public void onSuccess(@Nullable EduStudent res) {

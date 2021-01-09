@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import androidx.fragment.app.FragmentManager;
 
@@ -32,6 +33,8 @@ import io.agora.base.ToastManager;
 import io.agora.base.callback.ThrowableCallback;
 import io.agora.base.network.RetrofitManager;
 import io.agora.edu.R;
+import io.agora.edu.common.api.Chat;
+import io.agora.edu.common.impl.ChatImpl;
 import io.agora.edu.widget.EyeProtection;
 import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
@@ -71,10 +74,10 @@ import io.agora.education.api.user.data.EduUserRole;
 import io.agora.education.api.user.data.EduUserStateChangeType;
 import io.agora.education.api.user.listener.EduUserEventListener;
 import io.agora.edu.base.BaseActivity;
-import io.agora.edu.classroom.bean.board.BoardBean;
-import io.agora.edu.classroom.bean.board.BoardFollowMode;
-import io.agora.edu.classroom.bean.board.BoardInfo;
-import io.agora.edu.classroom.bean.board.BoardState;
+import io.agora.edu.common.bean.board.BoardBean;
+import io.agora.edu.common.bean.board.BoardFollowMode;
+import io.agora.edu.common.bean.board.BoardInfo;
+import io.agora.edu.common.bean.board.BoardState;
 import io.agora.edu.classroom.bean.channel.Room;
 import io.agora.edu.classroom.bean.channel.User;
 import io.agora.edu.classroom.bean.msg.ChannelMsg;
@@ -83,22 +86,24 @@ import io.agora.record.bean.RecordMsg;
 import io.agora.edu.classroom.fragment.ChatRoomFragment;
 import io.agora.edu.classroom.fragment.WhiteBoardFragment;
 import io.agora.edu.classroom.widget.TitleView;
-import io.agora.edu.launch.EduLaunchConfig;
-import io.agora.edu.service.BoardService;
-import io.agora.edu.service.bean.ResponseBody;
+import io.agora.edu.launch.AgoraEduLaunchConfig;
+import io.agora.edu.common.service.BoardService;
+import io.agora.edu.common.bean.ResponseBody;
 import io.agora.edu.util.AppUtil;
 import io.agora.edu.widget.ConfirmDialog;
-import io.agora.raisehand.AgoraCoVideoAction;
+import io.agora.covideo.AgoraCoVideoAction;
 import io.agora.whiteboard.netless.listener.GlobalStateChangeListener;
 import kotlin.Unit;
 
 import static io.agora.edu.BuildConfig.API_BASE_URL;
-import static io.agora.edu.classroom.bean.board.BoardBean.BOARD;
-import static io.agora.edu.launch.EduLaunch.CODE;
-import static io.agora.edu.launch.EduLaunch.REASON;
-import static io.agora.edu.launch.EduLaunch.launchCallback;
+import static io.agora.edu.common.bean.board.BoardBean.BOARD;
+import static io.agora.edu.launch.AgoraEduSDK.CODE;
+import static io.agora.edu.launch.AgoraEduSDK.REASON;
+import static io.agora.edu.launch.AgoraEduSDK.agoraEduLaunchCallback;
+import static io.agora.edu.launch.AgoraEduEvent.AgoraEduEventReady;
+import static io.agora.edu.launch.AgoraEduEvent.AgoraEduEventDestroyed;
 import static io.agora.record.bean.RecordBean.RECORD;
-import static io.agora.record.bean.RecordState.END;
+import static io.agora.record.bean.RecordAction.END;
 
 public abstract class BaseClassActivity extends BaseActivity implements EduRoomEventListener, EduUserEventListener,
         EduManagerEventListener, GlobalStateChangeListener, AgoraActionListener {
@@ -119,7 +124,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
     protected ChatRoomFragment chatRoomFragment = new ChatRoomFragment();
 
     private static EduManager eduManager;
-    protected EduLaunchConfig eduLaunchConfig;
+    protected AgoraEduLaunchConfig agoraEduLaunchConfig;
     private volatile boolean isJoining = false, joinSuccess = false;
     private EduRoom mainEduRoom;
     private EduStreamInfo localCameraStream, localScreenStream;
@@ -129,6 +134,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
     protected AgoraActionProcessManager actionProcessManager;
     protected List<AgoraActionConfigInfo> actionConfigs = new ArrayList<>();
     private ConfirmDialog audioInviteDialog, videoInviteDialog;
+    private Chat chat;
 
 
     @Override
@@ -139,19 +145,21 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
 
     @Override
     protected void initData() {
-        if(eduManager != null) {
+        if (eduManager != null) {
             eduManager.setEduManagerEventListener(this);
         }
-        eduLaunchConfig = getIntent().getParcelableExtra(LAUNCHCONFIG);
-        whiteboardFragment.setWhiteBoardAppId(eduLaunchConfig.getWhiteBoardAppId());
-        chatRoomFragment.setAppId(eduLaunchConfig.getAppId(), eduLaunchConfig.getWhiteBoardAppId());
-        RoomCreateOptions createOptions = new RoomCreateOptions(eduLaunchConfig.getRoomUuid(),
-                eduLaunchConfig.getRoomName(), eduLaunchConfig.getRoomType());
+        agoraEduLaunchConfig = getIntent().getParcelableExtra(LAUNCHCONFIG);
+        whiteboardFragment.setWhiteBoardAppId(agoraEduLaunchConfig.getWhiteBoardAppId());
+        chatRoomFragment.setAppId(agoraEduLaunchConfig.getAppId(), agoraEduLaunchConfig.getWhiteBoardAppId());
+        RoomCreateOptions createOptions = new RoomCreateOptions(agoraEduLaunchConfig.getRoomUuid(),
+                agoraEduLaunchConfig.getRoomName(), agoraEduLaunchConfig.getRoomType());
         try {
             mainEduRoom = buildEduRoom(createOptions, null);
-        } catch (NullPointerException e) {
+        }
+        catch (NullPointerException e) {
             e.printStackTrace();
         }
+        chat = new ChatImpl(agoraEduLaunchConfig.getAppId(), agoraEduLaunchConfig.getRoomUuid());
     }
 
     @Override
@@ -163,16 +171,59 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
 
     @Override
     protected void onStart() {
-        EyeProtection.setNeedShow(eduLaunchConfig.isEyeProtect());
+        EyeProtection.setNeedShow(agoraEduLaunchConfig.getOpenEyeCare() == 1);
         super.onStart();
     }
+
+    @Override
+    protected void onDestroy() {
+        /**尝试主动释放TimeView中的handle*/
+        title_view.setTimeState(false, 0);
+        /**退出activity之前释放eduRoom资源*/
+        mainEduRoom = null;
+        whiteboardFragment.releaseBoard();
+        if (eduManager != null) {
+            eduManager.setEduManagerEventListener(null);
+            eduManager.release();
+        }
+        super.onDestroy();
+        /*已销毁的状态回调出去*/
+        agoraEduLaunchCallback.onCallback(AgoraEduEventDestroyed);
+    }
+
+    @Override
+    public void onBackPressed() {
+        showLeaveDialog();
+    }
+
+    @Override
+    public void finish() {
+        /**退出activity之前离开eduRoom*/
+        if (getMainEduRoom() != null) {
+            getMainEduRoom().leave(new EduCallback<Unit>() {
+                @Override
+                public void onSuccess(@Nullable Unit res) {
+                    BaseClassActivity.super.finish();
+                }
+
+                @Override
+                public void onFailure(@NotNull EduError error) {
+                    Log.e(TAG, "leave EduRoom error->code:" + error.getType() + ",reason:" + error.getMsg());
+                    BaseClassActivity.super.finish();
+                }
+            });
+        }
+    }
+
+    @Room.Type
+    protected abstract int getClassType();
 
     public static void setEduManager(EduManager eduManager) {
         BaseClassActivity.eduManager = eduManager;
     }
 
     protected void showFragmentWithJoinSuccess() {
-        title_view.setTitle(eduLaunchConfig.getRoomName());
+        title_view.setTitle(agoraEduLaunchConfig.getRoomName());
         getSupportFragmentManager().beginTransaction()
                 .remove(whiteboardFragment)
                 .remove(chatRoomFragment)
@@ -198,7 +249,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         }
         options = new RoomCreateOptions(options.getRoomUuid(), options.getRoomName(), roomType);
         EduRoom room = null;
-        if(eduManager != null) {
+        if (eduManager != null) {
             room = eduManager.createClassroom(options);
             room.setEventListener(BaseClassActivity.this);
         } else {
@@ -214,7 +265,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         }
         isJoining = true;
         RoomJoinOptions options = new RoomJoinOptions(yourUuid, yourNameStr, EduUserRole.STUDENT,
-                new RoomMediaOptions(autoSubscribe, autoPublish), eduLaunchConfig.getRoomType());
+                new RoomMediaOptions(autoSubscribe, autoPublish), agoraEduLaunchConfig.getRoomType());
         eduRoom.joinClassroom(options, new EduCallback<EduUser>() {
             @Override
             public void onSuccess(@Nullable EduUser user) {
@@ -229,7 +280,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
                     EduStudent student = (EduStudent) user;
                     callback.onSuccess(student);
                     /*join完成的信息回调出去*/
-                    launchCallback.onComplete();
+                    agoraEduLaunchCallback.onCallback(AgoraEduEventReady);
                 } else {
                     EduError error = EduError.Companion.internalError("join failed: localUser is null");
                     callback.onFailure(error);
@@ -251,7 +302,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         }
         isJoining = true;
         RoomJoinOptions options = new RoomJoinOptions(yourUuid, yourNameStr, EduUserRole.TEACHER,
-                new RoomMediaOptions(autoSubscribe, autoPublish), eduLaunchConfig.getRoomType());
+                new RoomMediaOptions(autoSubscribe, autoPublish), agoraEduLaunchConfig.getRoomType());
         eduRoom.joinClassroom(options, new EduCallback<EduUser>() {
             @Override
             public void onSuccess(@Nullable EduUser user) {
@@ -285,7 +336,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         }
         isJoining = true;
         RoomJoinOptions options = new RoomJoinOptions(yourUuid, yourNameStr, EduUserRole.ASSISTANT,
-                new RoomMediaOptions(autoSubscribe, autoPublish), eduLaunchConfig.getRoomType());
+                new RoomMediaOptions(autoSubscribe, autoPublish), agoraEduLaunchConfig.getRoomType());
         eduRoom.joinClassroom(options, new EduCallback<EduUser>() {
             @Override
             public void onSuccess(@Nullable EduUser user) {
@@ -316,8 +367,9 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
      * 加入失败，回传数据并结束当前页面
      */
     protected void joinFailed(int code, String reason) {
-        /*join完成的信息回调出去*/
-        launchCallback.onComplete();
+        String msg = "join classRoom failed->code:" + code + ",reason:" + reason;
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        Log.e(TAG, msg);
         /*回传错误信息*/
         Intent intent = getIntent().putExtra(CODE, code).putExtra(REASON, reason);
         setResult(RESULT_CODE, intent);
@@ -427,21 +479,22 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
     }
 
     public void sendRoomChatMsg(String msg, EduCallback<EduChatMsg> callback) {
-        getLocalUser(new EduCallback<EduUser>() {
-            @Override
-            public void onSuccess(@Nullable EduUser res) {
-                if (res != null) {
-                    res.sendRoomChatMessage(msg, callback);
-                } else {
-                    callback.onFailure(EduError.Companion.internalError("current eduUser is null"));
-                }
-            }
-
-            @Override
-            public void onFailure(@NotNull EduError error) {
-                callback.onFailure(error);
-            }
-        });
+        chat.roomChat(msg, callback);
+//        getLocalUser(new EduCallback<EduUser>() {
+//            @Override
+//            public void onSuccess(@Nullable EduUser res) {
+//                if (res != null) {
+//                    res.sendRoomChatMessage(msg, callback);
+//                } else {
+//                    callback.onFailure(EduError.Companion.internalError("current eduUser is null"));
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(@NotNull EduError error) {
+//                callback.onFailure(error);
+//            }
+//        });
     }
 
     protected void getCurFullStream(EduCallback<List<EduStreamInfo>> callback) {
@@ -532,7 +585,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
                         public void onSuccess(@Nullable EduUserInfo userInfo) {
                             EduFromUserInfo fromUser = new EduFromUserInfo(userInfo.getUserUuid(),
                                     userInfo.getUserName(), userInfo.getRole());
-                            RecordMsg recordMsg = new RecordMsg(eduLaunchConfig.getRoomUuid(), fromUser,
+                            RecordMsg recordMsg = new RecordMsg(agoraEduLaunchConfig.getRoomUuid(), fromUser,
                                     getString(R.string.replay_link), System.currentTimeMillis(),
                                     EduChatMsgType.Text.getValue());
                             recordMsg.isMe = true;
@@ -548,71 +601,25 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         }
     }
 
-    @Room.Type
-    protected abstract int getClassType();
-
-    @Override
-    protected void onDestroy() {
-        /**尝试主动释放TimeView中的handle*/
-        title_view.setTimeState(false, 0);
-        /**退出activity之前释放eduRoom资源*/
-        mainEduRoom = null;
-        whiteboardFragment.releaseBoard();
-        if(eduManager != null) {
-            eduManager.setEduManagerEventListener(null);
-            eduManager.release();
-        }
-        super.onDestroy();
-    }
-
-    @Override
-    public void onBackPressed() {
-        showLeaveDialog();
-    }
-
     public final void showLeaveDialog() {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        if(fragmentManager != null && !fragmentManager.isDestroyed()) {
+        if (fragmentManager != null && !fragmentManager.isDestroyed()) {
             ConfirmDialog.normal(getString(R.string.confirm_leave_room_content), confirm -> {
                 if (confirm) {
-                    /**退出activity之前离开eduRoom*/
-                    if (getMainEduRoom() != null) {
-                        getMainEduRoom().leave(new EduCallback<Unit>() {
-                            @Override
-                            public void onSuccess(@Nullable Unit res) {
-                            }
-
-                            @Override
-                            public void onFailure(@NotNull EduError error) {
-                            }
-                        });
-                        BaseClassActivity.this.finish();
-                    }
+                    BaseClassActivity.this.finish();
                 }
             }).show(fragmentManager, null);
         }
     }
 
-    public final void showRemovedDialog() {
+    public final void showLeaveDialog(int strId) {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        if(fragmentManager != null && !fragmentManager.isDestroyed()) {
-            ConfirmDialog.single(getString(R.string.confirm_removed_from_room_content), confirm -> {
+        if (fragmentManager != null && !fragmentManager.isDestroyed()) {
+            ConfirmDialog.single(getString(strId), confirm -> {
                 if (confirm) {
-                    /**退出activity之前离开eduRoom*/
-                    if (getMainEduRoom() != null) {
-                        getMainEduRoom().leave(new EduCallback<Unit>() {
-                            @Override
-                            public void onSuccess(@Nullable Unit res) {
-                            }
-
-                            @Override
-                            public void onFailure(@NotNull EduError error) {
-                            }
-                        });
-                        BaseClassActivity.this.finish();
-                    }
+                    BaseClassActivity.this.finish();
                 }
-            }).show(fragmentManager, null);
+            }).setCancel(false).show(fragmentManager, null);
         }
     }
 
@@ -914,8 +921,8 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
             @Override
             public void onSuccess(@Nullable EduUserInfo userInfo) {
                 if (TextUtils.isEmpty(boardJson) && mainBoardBean == null) {
-                    requestBoardInfo(((EduLocalUserInfo) userInfo).getUserToken(), eduLaunchConfig.getAppId(),
-                            eduLaunchConfig.getRoomUuid());
+                    requestBoardInfo(((EduLocalUserInfo) userInfo).getUserToken(), agoraEduLaunchConfig.getAppId(),
+                            agoraEduLaunchConfig.getRoomUuid());
                 } else {
                     mainBoardBean = new Gson().fromJson(boardJson, BoardBean.class);
                     BoardInfo info = mainBoardBean.getInfo();
@@ -941,9 +948,9 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
             public void onSuccess(@Nullable EduUser localUser) {
                 if (localUser != null) {
                     EduLocalUserInfo localUserInfo = localUser.getUserInfo();
-                    AgoraActionProcessConfig config = new AgoraActionProcessConfig(eduLaunchConfig.getAppId(),
-                            eduLaunchConfig.getRoomUuid(), localUserInfo.getUserToken(), eduLaunchConfig.getCustomerId(),
-                            eduLaunchConfig.getCustomerCer(), API_BASE_URL);
+                    AgoraActionProcessConfig config = new AgoraActionProcessConfig(agoraEduLaunchConfig.getAppId(),
+                            agoraEduLaunchConfig.getRoomUuid(), localUserInfo.getUserToken(), agoraEduLaunchConfig.getCustomerId(),
+                            agoraEduLaunchConfig.getCustomerCer(), API_BASE_URL);
                     actionProcessManager = new AgoraActionProcessManager(config, BaseClassActivity.this);
                 }
             }
@@ -1092,6 +1099,10 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
                     case CourseState:
                         title_view.setTimeState(roomStatus.getCourseState() == EduRoomState.START,
                                 System.currentTimeMillis() - roomStatus.getStartTime());
+                        if (roomStatus.getCourseState().equals(EduRoomState.END)) {
+                            /*课堂结束，强制退出*/
+                            showLeaveDialog(R.string.courseend);
+                        }
                         break;
                     case AllStudentsChat:
                         chatRoomFragment.setMuteAll(!roomStatus.isStudentChatAllowed());

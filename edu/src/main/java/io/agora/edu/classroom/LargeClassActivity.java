@@ -27,6 +27,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.agora.base.ToastManager;
 import io.agora.edu.R;
+import io.agora.edu.common.api.RaiseHand;
+import io.agora.edu.common.impl.RaiseHandImpl;
 import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
 import io.agora.education.api.message.EduChatMsg;
@@ -60,6 +62,7 @@ import static io.agora.edu.classroom.bean.msg.PeerMsg.CoVideoMsg.Type.ACCEPT;
 import static io.agora.edu.classroom.bean.msg.PeerMsg.CoVideoMsg.Type.CANCEL;
 import static io.agora.edu.classroom.bean.msg.PeerMsg.CoVideoMsg.Type.EXIT;
 import static io.agora.edu.classroom.bean.msg.PeerMsg.CoVideoMsg.Type.REJECT;
+
 import io.agora.edu.R2;
 
 public class LargeClassActivity extends BaseClassActivity implements TabLayout.OnTabSelectedListener {
@@ -96,6 +99,11 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
 
     private int unReadCount = 0;
 
+    /**
+     * 举手组件类
+     */
+    private RaiseHand raiseHand;
+
     @Override
     protected int getLayoutResId() {
         Configuration configuration = getResources().getConfiguration();
@@ -111,7 +119,8 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
     @Override
     protected void initData() {
         super.initData();
-        joinRoomAsStudent(getMainEduRoom(), eduLaunchConfig.getUserName(), eduLaunchConfig.getUserUuid(), true, false, true,
+        raiseHand = new RaiseHandImpl(agoraEduLaunchConfig.getAppId(), agoraEduLaunchConfig.getRoomUuid());
+        joinRoomAsStudent(getMainEduRoom(), agoraEduLaunchConfig.getUserName(), agoraEduLaunchConfig.getUserUuid(), true, false, true,
                 new EduCallback<EduStudent>() {
                     @Override
                     public void onSuccess(@Nullable EduStudent res) {
@@ -256,10 +265,12 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
                 getTeacher(new EduCallback<EduUserInfo>() {
                     @Override
                     public void onSuccess(@Nullable EduUserInfo teacher) {
-                        if (teacher != null) {
+                        if (teacher != null && raiseHand != null) {
                             localCoVideoStatus = Applying;
                             resetHandState();
-                            user.sendUserMessage(peerMsg.toJsonString(), teacher, callback);
+                            raiseHand.applyRaiseHand(teacher.getUserUuid(), peerMsg.toJsonString(),
+                                    callback);
+//                            user.sendUserMessage(peerMsg.toJsonString(), teacher, callback);
                         } else {
                             ToastManager.showShort(R.string.there_is_no_teacher_disable_covideo);
                         }
@@ -311,8 +322,10 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
                                         resetHandState();
                                         renderStudentStream(getLocalCameraStream(), null);
                                         /*老师不在线就不用同步至老师*/
-                                        if (teacher != null) {
-                                            user.sendUserMessage(peerMsg.toJsonString(), teacher, callback);
+                                        if (teacher != null && raiseHand != null) {
+                                            raiseHand.cancelRaiseHand(teacher.getUserUuid(), peerMsg.toJsonString(),
+                                                    callback);
+//                                            user.sendUserMessage(peerMsg.toJsonString(), teacher, callback);
                                         }
                                         user.unPublishStream(res, new EduCallback<Boolean>() {
                                             @Override
@@ -335,7 +348,11 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
                             }
                         } else {
                             /*举手过程中取消(老师还未处理)；直接发送取消的点对点消息给老师即可*/
-                            user.sendUserMessage(peerMsg.toJsonString(), teacher, callback);
+                            if (teacher != null && raiseHand != null) {
+                                raiseHand.cancelRaiseHand(teacher.getUserUuid(), peerMsg.toJsonString(),
+                                        callback);
+//                                user.sendUserMessage(peerMsg.toJsonString(), teacher, callback);
+                            }
                             localCoVideoStatus = DisCoVideo;
                             runOnUiThread(() -> {
                                 resetHandState();

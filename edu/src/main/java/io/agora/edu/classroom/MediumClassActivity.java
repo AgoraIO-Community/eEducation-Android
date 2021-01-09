@@ -74,11 +74,11 @@ import io.agora.edu.classroom.fragment.StudentListFragment;
 import io.agora.edu.classroom.widget.RtcVideoView;
 import io.agora.agoraactionprocess.AgoraActionMsgRes;
 import io.agora.agoraactionprocess.AgoraActionConfigInfo;
-import io.agora.raisehand.AgoraCoVideoAction;
-import io.agora.raisehand.AgoraCoVideoFromRoom;
-import io.agora.raisehand.AgoraCoVideoListener;
-import io.agora.raisehand.AgoraCoVideoView;
-import io.agora.raisehand.CoVideoActionType;
+import io.agora.covideo.AgoraCoVideoAction;
+import io.agora.covideo.AgoraCoVideoFromRoom;
+import io.agora.covideo.AgoraCoVideoListener;
+import io.agora.covideo.AgoraCoVideoView;
+import io.agora.covideo.CoVideoActionType;
 import kotlin.Unit;
 
 import static io.agora.edu.classroom.bean.group.MediumClassPropertyCauseType.CMD;
@@ -144,7 +144,7 @@ public class MediumClassActivity extends BaseClassActivity implements TabLayout.
     @Override
     protected void initData() {
         super.initData();
-        joinRoomAsStudent(getMainEduRoom(), eduLaunchConfig.getUserName(), eduLaunchConfig.getUserUuid(), true, false, true,
+        joinRoomAsStudent(getMainEduRoom(), agoraEduLaunchConfig.getUserName(), agoraEduLaunchConfig.getUserUuid(), true, false, true,
                 new EduCallback<EduStudent>() {
                     @Override
                     public void onSuccess(@org.jetbrains.annotations.Nullable EduStudent res) {
@@ -188,7 +188,7 @@ public class MediumClassActivity extends BaseClassActivity implements TabLayout.
         removeFromParent(videoTeacher);
         layoutVideoTeacher.addView(videoTeacher, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
-        studentListFragment = new StudentListFragment(eduLaunchConfig.getUserUuid());
+        studentListFragment = new StudentListFragment(agoraEduLaunchConfig.getUserUuid());
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.layout_chat_room, studentListFragment)
                 .show(studentListFragment)
@@ -970,7 +970,7 @@ public class MediumClassActivity extends BaseClassActivity implements TabLayout.
     @Override
     public void onLocalUserLeft(@NotNull EduUserEvent userEvent, @NotNull EduUserLeftType leftType) {
         if (leftType == EduUserLeftType.KickOff) {
-            showRemovedDialog();
+            showLeaveDialog(R.string.confirm_removed_from_room_content);
         }
     }
 

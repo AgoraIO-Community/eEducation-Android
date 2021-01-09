@@ -66,6 +66,11 @@ public class ConfirmDialog extends DialogFragment {
         return fragment;
     }
 
+    public ConfirmDialog setCancel(boolean cancelable) {
+        this.setCancelable(cancelable);
+        return this;
+    }
+
     @Override
     public void onCancel(@NonNull DialogInterface dialog) {
         if (listener != null)

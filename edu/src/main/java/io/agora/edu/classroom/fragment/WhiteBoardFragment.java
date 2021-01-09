@@ -31,7 +31,7 @@ import butterknife.OnTouch;
 import io.agora.base.ToastManager;
 import io.agora.edu.R;
 import io.agora.edu.base.BaseFragment;
-import io.agora.edu.classroom.bean.board.BoardState;
+import io.agora.edu.common.bean.board.BoardState;
 import io.agora.edu.classroom.widget.whiteboard.ApplianceView;
 import io.agora.edu.classroom.widget.whiteboard.ColorPicker;
 import io.agora.edu.classroom.widget.whiteboard.PageControlView;

@@ -99,6 +99,7 @@
 
 -keep public class io.agora.edu.launch.AgoraEduSDKConfig { *; }
 
+-keep class io.agora.edu.common.bean.board.** { *; }
 -keep class io.agora.edu.common.bean.roompre.** { *; }
 -keep class io.agora.edu.common.bean.request.** { *; }
 -keep class io.agora.edu.common.bean.response.** { *; }

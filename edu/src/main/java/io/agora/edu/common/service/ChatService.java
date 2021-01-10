@@ -1,6 +1,6 @@
 package io.agora.edu.common.service;
 
-import io.agora.base.network.ResponseBody;
+import io.agora.edu.common.bean.ResponseBody;
 import io.agora.education.impl.user.data.request.EduRoomChatMsgReq;
 import retrofit2.Call;
 import retrofit2.http.Body;

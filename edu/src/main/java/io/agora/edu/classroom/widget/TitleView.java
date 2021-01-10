@@ -12,11 +12,15 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import org.jetbrains.annotations.NotNull;
+
 import butterknife.BindView;
 import io.agora.edu.R2;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.agora.edu.R;
+import io.agora.education.api.EduCallback;
+import io.agora.education.api.base.EduError;
 import io.agora.education.api.statistics.NetworkQuality;
 import io.agora.edu.classroom.BaseClassActivity;
 
@@ -27,6 +31,8 @@ public class TitleView extends ConstraintLayout {
     protected ImageView iv_quality;
     @BindView(R2.id.tv_room_name)
     protected TextView tv_room_name;
+    @BindView(R2.id.iv_uploadLog)
+    protected ImageView iv_uploadLog;
     @Nullable
     @BindView(R2.id.time_view)
     protected TimeView time_view;
@@ -110,7 +116,18 @@ public class TitleView extends ConstraintLayout {
             if (id == R.id.iv_close) {
                 ((BaseClassActivity) context).showLeaveDialog();
             } else if (id == R.id.iv_uploadLog) {
-                ((BaseClassActivity) context).uploadLog();
+                iv_uploadLog.setEnabled(false);
+                ((BaseClassActivity) context).uploadLog(new EduCallback() {
+                    @Override
+                    public void onSuccess(@org.jetbrains.annotations.Nullable Object res) {
+                        post(() -> iv_uploadLog.setEnabled(true));
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull EduError error) {
+                        post(() -> iv_uploadLog.setEnabled(true));
+                    }
+                });
             }
         }
     }

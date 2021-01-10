@@ -15,7 +15,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
-import io.agora.base.PreferenceManager;
 
 import static io.agora.education.Constants.KEY_SP;
 import static io.agora.education.Constants.POLICYURL;

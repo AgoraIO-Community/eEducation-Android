@@ -970,7 +970,7 @@ public class MediumClassActivity extends BaseClassActivity implements TabLayout.
     @Override
     public void onLocalUserLeft(@NotNull EduUserEvent userEvent, @NotNull EduUserLeftType leftType) {
         if (leftType == EduUserLeftType.KickOff) {
-            showLeaveDialog(R.string.confirm_removed_from_room_content);
+            showLeavedDialog(R.string.confirm_removed_from_room_content);
         }
     }
 

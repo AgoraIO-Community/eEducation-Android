@@ -26,41 +26,41 @@ public class RaiseHandImpl extends Base implements RaiseHand {
 
     @Override
     public void applyRaiseHand(@NotNull String toUserUuid, @NotNull String payload,
-                               @NotNull EduCallback<EduMsg> callback) {
+                               @NotNull EduCallback<Boolean> callback) {
         RetrofitManager.instance().getService(API_BASE_URL, RaiseHandService.class)
                 .raiseHand(appId, roomUuid, toUserUuid, new RaiseHandReq(payload))
-                .enqueue(new RetrofitManager.Callback(0, new ThrowableCallback<ResponseBody<EduMsg>>() {
-                            @Override
-                            public void onFailure(@Nullable Throwable throwable) {
-                                callback.onFailure(EduError.Companion.customMsgError(throwable.getMessage()));
-                            }
-
-                            @Override
-                            public void onSuccess(@Nullable ResponseBody<EduMsg> res) {
-                                if(res != null) {
-                                    callback.onSuccess(res.data);
-                                } else {
-                                    callback.onFailure(EduError.Companion.customMsgError("response is null"));
-                                }
-                            }
-                        }));
-    }
-
-    @Override
-    public void cancelRaiseHand(@NotNull String toUserUuid, @NotNull String payload,
-                                @NotNull EduCallback<EduMsg> callback) {
-        RetrofitManager.instance().getService(API_BASE_URL, RaiseHandService.class)
-                .raiseHand(appId, roomUuid, toUserUuid, new RaiseHandReq(payload))
-                .enqueue(new RetrofitManager.Callback(0, new ThrowableCallback<ResponseBody<EduMsg>>() {
+                .enqueue(new RetrofitManager.Callback(0, new ThrowableCallback<ResponseBody<Integer>>() {
                     @Override
                     public void onFailure(@Nullable Throwable throwable) {
                         callback.onFailure(EduError.Companion.customMsgError(throwable.getMessage()));
                     }
 
                     @Override
-                    public void onSuccess(@Nullable ResponseBody<EduMsg> res) {
-                        if(res != null) {
-                            callback.onSuccess(res.data);
+                    public void onSuccess(@Nullable ResponseBody<Integer> res) {
+                        if (res != null) {
+                            callback.onSuccess(res.data == 1);
+                        } else {
+                            callback.onFailure(EduError.Companion.customMsgError("response is null"));
+                        }
+                    }
+                }));
+    }
+
+    @Override
+    public void cancelRaiseHand(@NotNull String toUserUuid, @NotNull String payload,
+                                @NotNull EduCallback<Boolean> callback) {
+        RetrofitManager.instance().getService(API_BASE_URL, RaiseHandService.class)
+                .raiseHand(appId, roomUuid, toUserUuid, new RaiseHandReq(payload))
+                .enqueue(new RetrofitManager.Callback(0, new ThrowableCallback<ResponseBody<Integer>>() {
+                    @Override
+                    public void onFailure(@Nullable Throwable throwable) {
+                        callback.onFailure(EduError.Companion.customMsgError(throwable.getMessage()));
+                    }
+
+                    @Override
+                    public void onSuccess(@Nullable ResponseBody<Integer> res) {
+                        if (res != null) {
+                            callback.onSuccess(res.data == 1);
                         } else {
                             callback.onFailure(EduError.Companion.customMsgError("response is null"));
                         }

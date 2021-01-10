@@ -8,7 +8,7 @@ import io.agora.edu.classroom.ReplayActivity;
 
 public class AgoraEduReplay {
     private WeakReference<ReplayActivity> replayActivityWeak;
-    private AgoraEduEvent curState;
+    private AgoraEduEvent curState = AgoraEduEvent.AgoraEduEventDestroyed;
 
     public AgoraEduReplay() {
     }

@@ -26,10 +26,10 @@ public class ChatImpl extends Base implements Chat {
     }
 
     @Override
-    public void roomChat(String message, EduCallback<EduChatMsg> callback) {
+    public void roomChat(@NotNull String fromUuid, @NotNull String message, EduCallback<EduChatMsg> callback) {
         EduRoomChatMsgReq req = new EduRoomChatMsgReq(message, EduChatMsgType.Text.getValue());
         RetrofitManager.instance().getService(API_BASE_URL, ChatService.class)
-                .roomChat(appId, roomUuid, req)
+                .roomChat(appId, roomUuid, fromUuid, req)
                 .enqueue(new RetrofitManager.Callback(0, new ThrowableCallback<ResponseBody<EduChatMsg>>() {
                     @Override
                     public void onFailure(@Nullable Throwable throwable) {

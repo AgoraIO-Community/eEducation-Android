@@ -102,13 +102,14 @@ public class AgoraEduSDK {
         ToastManager.init(config.getContext().getApplicationContext());
         PreferenceManager.init(config.getContext().getApplicationContext());
 
-        /**step-0:get agoraEduSDKConfig*/
+        /**step-0:get agoraEduSDKConfig and to configure*/
         if (agoraEduSDKConfig == null) {
             Log.e(TAG, "agoraEduSDKConfig is null!");
             return null;
         }
         config.setAppId(agoraEduSDKConfig.getAppId());
         config.setOpenEyeCare(agoraEduSDKConfig.getOpenEyeCare());
+        RetrofitManager.instance().addHeader("token", config.getToken());
 
         /**step-1:pull remote config*/
         roomPre = new RoomPreImpl(config.getAppId(), config.getRoomUuid());
@@ -199,6 +200,7 @@ public class AgoraEduSDK {
     private static void errorTips(Context context, String msg) {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
         Log.e(TAG, msg);
+        agoraEduLaunchCallback.onCallback(AgoraEduEvent.AgoraEduEventDestroyed);
     }
 
 

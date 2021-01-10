@@ -223,10 +223,10 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
         boolean status = localCoVideoStatus == DisCoVideo;
         if (!status) {
             /*取消举手(包括在老师处理前主动取消和老师同意后主动退出)*/
-            cancelCoVideo(new EduCallback<EduMsg>() {
+            cancelCoVideo(new EduCallback<Boolean>() {
                 @Override
-                public void onSuccess(@Nullable EduMsg res) {
-                    Log.e(TAG, "取消举手成功");
+                public void onSuccess(@Nullable Boolean res) {
+                    Log.e(TAG, res ? "取消举手成功" : "取消举手失败");
                 }
 
                 @Override
@@ -236,10 +236,10 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
             });
         } else {
             /*举手*/
-            applyCoVideo(new EduCallback<EduMsg>() {
+            applyCoVideo(new EduCallback<Boolean>() {
                 @Override
-                public void onSuccess(@Nullable EduMsg res) {
-                    Log.e(TAG, "举手成功");
+                public void onSuccess(@Nullable Boolean res) {
+                    Log.e(TAG, res ? "举手成功" : "老师不在线，举手失败");
                 }
 
                 @Override
@@ -255,7 +255,7 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
     /**
      * 申请举手连麦
      */
-    private void applyCoVideo(EduCallback<EduMsg> callback) {
+    private void applyCoVideo(EduCallback<Boolean> callback) {
         getLocalUser(new EduCallback<EduUser>() {
             @Override
             public void onSuccess(@Nullable EduUser user) {
@@ -293,7 +293,7 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
     /**
      * 取消举手(包括在老师处理前主动取消和老师同意后主动退出)
      */
-    private void cancelCoVideo(EduCallback<EduMsg> callback) {
+    private void cancelCoVideo(EduCallback<Boolean> callback) {
         getLocalUser(new EduCallback<EduUser>() {
             @Override
             public void onSuccess(@Nullable EduUser user) {

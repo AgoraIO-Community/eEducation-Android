@@ -24,6 +24,10 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import io.agora.base.callback.Callback;
 import io.agora.base.callback.ThrowableCallback;
@@ -38,6 +42,7 @@ public class UploadManager {
     public static final String LOG = "log";
     private static final String callbackPath = "/monitor/apps/{appId}/v1/log/oss/callback";
     private static final String APP_JSON = "application/json";
+    private static Object object = new Object();
 
     public static class UploadParam {
         public String appVersion;
@@ -93,49 +98,57 @@ public class UploadManager {
                 }));
     }
 
-    private static void uploadByOss(@NonNull Context context, @NonNull String uploadPath, @NonNull LogParamsRes param, @Nullable Callback<String> callback) {
+    private static void uploadByOss(@NonNull Context context, @NonNull String uploadPath,
+                                    @NonNull LogParamsRes param, @Nullable Callback<String> callback) {
         try {
-            File file = new File(new File(uploadPath).getParentFile(), "temp.zip");
-            ZipUtils.zipFile(new File(uploadPath), file);
+            synchronized (object) {
+                CountDownLatch countDownLatch = new CountDownLatch(1);
 
-            // 构造上传请求。
-            PutObjectRequest put = new PutObjectRequest(param.bucketName, param.ossKey, file.getAbsolutePath());
-            put.setCallbackParam(new HashMap<String, String>() {{
-                put("callbackUrl", param.callbackUrl);
-                put("callbackBodyType", param.callbackContentType);
-                put("callbackBody", param.callbackBody);
-            }});
-            // 推荐使用OSSAuthCredentialsProvider。token过期可以及时更新。
-            OSSCredentialProvider credentialProvider = new OSSStsTokenCredentialProvider(param.accessKeyId,
-                    param.accessKeySecret, param.securityToken);
-            OSS oss = new OSSClient(context, param.ossEndpoint, credentialProvider);
-            oss.asyncPutObject(put, new OSSCompletedCallback<PutObjectRequest, PutObjectResult>() {
-                @Override
-                public void onSuccess(PutObjectRequest request, PutObjectResult result) {
-                    //noinspection ResultOfMethodCallIgnored
-                    file.delete();
-                    if (callback != null) {
-                        String body = result.getServerCallbackReturnBody();
-                        JsonObject json = JsonParser.parseString(body).getAsJsonObject();
-                        callback.onSuccess(json.get("data").getAsString());
-                    }
-                }
+                File file = new File(new File(uploadPath).getParentFile(), "temp.zip");
+                ZipUtils.zipFile(new File(uploadPath), file);
 
-                @Override
-                public void onFailure(PutObjectRequest request, ClientException clientException, ServiceException serviceException) {
-                    //noinspection ResultOfMethodCallIgnored
-                    file.delete();
-                    if (callback instanceof ThrowableCallback) {
-                        if (clientException != null) {
-                            ((ThrowableCallback<String>) callback).onFailure(clientException);
-                        } else if (serviceException != null) {
-                            ((ThrowableCallback<String>) callback).onFailure(serviceException);
-                        } else {
-                            ((ThrowableCallback<String>) callback).onFailure(null);
+                // 构造上传请求。
+                PutObjectRequest put = new PutObjectRequest(param.bucketName, param.ossKey, file.getAbsolutePath());
+                put.setCallbackParam(new HashMap<String, String>() {{
+                    put("callbackUrl", param.callbackUrl);
+                    put("callbackBodyType", param.callbackContentType);
+                    put("callbackBody", param.callbackBody);
+                }});
+                // 推荐使用OSSAuthCredentialsProvider。token过期可以及时更新。
+                OSSCredentialProvider credentialProvider = new OSSStsTokenCredentialProvider(param.accessKeyId,
+                        param.accessKeySecret, param.securityToken);
+                OSS oss = new OSSClient(context, param.ossEndpoint, credentialProvider);
+                oss.asyncPutObject(put, new OSSCompletedCallback<PutObjectRequest, PutObjectResult>() {
+                    @Override
+                    public void onSuccess(PutObjectRequest request, PutObjectResult result) {
+                        //noinspection ResultOfMethodCallIgnored
+                        file.delete();
+                        countDownLatch.countDown();
+                        if (callback != null) {
+                            String body = result.getServerCallbackReturnBody();
+                            JsonObject json = JsonParser.parseString(body).getAsJsonObject();
+                            callback.onSuccess(json.get("data").getAsString());
                         }
                     }
-                }
-            });
+
+                    @Override
+                    public void onFailure(PutObjectRequest request, ClientException clientException, ServiceException serviceException) {
+                        //noinspection ResultOfMethodCallIgnored
+                        file.delete();
+                        countDownLatch.countDown();
+                        if (callback instanceof ThrowableCallback) {
+                            if (clientException != null) {
+                                ((ThrowableCallback<String>) callback).onFailure(clientException);
+                            } else if (serviceException != null) {
+                                ((ThrowableCallback<String>) callback).onFailure(serviceException);
+                            } else {
+                                ((ThrowableCallback<String>) callback).onFailure(null);
+                            }
+                        }
+                    }
+                });
+                countDownLatch.await(70 * 1000, TimeUnit.MILLISECONDS);
+            }
         }
         catch (Exception e) {
             e.printStackTrace();

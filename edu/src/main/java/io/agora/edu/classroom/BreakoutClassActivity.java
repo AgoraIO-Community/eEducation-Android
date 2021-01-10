@@ -258,7 +258,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
 
             @Override
             public void onFailure(@NotNull EduError error) {
-                Log.e(TAG, "进入下班失败->code:" + error.getType() + ", reason:" + error.getMsg());
+                Log.e(TAG, "进入小班失败->code:" + error.getType() + ", reason:" + error.getMsg());
             }
         });
     }
@@ -537,15 +537,32 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
             getMyMediaRoom().leave(new EduCallback<Unit>() {
                 @Override
                 public void onSuccess(@Nullable Unit res) {
+                    leaveMainEduRoom();
                 }
 
                 @Override
                 public void onFailure(@NotNull EduError error) {
+                    leaveMainEduRoom();
                 }
             });
             subEduRoom = null;
         }
         super.onDestroy();
+    }
+
+    private void leaveMainEduRoom() {
+        if (getMainEduRoom() != null) {
+            getMainEduRoom().leave(new EduCallback<Unit>() {
+                @Override
+                public void onSuccess(@Nullable Unit res) {
+                }
+
+                @Override
+                public void onFailure(@NotNull EduError error) {
+                    Log.e(TAG, "leave EduRoom error->code:" + error.getType() + ",reason:" + error.getMsg());
+                }
+            });
+        }
     }
 
     @Override

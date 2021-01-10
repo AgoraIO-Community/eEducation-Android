@@ -5,7 +5,7 @@ import io.agora.education.api.message.EduMsg;
 
 public interface RaiseHand {
 
-    void applyRaiseHand(String toUserUuid, String payload, EduCallback<EduMsg> callback);
+    void applyRaiseHand(String toUserUuid, String payload, EduCallback<Boolean> callback);
 
-    void cancelRaiseHand(String toUserUuid, String payload, EduCallback<EduMsg> callback);
+    void cancelRaiseHand(String toUserUuid, String payload, EduCallback<Boolean> callback);
 }

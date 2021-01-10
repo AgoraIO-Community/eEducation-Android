@@ -181,15 +181,16 @@ public class ChatRoomFragment extends BaseFragment implements OnItemChildClickLi
                                 EduChatMsgType.Text.getValue());
                         msg.isMe = true;
                         addMessage(msg);
-                        activity.sendRoomChatMsg(text, new EduCallback<EduChatMsg>() {
-                            @Override
-                            public void onSuccess(@Nullable EduChatMsg res) {
-                            }
+                        activity.sendRoomChatMsg(userInfo.getUserUuid(), text,
+                                new EduCallback<EduChatMsg>() {
+                                    @Override
+                                    public void onSuccess(@Nullable EduChatMsg res) {
+                                    }
 
-                            @Override
-                            public void onFailure(@NotNull EduError error) {
-                            }
-                        });
+                                    @Override
+                                    public void onFailure(@NotNull EduError error) {
+                                    }
+                                });
                     }
 
                     @Override

@@ -16,10 +16,18 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTouch;
+import io.agora.edu.common.bean.ResponseBody;
 import io.agora.edu.launch.AgoraEduClassRoom;
 import io.agora.edu.launch.AgoraEduReplay;
 import io.agora.edu.launch.AgoraEduReplayConfig;
@@ -28,7 +36,13 @@ import io.agora.edu.launch.AgoraEduRoomType;
 import io.agora.edu.launch.AgoraEduSDK;
 import io.agora.edu.launch.AgoraEduLaunchConfig;
 import io.agora.edu.launch.AgoraEduSDKConfig;
+import okhttp3.Call;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.Callback;
 
+import static io.agora.edu.BuildConfig.API_BASE_URL;
 import static io.agora.edu.launch.AgoraEduSDK.REQUEST_CODE_RTC;
 import static io.agora.education.Constants.KEY_SP;
 import static io.agora.education.EduApplication.getAppId;
@@ -99,32 +113,32 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, SettingActivity.class));
                 break;
             case R.id.btn_join:
-                AgoraEduReplayConfig config = new AgoraEduReplayConfig(this, 1610194790798L, 1610194828584L,
-                        "scenario/recording/f488493d1886435f963dfb3d95984fd4/5ff99f6612c83b045ed90495/6b6c425515445a49a26e29aa7a828f33_1235542.m3u8",
-                        "646/P8Kb7e_DJZVAQw", "4c25df50526f11eb881eb12e7d1eca69", "WHITEcGFydG5lcl9pZD0xTnd5aDBsMW9ZazhaRWNuZG1kaWgwcmJjVWVsQnE1UkpPMVMmc2lnPTcwODlkYzdjNzA2YTFmMjZkZDdlMmEyYWI0YjFhMzQ4MDQ4YzY2N2Y6YWs9MU53eWgwbDFvWWs4WkVjbmRtZGloMHJiY1VlbEJxNVJKTzFTJmNyZWF0ZV90aW1lPTE2MTAxOTIzNTM5OTAmZXhwaXJlX3RpbWU9MTY0MTcyODM1Mzk5MCZub25jZT0xNjEwMTkyMzUzOTkwMDAmcm9sZT1yb29tJnJvb21JZD00YzI1ZGY1MDUyNmYxMWViODgxZWIxMmU3ZDFlY2E2OSZ0ZWFtSWQ9NjQ2");
-                AgoraEduReplay replay = AgoraEduSDK.replay(config, state -> {
-                    Log.e(TAG, "replay-课堂状态:" + state.name());
-                });
-                new Thread(() -> {
-                    try {
-                        Thread.sleep(10000);
-                        Log.e(TAG, "replay-主动自动结束课堂");
-                        replay.destroy();
-                    }
-                    catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }).start();
-//                if (AppUtil.isFastClick()) {
-//                    return;
-//                }
-//                if (AppUtil.checkAndRequestAppPermission(this, new String[]{
-//                        Manifest.permission.RECORD_AUDIO,
-//                        Manifest.permission.CAMERA,
-//                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-//                }, REQUEST_CODE_RTC)) {
-//                    start();
-//                }
+//                AgoraEduReplayConfig config = new AgoraEduReplayConfig(this, 1610194790798L, 1610194828584L,
+//                        "scenario/recording/f488493d1886435f963dfb3d95984fd4/5ff99f6612c83b045ed90495/6b6c425515445a49a26e29aa7a828f33_1235542.m3u8",
+//                        "646/P8Kb7e_DJZVAQw", "4c25df50526f11eb881eb12e7d1eca69", "WHITEcGFydG5lcl9pZD0xTnd5aDBsMW9ZazhaRWNuZG1kaWgwcmJjVWVsQnE1UkpPMVMmc2lnPTcwODlkYzdjNzA2YTFmMjZkZDdlMmEyYWI0YjFhMzQ4MDQ4YzY2N2Y6YWs9MU53eWgwbDFvWWs4WkVjbmRtZGloMHJiY1VlbEJxNVJKTzFTJmNyZWF0ZV90aW1lPTE2MTAxOTIzNTM5OTAmZXhwaXJlX3RpbWU9MTY0MTcyODM1Mzk5MCZub25jZT0xNjEwMTkyMzUzOTkwMDAmcm9sZT1yb29tJnJvb21JZD00YzI1ZGY1MDUyNmYxMWViODgxZWIxMmU3ZDFlY2E2OSZ0ZWFtSWQ9NjQ2");
+//                AgoraEduReplay replay = AgoraEduSDK.replay(config, state -> {
+//                    Log.e(TAG, "replay-课堂状态:" + state.name());
+//                });
+//                new Thread(() -> {
+//                    try {
+//                        Thread.sleep(10000);
+//                        Log.e(TAG, "replay-主动自动结束课堂");
+//                        replay.destroy();
+//                    }
+//                    catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }).start();
+                if (AppUtil.isFastClick()) {
+                    return;
+                }
+                if (AppUtil.checkAndRequestAppPermission(this, new String[]{
+                        Manifest.permission.RECORD_AUDIO,
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                }, REQUEST_CODE_RTC)) {
+                    start();
+                }
                 break;
             case R.id.tv_one2one:
                 et_room_type.setText(R.string.one2one_class);
@@ -188,12 +202,28 @@ public class MainActivity extends AppCompatActivity {
         String userUuid = yourNameStr + AgoraEduRoleType.AgoraEduRoleTypeStudent.getValue();
         String roomUuid = roomNameStr + roomType;
 
-        AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(this, yourNameStr, userUuid,
-                roomNameStr, roomUuid, roomType, "");
-        AgoraEduClassRoom classRoom = AgoraEduSDK.launch(agoraEduLaunchConfig, (state) -> {
-            Log.e(TAG, "launch-课堂状态:" + state.name());
-            notifyBtnJoinEnable(true);
-        });
+        fetchToken(getAppId(), roomUuid, userUuid, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                notifyBtnJoinEnable(true);
+                Log.e(TAG, "fetchToken onFailure:" + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String body = response.body().string();
+                ResponseBody<String> res = new Gson().fromJson(body, new TypeToken<ResponseBody<String>>() {
+                }.getType());
+                if (res != null && !TextUtils.isEmpty(res.data)) {
+                    Log.d(TAG, "fetchToken onResponse:" + body);
+                    runOnUiThread(() -> {
+                        AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(
+                                MainActivity.this, yourNameStr, userUuid, roomNameStr, roomUuid,
+                                roomType, res.data);
+                        AgoraEduClassRoom classRoom = AgoraEduSDK.launch(agoraEduLaunchConfig, (state) -> {
+                            Log.e(TAG, "launch-课堂状态:" + state.name());
+                            notifyBtnJoinEnable(true);
+                        });
 //        new Thread(() -> {
 //            try {
 //                Thread.sleep(10000);
@@ -204,6 +234,12 @@ public class MainActivity extends AppCompatActivity {
 //                e.printStackTrace();
 //            }
 //        }).start();
+                    });
+                } else {
+                    Log.e(TAG, "fetchToken onFailure: response data is empty!");
+                }
+            }
+        });
     }
 
     private int getClassType(String roomTypeStr) {
@@ -214,6 +250,28 @@ public class MainActivity extends AppCompatActivity {
         } else {
             return AgoraEduRoomType.AgoraEduRoomTypeBig.getValue();
         }
+    }
+
+    private void fetchToken(String appId, String roomUuid, String userUuid, Callback callback) {
+        String url = API_BASE_URL + "/token/apps/" + appId + "/rooms/" + roomUuid +
+                "/roles/2/users/" + userUuid;
+        OkHttpClient okHttpClient = new OkHttpClient();
+        final Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .build();
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                callback.onFailure(call, e);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                callback.onResponse(call, response);
+            }
+        });
     }
 
     private void notifyBtnJoinEnable(boolean enable) {

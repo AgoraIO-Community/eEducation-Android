@@ -196,25 +196,6 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         showLeaveDialog();
     }
 
-    @Override
-    public void finish() {
-        /**退出activity之前离开eduRoom*/
-        if (getMainEduRoom() != null) {
-            getMainEduRoom().leave(new EduCallback<Unit>() {
-                @Override
-                public void onSuccess(@Nullable Unit res) {
-                    BaseClassActivity.super.finish();
-                }
-
-                @Override
-                public void onFailure(@NotNull EduError error) {
-                    Log.e(TAG, "leave EduRoom error->code:" + error.getType() + ",reason:" + error.getMsg());
-                    BaseClassActivity.super.finish();
-                }
-            });
-        }
-    }
-
     @Room.Type
     protected abstract int getClassType();
 
@@ -370,6 +351,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         String msg = "join classRoom failed->code:" + code + ",reason:" + reason;
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         Log.e(TAG, msg);
+        agoraEduLaunchCallback.onCallback(AgoraEduEventDestroyed);
         /*回传错误信息*/
         Intent intent = getIntent().putExtra(CODE, code).putExtra(REASON, reason);
         setResult(RESULT_CODE, intent);
@@ -478,23 +460,26 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         this.localCameraStream = streamInfo;
     }
 
-    public void sendRoomChatMsg(String msg, EduCallback<EduChatMsg> callback) {
-        chat.roomChat(msg, callback);
-//        getLocalUser(new EduCallback<EduUser>() {
-//            @Override
-//            public void onSuccess(@Nullable EduUser res) {
-//                if (res != null) {
-//                    res.sendRoomChatMessage(msg, callback);
-//                } else {
-//                    callback.onFailure(EduError.Companion.internalError("current eduUser is null"));
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(@NotNull EduError error) {
-//                callback.onFailure(error);
-//            }
-//        });
+    protected void sendRoomChatMsg(String msg, EduCallback<EduChatMsg> callback) {
+        getLocalUser(new EduCallback<EduUser>() {
+            @Override
+            public void onSuccess(@Nullable EduUser res) {
+                if (res != null) {
+                    res.sendRoomChatMessage(msg, callback);
+                } else {
+                    callback.onFailure(EduError.Companion.internalError("current eduUser is null"));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull EduError error) {
+                callback.onFailure(error);
+            }
+        });
+    }
+
+    public void sendRoomChatMsg(String fromUuid, String msg, EduCallback<EduChatMsg> callback) {
+        chat.roomChat(fromUuid, msg, callback);
     }
 
     protected void getCurFullStream(EduCallback<List<EduStreamInfo>> callback) {
@@ -606,18 +591,45 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         if (fragmentManager != null && !fragmentManager.isDestroyed()) {
             ConfirmDialog.normal(getString(R.string.confirm_leave_room_content), confirm -> {
                 if (confirm) {
-                    BaseClassActivity.this.finish();
+                    if (getMainEduRoom() != null) {
+                        getMainEduRoom().leave(new EduCallback<Unit>() {
+                            @Override
+                            public void onSuccess(@Nullable Unit res) {
+                                BaseClassActivity.super.finish();
+                            }
+
+                            @Override
+                            public void onFailure(@NotNull EduError error) {
+                                Log.e(TAG, "leave EduRoom error->code:" + error.getType() + ",reason:" + error.getMsg());
+                                BaseClassActivity.super.finish();
+                            }
+                        });
+                    }
                 }
             }).show(fragmentManager, null);
         }
     }
 
-    public final void showLeaveDialog(int strId) {
+    public final void showLeavedDialog(int strId) {
+        runOnUiThread(() -> {
+            if (getMainEduRoom() != null) {
+                getMainEduRoom().leave(new EduCallback<Unit>() {
+                    @Override
+                    public void onSuccess(@Nullable Unit res) {
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull EduError error) {
+                        Log.e(TAG, "leave EduRoom error->code:" + error.getType() + ",reason:" + error.getMsg());
+                    }
+                });
+            }
+        });
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (fragmentManager != null && !fragmentManager.isDestroyed()) {
             ConfirmDialog.single(getString(strId), confirm -> {
                 if (confirm) {
-                    BaseClassActivity.this.finish();
+                    BaseClassActivity.super.finish();
                 }
             }).setCancel(false).show(fragmentManager, null);
         }
@@ -734,11 +746,12 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         }
     }
 
-    public final void uploadLog() {
+    public final void uploadLog(EduCallback callback) {
         if (eduManager != null) {
             eduManager.uploadDebugItem(DebugItem.LOG, new EduCallback<String>() {
                 @Override
                 public void onSuccess(@Nullable String res) {
+                    callback.onSuccess(res);
                     if (res != null) {
                         showLogId(res);
                     }
@@ -746,6 +759,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
 
                 @Override
                 public void onFailure(@NotNull EduError error) {
+                    callback.onSuccess(error);
                     ToastManager.showShort(String.format(getString(R.string.function_error),
                             error.getType(), error.getMsg()));
                 }
@@ -1101,7 +1115,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
                                 System.currentTimeMillis() - roomStatus.getStartTime());
                         if (roomStatus.getCourseState().equals(EduRoomState.END)) {
                             /*课堂结束，强制退出*/
-                            showLeaveDialog(R.string.courseend);
+                            showLeavedDialog(R.string.courseend);
                         }
                         break;
                     case AllStudentsChat:

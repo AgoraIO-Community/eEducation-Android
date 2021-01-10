@@ -42,8 +42,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Callback;
 
-import static io.agora.edu.BuildConfig.API_BASE_URL;
 import static io.agora.edu.launch.AgoraEduSDK.REQUEST_CODE_RTC;
+import static io.agora.education.Constants.BASE_URL;
 import static io.agora.education.Constants.KEY_SP;
 import static io.agora.education.EduApplication.getAppId;
 
@@ -253,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchToken(String appId, String roomUuid, String userUuid, Callback callback) {
-        String url = API_BASE_URL + "/token/apps/" + appId + "/rooms/" + roomUuid +
+        String url = BASE_URL + "/token/apps/" + appId + "/rooms/" + roomUuid +
                 "/roles/2/users/" + userUuid;
         OkHttpClient okHttpClient = new OkHttpClient();
         final Request request = new Request.Builder()

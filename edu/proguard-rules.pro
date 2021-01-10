@@ -79,6 +79,20 @@
 
 -keep class io.agora.edu.classroom.bean.** { *; }
 
+-keep public class io.agora.edu.launch.AgoraEduClassRoom { *; }
+
+-keep public interface io.agora.edu.launch.AgoraEduLaunchCallback { *; }
+
+-keep public class io.agora.edu.launch.AgoraEduLaunchConfig { *; }
+
+-keep public class io.agora.edu.launch.AgoraEduReplay { *; }
+
+-keep public class io.agora.edu.launch.AgoraEduReplayConfig { *; }
+
+-keep public class io.agora.edu.launch.AgoraEduRoleType { *; }
+
+-keep public class io.agora.edu.launch.AgoraEduRoomType { *; }
+
 -keep public class io.agora.edu.launch.AgoraEduSDK
 -keepclassmembers class io.agora.edu.launch.AgoraEduSDK {
      public static final int REQUEST_CODE_RTC;
@@ -88,12 +102,8 @@
      public static io.agora.edu.launch.AgoraEduLaunchCallback agoraEduLaunchCallback;
      public static void launch(io.agora.edu.launch.AgoraEduLaunchConfig, io.agora.edu.launch.AgoraEduLaunchCallback);
 }
--keep public class io.agora.edu.launch.AgoraEduLaunchConfig { *; }
 
--keep public interface io.agora.edu.launch.AgoraEduLaunchCallback { *; }
-
--keep public class io.agora.edu.launch.ReplayLaunch { *; }
--keep public class io.agora.edu.launch.AgoraEduReplayConfig { *; }
+-keep public class io.agora.edu.launch.AgoraEduSDKConfig { *; }
 
 -keep class io.agora.edu.common.bean.roompre.** { *; }
 -keep class io.agora.edu.common.bean.request.** { *; }

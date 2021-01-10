@@ -81,6 +81,8 @@
 
 -keep public class io.agora.edu.launch.AgoraEduClassRoom { *; }
 
+-keep public class io.agora.edu.launch.AgoraEduEvent { *; }
+
 -keep public interface io.agora.edu.launch.AgoraEduLaunchCallback { *; }
 
 -keep public class io.agora.edu.launch.AgoraEduLaunchConfig { *; }

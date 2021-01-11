@@ -147,6 +147,8 @@ public class ChatRoomFragment extends BaseFragment implements OnItemChildClickLi
                                 } else {
                                     ToastManager.showShort(R.string.wait_record);
                                 }
+                            } else {
+                                ToastManager.showShort(R.string.noreplaydata);
                             }
                         }
 

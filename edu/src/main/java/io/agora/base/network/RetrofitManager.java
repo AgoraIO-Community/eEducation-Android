@@ -111,7 +111,11 @@ public class RetrofitManager {
                     throwableCallback(new Throwable("response body is null"));
                 } else {
                     if (body.code != code) {
-                        throwableCallback(new BusinessException(body.code, body.msg.toString()));
+                        if (body.msg != null) {
+                            throwableCallback(new BusinessException(body.code, body.msg.toString()));
+                        } else {
+                            throwableCallback(new BusinessException(body.code, ""));
+                        }
                     } else {
                         callback.onSuccess(body);
                     }

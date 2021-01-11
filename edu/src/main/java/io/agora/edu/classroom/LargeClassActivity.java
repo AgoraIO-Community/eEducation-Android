@@ -239,7 +239,7 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
             applyCoVideo(new EduCallback<Boolean>() {
                 @Override
                 public void onSuccess(@Nullable Boolean res) {
-                    Log.e(TAG, res ? "举手成功" : "老师不在线，举手失败");
+                    Log.e(TAG, "举手成功");
                 }
 
                 @Override
@@ -266,11 +266,24 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
                     @Override
                     public void onSuccess(@Nullable EduUserInfo teacher) {
                         if (teacher != null && raiseHand != null) {
-                            localCoVideoStatus = Applying;
-                            resetHandState();
                             raiseHand.applyRaiseHand(teacher.getUserUuid(), peerMsg.toJsonString(),
-                                    callback);
-//                            user.sendUserMessage(peerMsg.toJsonString(), teacher, callback);
+                                    new EduCallback<Boolean>() {
+                                        @Override
+                                        public void onSuccess(@Nullable Boolean res) {
+                                            if(res) {
+                                                localCoVideoStatus = Applying;
+                                                resetHandState();
+                                                callback.onSuccess(true);
+                                            } else {
+                                                callback.onFailure(EduError.Companion.customMsgError("老师不在线"));
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(@NotNull EduError error) {
+                                            callback.onFailure(error);
+                                        }
+                                    });
                         } else {
                             ToastManager.showShort(R.string.there_is_no_teacher_disable_covideo);
                         }
@@ -325,7 +338,6 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
                                         if (teacher != null && raiseHand != null) {
                                             raiseHand.cancelRaiseHand(teacher.getUserUuid(), peerMsg.toJsonString(),
                                                     callback);
-//                                            user.sendUserMessage(peerMsg.toJsonString(), teacher, callback);
                                         }
                                         user.unPublishStream(res, new EduCallback<Boolean>() {
                                             @Override

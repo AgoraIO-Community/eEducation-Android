@@ -53,6 +53,7 @@
     <string name="cancelhandsupfailed">cancel hands up failed</string>
     <string name="onstage">on stage</string>
     <string name="courseend">Class is over</string>
+    <string name="noreplaydata">can not find replay data</string>
 
     <string name="covideo_accept_interactive">Teacher accept your interactive request!</string>
     <string name="covideo_reject_interactive">Teacher reject your interactive request!</string>

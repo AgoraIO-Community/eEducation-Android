@@ -1,7 +1,8 @@
 package io.agora.edu.classroom.bean.group
 
-object MediumClassPropertyCauseType {
-    const val CMD = "cmd"
+import io.agora.edu.classroom.bean.PropertyCauseType
+
+object MediumClassPropertyCauseType : PropertyCauseType() {
 
     /*开关分组*/
     const val SWITCHGROUP = 101

@@ -866,7 +866,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
                     }
                 });
             }
-            parseRecordMsg(roomProperties);
+            parseRecordMsg(roomProperties, cause);
         }
     }
 

@@ -96,6 +96,8 @@ import io.agora.whiteboard.netless.listener.GlobalStateChangeListener;
 import kotlin.Unit;
 
 import static io.agora.edu.BuildConfig.API_BASE_URL;
+import static io.agora.edu.classroom.bean.PropertyCauseType.CMD;
+import static io.agora.edu.classroom.bean.PropertyCauseType.RECORDSTATECHANGED;
 import static io.agora.edu.common.bean.board.BoardBean.BOARD;
 import static io.agora.edu.launch.AgoraEduSDK.CODE;
 import static io.agora.edu.launch.AgoraEduSDK.REASON;
@@ -558,29 +560,44 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
     /**
      * 尝试解析录制消息
      */
-    protected void parseRecordMsg(Map<String, Object> roomProperties) {
-        String recordJson = getProperty(roomProperties, RECORD);
-        if (!TextUtils.isEmpty(recordJson)) {
-            RecordBean tmp = RecordBean.fromJson(recordJson, RecordBean.class);
-            if (mainRecordBean == null || tmp.getState() != mainRecordBean.getState()) {
-                mainRecordBean = tmp;
-                if (mainRecordBean.getState() == END) {
-                    getLocalUserInfo(new EduCallback<EduUserInfo>() {
-                        @Override
-                        public void onSuccess(@Nullable EduUserInfo userInfo) {
-                            EduFromUserInfo fromUser = new EduFromUserInfo(userInfo.getUserUuid(),
-                                    userInfo.getUserName(), userInfo.getRole());
-                            RecordMsg recordMsg = new RecordMsg(agoraEduLaunchConfig.getRoomUuid(), fromUser,
-                                    getString(R.string.replay_link), System.currentTimeMillis(),
-                                    EduChatMsgType.Text.getValue());
-                            recordMsg.isMe = true;
-                            chatRoomFragment.addMessage(recordMsg);
-                        }
+    protected void parseRecordMsg(Map<String, Object> roomProperties, Map<String, Object> cause) {
+        if(cause != null && !cause.isEmpty()) {
+            int causeType = (int) Float.parseFloat(cause.get(CMD).toString());
+            if(causeType == RECORDSTATECHANGED) {
+                String recordJson = getProperty(roomProperties, RECORD);
+                if (!TextUtils.isEmpty(recordJson)) {
+                    RecordBean tmp = RecordBean.fromJson(recordJson, RecordBean.class);
+                    if (mainRecordBean == null || tmp.getState() != mainRecordBean.getState()) {
+                        mainRecordBean = tmp;
+                        if (mainRecordBean.getState() == END) {
+                            getLocalUserInfo(new EduCallback<EduUserInfo>() {
+                                @Override
+                                public void onSuccess(@Nullable EduUserInfo userInfo) {
+                                    getMediaRoomUuid(new EduCallback<String>() {
+                                        @Override
+                                        public void onSuccess(@Nullable String uuid) {
+                                            EduFromUserInfo fromUser = new EduFromUserInfo(userInfo.getUserUuid(),
+                                                    userInfo.getUserName(), userInfo.getRole());
+                                            RecordMsg recordMsg = new RecordMsg(uuid, fromUser,
+                                                    getString(R.string.replay_link), System.currentTimeMillis(),
+                                                    EduChatMsgType.Text.getValue());
+                                            recordMsg.isMe = true;
+                                            chatRoomFragment.addMessage(recordMsg);
+                                        }
 
-                        @Override
-                        public void onFailure(@NotNull EduError error) {
+                                        @Override
+                                        public void onFailure(@NotNull EduError error) {
+
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onFailure(@NotNull EduError error) {
+                                }
+                            });
                         }
-                    });
+                    }
                 }
             }
         }
@@ -1150,30 +1167,35 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
                                 mainBoardBean.getInfo().getBoardToken(), userInfo.getUserUuid());
                     });
                 }
-                String recordJson = getProperty(roomProperties, RECORD);
-                if (!TextUtils.isEmpty(recordJson)) {
-                    RecordBean tmp = RecordBean.fromJson(recordJson, RecordBean.class);
-                    if (mainRecordBean == null || tmp.getState() != mainRecordBean.getState()) {
-                        mainRecordBean = tmp;
-                        if (mainRecordBean.getState() == END) {
-                            getMediaRoomUuid(new EduCallback<String>() {
-                                @Override
-                                public void onSuccess(@Nullable String uuid) {
-                                    revRecordMsg = true;
-                                    EduFromUserInfo fromUser = new EduFromUserInfo(userInfo.getUserUuid(),
-                                            userInfo.getUserName(), userInfo.getRole());
-                                    RecordMsg recordMsg = new RecordMsg(uuid, fromUser,
-                                            getString(R.string.replay_link), System.currentTimeMillis(),
-                                            EduChatMsgType.Text.getValue());
-                                    recordMsg.isMe = true;
-                                    chatRoomFragment.addMessage(recordMsg);
-                                }
+                if(cause != null && !cause.isEmpty()) {
+                    int causeType = (int) Float.parseFloat(cause.get(CMD).toString());
+                    if(causeType == RECORDSTATECHANGED) {
+                        String recordJson = getProperty(roomProperties, RECORD);
+                        if (!TextUtils.isEmpty(recordJson)) {
+                            RecordBean tmp = RecordBean.fromJson(recordJson, RecordBean.class);
+                            if (mainRecordBean == null || tmp.getState() != mainRecordBean.getState()) {
+                                mainRecordBean = tmp;
+                                if (mainRecordBean.getState() == END) {
+                                    getMediaRoomUuid(new EduCallback<String>() {
+                                        @Override
+                                        public void onSuccess(@Nullable String uuid) {
+                                            revRecordMsg = true;
+                                            EduFromUserInfo fromUser = new EduFromUserInfo(userInfo.getUserUuid(),
+                                                    userInfo.getUserName(), userInfo.getRole());
+                                            RecordMsg recordMsg = new RecordMsg(uuid, fromUser,
+                                                    getString(R.string.replay_link), System.currentTimeMillis(),
+                                                    EduChatMsgType.Text.getValue());
+                                            recordMsg.isMe = true;
+                                            chatRoomFragment.addMessage(recordMsg);
+                                        }
 
-                                @Override
-                                public void onFailure(@NotNull EduError error) {
+                                        @Override
+                                        public void onFailure(@NotNull EduError error) {
 
+                                        }
+                                    });
                                 }
-                            });
+                            }
                         }
                     }
                 }

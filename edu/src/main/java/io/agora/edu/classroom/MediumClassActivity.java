@@ -828,7 +828,7 @@ public class MediumClassActivity extends BaseClassActivity implements TabLayout.
             Log.e(TAG, "收到大房间的roomProperty改变的数据");
             initParseBoardInfo(getMainEduRoom());
             Map<String, Object> roomProperties = classRoom.getRoomProperties();
-            parseRecordMsg(roomProperties);
+            parseRecordMsg(roomProperties, cause);
             /*处理分组信息*/
             syncRoomGroupProperty(roomProperties);
             if (cause != null && !cause.isEmpty()) {

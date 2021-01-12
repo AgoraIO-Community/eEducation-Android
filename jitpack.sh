@@ -18,5 +18,5 @@ git commit -a -m commitMsg
 git push origin android-sdk:android-sdk
 echo "-----push code success----"
 echo "-----create new release->$releaseTag----"
-git tag -v "v$releaseTag" -m "$commitMsg"
+git tag -a "v$releaseTag" -m "$commitMsg"
 git push origin "$releaseTag"

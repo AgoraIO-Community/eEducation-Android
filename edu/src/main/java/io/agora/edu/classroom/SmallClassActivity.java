@@ -81,6 +81,8 @@ public class SmallClassActivity extends BaseClassActivity implements TabLayout.O
                             @Override
                             public void onSuccess(@Nullable EduUser user) {
                                 userListFragment.setLocalUserUuid(user.getUserInfo().getUserUuid());
+                                initTitleTimeState();
+                                initParseBoardInfo(getMainEduRoom());
                             }
 
                             @Override

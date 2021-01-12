@@ -109,7 +109,8 @@ public class AgoraEduSDK {
         }
         config.setAppId(agoraEduSDKConfig.getAppId());
         config.setOpenEyeCare(agoraEduSDKConfig.getOpenEyeCare());
-        RetrofitManager.instance().addHeader("token", config.getToken());
+        RetrofitManager.instance().addHeader("x-agora-token", config.getToken());
+        RetrofitManager.instance().addHeader("x-agora-uid", config.getUserUuid());
 
         /**step-1:pull remote config*/
         roomPre = new RoomPreImpl(config.getAppId(), config.getRoomUuid());

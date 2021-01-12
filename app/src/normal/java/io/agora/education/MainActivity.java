@@ -16,34 +16,18 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTouch;
-import io.agora.edu.common.bean.ResponseBody;
 import io.agora.edu.launch.AgoraEduClassRoom;
-import io.agora.edu.launch.AgoraEduReplay;
-import io.agora.edu.launch.AgoraEduReplayConfig;
 import io.agora.edu.launch.AgoraEduRoleType;
 import io.agora.edu.launch.AgoraEduRoomType;
 import io.agora.edu.launch.AgoraEduSDK;
 import io.agora.edu.launch.AgoraEduLaunchConfig;
 import io.agora.edu.launch.AgoraEduSDKConfig;
-import okhttp3.Call;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.Callback;
 
 import static io.agora.edu.launch.AgoraEduSDK.REQUEST_CODE_RTC;
-import static io.agora.education.Constants.BASE_URL;
 import static io.agora.education.Constants.KEY_SP;
 import static io.agora.education.EduApplication.getAppId;
 
@@ -72,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         int eyeProtect = PreferenceManager.get(KEY_SP, false) ? 1 : 0;
-        AgoraEduSDK.setAgoraEduSDKConfig(new AgoraEduSDKConfig(getAppId(), eyeProtect));
+        AgoraEduSDK.setConfig(new AgoraEduSDKConfig(getAppId(), eyeProtect));
     }
 
     @Override
@@ -201,10 +185,12 @@ public class MainActivity extends AppCompatActivity {
         int roomType = getClassType(roomTypeStr);
         String userUuid = userName + AgoraEduRoleType.AgoraEduRoleTypeStudent.getValue();
         String roomUuid = roomName + roomType;
+        /*根据userUuid和appId签发的token*/
+        String token = "";
 
         AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(
                 MainActivity.this, userName, userUuid, roomName, roomUuid,
-                roomType, "");
+                roomType, token);
         AgoraEduClassRoom classRoom = AgoraEduSDK.launch(agoraEduLaunchConfig, (state) -> {
             Log.e(TAG, "launch-课堂状态:" + state.name());
             notifyBtnJoinEnable(true);

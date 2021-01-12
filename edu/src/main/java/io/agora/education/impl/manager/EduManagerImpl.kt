@@ -81,9 +81,11 @@ internal class EduManagerImpl(
         /*为RteEngine设置eventListener*/
         RteEngineImpl.eventListener = this
         APPID = options.appId
-        val auth = Base64.encodeToString("${options.customerId}:${options.customerCertificate}"
-                .toByteArray(Charsets.UTF_8), Base64.DEFAULT).replace("\n", "").trim()
-        RetrofitManager.instance()!!.addHeader("Authorization", CryptoUtil.getAuth(auth))
+        if (!TextUtils.isEmpty(options.customerId) && !TextUtils.isEmpty(options.customerCertificate)) {
+            val auth = Base64.encodeToString("${options.customerId}:${options.customerCertificate}"
+                    .toByteArray(Charsets.UTF_8), Base64.DEFAULT).replace("\n", "").trim()
+            RetrofitManager.instance()!!.addHeader("Authorization", CryptoUtil.getAuth(auth))
+        }
         RetrofitManager.instance()!!.setLogger(object : HttpLoggingInterceptor.Logger {
             override fun log(message: String) {
                 /**OKHttp的log写入SDK的log文件*/

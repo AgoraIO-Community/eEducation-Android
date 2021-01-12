@@ -5,6 +5,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
@@ -80,7 +81,7 @@ public class AgoraEduSDK {
         return EduManager.Companion.version();
     }
 
-    public static void setAgoraEduSDKConfig(AgoraEduSDKConfig agoraEduSDKConfig) {
+    public static void setConfig(AgoraEduSDKConfig agoraEduSDKConfig) {
         AgoraEduSDK.agoraEduSDKConfig = agoraEduSDKConfig;
     }
 
@@ -109,16 +110,20 @@ public class AgoraEduSDK {
         }
         config.setAppId(agoraEduSDKConfig.getAppId());
         config.setOpenEyeCare(agoraEduSDKConfig.getOpenEyeCare());
-        RetrofitManager.instance().addHeader("x-agora-token", config.getToken());
-        RetrofitManager.instance().addHeader("x-agora-uid", config.getUserUuid());
+        if (!TextUtils.isEmpty(config.getToken())) {
+            RetrofitManager.instance().addHeader("x-agora-token", config.getToken());
+            RetrofitManager.instance().addHeader("x-agora-uid", config.getUserUuid());
+        }
 
         /**step-1:pull remote config*/
         roomPre = new RoomPreImpl(config.getAppId(), config.getRoomUuid());
         roomPre.pullRemoteConfig(new EduCallback<EduRemoteConfigRes>() {
             @Override
             public void onSuccess(@Nullable EduRemoteConfigRes res) {
-                config.setCustomerId(res.getCustomerId());
-                config.setCustomerCer(res.getCustomerCertificate());
+                if (!TextUtils.isEmpty(res.getCustomerId()) || !TextUtils.isEmpty(res.getCustomerCertificate())) {
+                    config.setCustomerId(res.getCustomerId());
+                    config.setCustomerCer(res.getCustomerCertificate());
+                }
                 /**为OKHttp添加Authorization的header*/
                 String auth = Base64.encodeToString((config.getCustomerId() + ":" + config.getCustomerCer())
                         .getBytes(Charsets.UTF_8), Base64.DEFAULT).replace("\n", "").trim();

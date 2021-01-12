@@ -103,7 +103,7 @@
      public static final java.lang.String REASON;
      public static io.agora.edu.launch.AgoraEduLaunchCallback agoraEduLaunchCallback;
      public static java.lang.String version();
-     public static void setAgoraEduSDKConfig(io.agora.edu.launch.AgoraEduSDKConfig);
+     public static void setConfig(io.agora.edu.launch.AgoraEduSDKConfig);
      public static io.agora.edu.launch.AgoraEduClassRoom launch(io.agora.edu.launch.AgoraEduLaunchConfig, io.agora.edu.launch.AgoraEduLaunchCallback);
      public static final java.lang.String WHITEBOARD_APP_ID;
      public static final java.lang.String WHITEBOARD_START_TIME;

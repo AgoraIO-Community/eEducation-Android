@@ -88,10 +88,10 @@ public class AgoraEduSDK {
                                            @NotNull AgoraEduLaunchCallback callback)
             throws IllegalStateException {
         if (!classRoom.isReady()) {
-            throw new IllegalStateException("curState is not AgoraEduEventDestroyed, replay() cannot be called");
+            throw new IllegalStateException("curState is not AgoraEduEventDestroyed, launch() cannot be called");
         }
 
-        ((Application) config.getContext().getApplicationContext()).unregisterActivityLifecycleCallbacks(replayListener);
+//        ((Application) config.getContext().getApplicationContext()).unregisterActivityLifecycleCallbacks(replayListener);
         ((Application) config.getContext().getApplicationContext()).unregisterActivityLifecycleCallbacks(classRoomListener);
         ((Application) config.getContext().getApplicationContext()).registerActivityLifecycleCallbacks(classRoomListener);
 
@@ -218,7 +218,7 @@ public class AgoraEduSDK {
         }
 
         ((Application) config.getContext().getApplicationContext()).unregisterActivityLifecycleCallbacks(replayListener);
-        ((Application) config.getContext().getApplicationContext()).unregisterActivityLifecycleCallbacks(classRoomListener);
+//        ((Application) config.getContext().getApplicationContext()).unregisterActivityLifecycleCallbacks(classRoomListener);
         ((Application) config.getContext().getApplicationContext()).registerActivityLifecycleCallbacks(replayListener);
 
         agoraEduLaunchCallback = callback;

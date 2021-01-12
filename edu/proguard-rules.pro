@@ -95,7 +95,24 @@
 
 -keep public class io.agora.edu.launch.AgoraEduRoomType { *; }
 
--keep public class io.agora.edu.launch.AgoraEduSDK { *; }
+-keep public class io.agora.edu.launch.AgoraEduSDK
+-keepclassmembers class io.agora.edu.launch.AgoraEduSDK {
+     public static final int REQUEST_CODE_RTC;
+     public static final int REQUEST_CODE_RTE;
+     public static final java.lang.String CODE;
+     public static final java.lang.String REASON;
+     public static io.agora.edu.launch.AgoraEduLaunchCallback agoraEduLaunchCallback;
+     public static java.lang.String version();
+     public static void setAgoraEduSDKConfig(io.agora.edu.launch.AgoraEduSDKConfig);
+     public static io.agora.edu.launch.AgoraEduClassRoom launch(io.agora.edu.launch.AgoraEduLaunchConfig, io.agora.edu.launch.AgoraEduLaunchCallback);
+     public static final java.lang.String WHITEBOARD_APP_ID;
+     public static final java.lang.String WHITEBOARD_START_TIME;
+     public static final java.lang.String WHITEBOARD_END_TIME;
+     public static final java.lang.String VIDEO_URL;
+     public static final java.lang.String WHITEBOARD_ID;
+     public static final java.lang.String WHITEBOARD_TOKEN;
+     public static io.agora.edu.launch.AgoraEduReplay replay(io.agora.edu.launch.AgoraEduReplayConfig, io.agora.edu.launch.AgoraEduLaunchCallback);
+}
 
 -keep public class io.agora.edu.launch.AgoraEduSDKConfig { *; }
 

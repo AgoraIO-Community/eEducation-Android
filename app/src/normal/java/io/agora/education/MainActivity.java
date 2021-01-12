@@ -179,14 +179,14 @@ public class MainActivity extends AppCompatActivity {
     private void start() {
         notifyBtnJoinEnable(false);
 
-        String roomNameStr = et_room_name.getText().toString();
-        if (TextUtils.isEmpty(roomNameStr)) {
+        String roomName = et_room_name.getText().toString();
+        if (TextUtils.isEmpty(roomName)) {
             Toast.makeText(this, R.string.room_name_should_not_be_empty, Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String yourNameStr = et_your_name.getText().toString();
-        if (TextUtils.isEmpty(yourNameStr)) {
+        String userName = et_your_name.getText().toString();
+        if (TextUtils.isEmpty(userName)) {
             Toast.makeText(this, R.string.your_name_should_not_be_empty, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -199,31 +199,16 @@ public class MainActivity extends AppCompatActivity {
 
         /**userUuid和roomUuid需用户自己指定，并保证唯一性*/
         int roomType = getClassType(roomTypeStr);
-        String userUuid = yourNameStr + AgoraEduRoleType.AgoraEduRoleTypeStudent.getValue();
-        String roomUuid = roomNameStr + roomType;
+        String userUuid = userName + AgoraEduRoleType.AgoraEduRoleTypeStudent.getValue();
+        String roomUuid = roomName + roomType;
 
-        fetchToken(getAppId(), roomUuid, userUuid, new Callback() {
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                notifyBtnJoinEnable(true);
-                Log.e(TAG, "fetchToken onFailure:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                String body = response.body().string();
-                ResponseBody<String> res = new Gson().fromJson(body, new TypeToken<ResponseBody<String>>() {
-                }.getType());
-                if (res != null && !TextUtils.isEmpty(res.data)) {
-                    Log.d(TAG, "fetchToken onResponse:" + body);
-                    runOnUiThread(() -> {
-                        AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(
-                                MainActivity.this, yourNameStr, userUuid, roomNameStr, roomUuid,
-                                roomType, res.data);
-                        AgoraEduClassRoom classRoom = AgoraEduSDK.launch(agoraEduLaunchConfig, (state) -> {
-                            Log.e(TAG, "launch-课堂状态:" + state.name());
-                            notifyBtnJoinEnable(true);
-                        });
+        AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(
+                MainActivity.this, userName, userUuid, roomName, roomUuid,
+                roomType, "");
+        AgoraEduClassRoom classRoom = AgoraEduSDK.launch(agoraEduLaunchConfig, (state) -> {
+            Log.e(TAG, "launch-课堂状态:" + state.name());
+            notifyBtnJoinEnable(true);
+        });
 //        new Thread(() -> {
 //            try {
 //                Thread.sleep(10000);
@@ -234,12 +219,6 @@ public class MainActivity extends AppCompatActivity {
 //                e.printStackTrace();
 //            }
 //        }).start();
-                    });
-                } else {
-                    Log.e(TAG, "fetchToken onFailure: response data is empty!");
-                }
-            }
-        });
     }
 
     private int getClassType(String roomTypeStr) {
@@ -250,28 +229,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             return AgoraEduRoomType.AgoraEduRoomTypeBig.getValue();
         }
-    }
-
-    private void fetchToken(String appId, String roomUuid, String userUuid, Callback callback) {
-        String url = BASE_URL + "/token/apps/" + appId + "/rooms/" + roomUuid +
-                "/roles/2/users/" + userUuid;
-        OkHttpClient okHttpClient = new OkHttpClient();
-        final Request request = new Request.Builder()
-                .url(url)
-                .get()
-                .build();
-        Call call = okHttpClient.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                callback.onFailure(call, e);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                callback.onResponse(call, response);
-            }
-        });
     }
 
     private void notifyBtnJoinEnable(boolean enable) {

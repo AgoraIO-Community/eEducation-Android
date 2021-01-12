@@ -151,8 +151,7 @@ public class AgoraEduSDK {
             public void onSuccess(@Nullable RoomPreCheckRes res) {
                 if (res.getState() != EduRoomState.END.getValue()) {
                     EduManagerOptions options = new EduManagerOptions(config.getContext(), config.getAppId(),
-                            config.getCustomerId(), config.getCustomerCer(), config.getUserUuid(),
-                            config.getUserName());
+                            config.getToken(), config.getUserUuid(), config.getUserName());
                     options.setLogFileDir(config.getContext().getCacheDir().getAbsolutePath());
                     EduManager.init(options, new EduCallback<EduManager>() {
                         @Override

@@ -217,6 +217,7 @@ internal class EduRoomImpl(
                         /**解析返回的user相关数据*/
                         localUserInfo.userToken = roomEntryRes.user.userToken
                         rtcToken = roomEntryRes.user.rtcToken
+                        /**RTE中的API需要的userToken*/
                         RetrofitManager.instance()!!.addHeader("token", roomEntryRes.user.userToken)
                         localUserInfo.isChatAllowed = roomEntryRes.user.muteChat == EduChatState.Allow.value
                         localUserInfo.userProperties = roomEntryRes.user.userProperties

@@ -6,8 +6,7 @@ import io.agora.education.api.logger.LogLevel
 data class EduManagerOptions(
         val context: Context,
         val appId: String,
-        val customerId: String,
-        val customerCertificate: String,
+        val rtmToken: String,
         val userUuid: String,
         val userName: String
 ) {

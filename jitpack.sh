@@ -18,5 +18,7 @@ git commit -a -m commitMsg
 git push origin android-sdk:android-sdk
 echo "-----push code success----"
 echo "-----create new release->$releaseTag----"
-git tag -a "v$releaseTag" -m "$commitMsg"
-git push origin "$releaseTag"
+# shellcheck disable=SC2086
+git tag -a $releaseTag -m "$commitMsg"
+# shellcheck disable=SC2086
+git push origin $releaseTag

@@ -1,3 +1,4 @@
 #!/bin/zsh
-git commit -m $1
-git push origin android-sdk android-sdk
+echo $1
+git commit -a -m $1
+git push origin android-sdk:android-sdk

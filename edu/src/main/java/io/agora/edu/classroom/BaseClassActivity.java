@@ -253,8 +253,8 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
             @Override
             public void onSuccess(@Nullable EduUser user) {
                 if (user != null) {
-                    /**设置全局的userToken(注意同一个user在不同的room内，token不一样)*/
-                    RetrofitManager.instance().addHeader("token", user.getUserInfo().getUserToken());
+//                    /**设置全局的userToken(注意同一个user在不同的room内，token不一样)*/
+//                    RetrofitManager.instance().addHeader("token", user.getUserInfo().getUserToken());
                     joinSuccess = true;
                     isJoining = false;
                     if (needUserListener) {
@@ -290,8 +290,8 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
             @Override
             public void onSuccess(@Nullable EduUser user) {
                 if (user != null) {
-                    /**设置全局的userToken(注意同一个user在不同的room内，token不一样)*/
-                    RetrofitManager.instance().addHeader("token", user.getUserInfo().getUserToken());
+//                    /**设置全局的userToken(注意同一个user在不同的room内，token不一样)*/
+//                    RetrofitManager.instance().addHeader("token", user.getUserInfo().getUserToken());
                     joinSuccess = true;
                     isJoining = false;
                     if (needUserListener) {
@@ -324,8 +324,8 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
             @Override
             public void onSuccess(@Nullable EduUser user) {
                 if (user != null) {
-                    /**设置全局的userToken(注意同一个user在不同的room内，token不一样)*/
-                    RetrofitManager.instance().addHeader("token", user.getUserInfo().getUserToken());
+//                    /**设置全局的userToken(注意同一个user在不同的room内，token不一样)*/
+//                    RetrofitManager.instance().addHeader("token", user.getUserInfo().getUserToken());
                     joinSuccess = true;
                     isJoining = false;
                     if (needUserListener) {

@@ -185,12 +185,12 @@ public class MainActivity extends AppCompatActivity {
         int roomType = getClassType(roomTypeStr);
         String userUuid = userName + AgoraEduRoleType.AgoraEduRoleTypeStudent.getValue();
         String roomUuid = roomName + roomType;
+        int roleType = AgoraEduRoleType.AgoraEduRoleTypeStudent.getValue();
         /*根据userUuid和appId签发的token*/
         String token = "";
 
         AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(
-                MainActivity.this, userName, userUuid, roomName, roomUuid,
-                roomType, token);
+                MainActivity.this, userName, userUuid, roomName, roomUuid, roleType, roomType, token);
         AgoraEduClassRoom classRoom = AgoraEduSDK.launch(agoraEduLaunchConfig, (state) -> {
             Log.e(TAG, "launch-课堂状态:" + state.name());
             notifyBtnJoinEnable(true);

@@ -22,3 +22,4 @@ echo "-----create new release->$releaseTag----"
 git tag -a $releaseTag -m "$commitMsg"
 # shellcheck disable=SC2086
 git push origin $releaseTag
+echo "-----create release->$releaseTag success!----"

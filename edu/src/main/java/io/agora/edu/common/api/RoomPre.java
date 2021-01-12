@@ -13,7 +13,7 @@ public interface RoomPre {
 
     void createClassRoom(RoomCreateOptionsReq roomCreateOptionsReq, EduCallback<String> callback);
 
-    void preCheckClassRoom(RoomPreCheckReq req, EduCallback<RoomPreCheckRes> callback);
+    void preCheckClassRoom(String userUuid, RoomPreCheckReq req, EduCallback<RoomPreCheckRes> callback);
 
     void pullRemoteConfig(EduCallback<EduRemoteConfigRes> callback);
 }

@@ -146,7 +146,7 @@ public class AgoraEduSDK {
 
     private static void checkAndInit(@NotNull AgoraEduLaunchConfig config) {
         RoomPreCheckReq req = new RoomPreCheckReq(config.getRoomName(), config.getRoomType());
-        roomPre.preCheckClassRoom(req, new EduCallback<RoomPreCheckRes>() {
+        roomPre.preCheckClassRoom(config.getUserUuid(), req, new EduCallback<RoomPreCheckRes>() {
             @Override
             public void onSuccess(@Nullable RoomPreCheckRes res) {
                 if (res.getState() != EduRoomState.END.getValue()) {

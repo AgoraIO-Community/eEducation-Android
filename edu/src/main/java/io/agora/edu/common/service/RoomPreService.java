@@ -42,10 +42,11 @@ public interface RoomPreService {
     /**
      * 创建/返回房间预检状态
      */
-    @PUT("/edu/apps/{appId}/v2/rooms/{roomUuid}")
+    @PUT("/edu/apps/{appId}/v2/rooms/{roomUuid}/users/{userUuid}")
     Call<ResponseBody<RoomPreCheckRes>> preCheckClassroom(
             @Path("appId") String appId,
             @Path("roomUuid") String roomUuid,
+            @Path("userUuid") String userUuid,
             @Body RoomPreCheckReq req
     );
 

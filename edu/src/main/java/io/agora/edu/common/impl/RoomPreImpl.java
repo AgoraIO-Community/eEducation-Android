@@ -38,9 +38,9 @@ public class RoomPreImpl extends Base implements RoomPre {
     }
 
     @Override
-    public void preCheckClassRoom(RoomPreCheckReq req, EduCallback<RoomPreCheckRes> callback) {
+    public void preCheckClassRoom(String userUuid, RoomPreCheckReq req, EduCallback<RoomPreCheckRes> callback) {
         RetrofitManager.instance().getService(API_BASE_URL, RoomPreService.class)
-                .preCheckClassroom(appId, roomUuid, req)
+                .preCheckClassroom(appId, roomUuid, userUuid, req)
                 .enqueue(new RetrofitManager.Callback(0, new ThrowableCallback<ResponseBody<RoomPreCheckRes>>() {
                     @Override
                     public void onFailure(@Nullable Throwable throwable) {

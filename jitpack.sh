@@ -13,10 +13,10 @@ if [ -z "$releaseTag" ]
     exit 0
 fi
 # shellcheck disable=SC2006
-echo "-----push code to`git branch --show-current`branch----"
+echo "-----push code to `git branch --show-current`branch----"
 git commit -a -m commitMsg
 git push origin android-sdk:android-sdk
 echo "-----push code success----"
 echo "-----create new release->$releaseTag----"
-git tag -v "$releaseTag" -m "$commitMsg"
+git tag -v "v$releaseTag" -m "$commitMsg"
 git push origin "$releaseTag"

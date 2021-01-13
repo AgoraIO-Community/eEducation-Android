@@ -15,10 +15,13 @@ fi
 # shellcheck disable=SC2006
 echo "-----push code to `git branch --show-current` branch----"
 git commit -a -m commitMsg
+# shellcheck disable=SC2181
 if [ $? -eq 0 ]; then
     echo "success"
 else
+    exit 0
     echo "fail"
+    exit 0
 fi
 #git push origin android-sdk:android-sdk
 #echo "-----push code success----"

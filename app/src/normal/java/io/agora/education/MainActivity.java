@@ -210,8 +210,8 @@ public class MainActivity extends AppCompatActivity {
         catch (Exception e) {
             e.printStackTrace();
         }
-        AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(
-                MainActivity.this, userName, userUuid, roomName, roomUuid, roleType, roomType, rtmToken);
+        AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(this, userName,
+                userUuid, roomName, roomUuid, roleType, roomType, rtmToken);
         AgoraEduClassRoom classRoom = AgoraEduSDK.launch(agoraEduLaunchConfig, (state) -> {
             Log.e(TAG, "launch-课堂状态:" + state.name());
             notifyBtnJoinEnable(true);

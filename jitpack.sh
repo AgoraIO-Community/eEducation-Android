@@ -19,7 +19,6 @@ git commit -a -m commitMsg
 if [ $? -eq 0 ]; then
     echo "success"
 else
-    exit 0
     echo "fail"
     exit 0
 fi

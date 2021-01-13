@@ -80,7 +80,8 @@ abstract class EduManager(
         }
 
         fun version(): String {
-            return RteEngineImpl.version().plus(".").plus(BuildConfig.SDK_VERSION)
+//            return RteEngineImpl.version().plus(".").plus(BuildConfig.SDK_VERSION)
+            return BuildConfig.SDK_VERSION
         }
     }
 

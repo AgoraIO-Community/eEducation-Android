@@ -230,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
 
         /**本地生成rtmToken---开源版本*/
         try {
-            rtmToken = new RtmTokenBuilder().buildToken(getAppId(), "1560d3b87dd040b1bfe9cb506cbeeaed",
+            rtmToken = new RtmTokenBuilder().buildToken(getAppId(), "appCertificate",
                     userUuid, RtmTokenBuilder.Role.Rtm_User, 0);
         }
         catch (Exception e) {

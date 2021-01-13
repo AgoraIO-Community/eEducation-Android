@@ -26,14 +26,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import io.agora.base.callback.Callback;
 import io.agora.base.callback.ThrowableCallback;
-import io.agora.base.network.BusinessException;
 import io.agora.base.network.RetrofitManager;
-import io.agora.education.api.base.EduError;
 import io.agora.log.service.LogService;
 import io.agora.log.service.bean.ResponseBody;
 import io.agora.log.service.bean.response.LogParamsRes;

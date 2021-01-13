@@ -137,6 +137,9 @@
 -keep class io.agora.education.impl.ResponseBody { *; }
 
 -keep class io.agora.log.service.bean.** { *; }
+-keep class io.agora.log.UploadManager$* {
+        *;
+ }
 
 -keep public class io.agora.education.impl.manager.EduManagerImpl { *; }
 

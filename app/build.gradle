@@ -69,4 +69,9 @@ dependencies {
     //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
     implementation 'com.tencent.bugly:nativecrashreport:latest.release'
     //其中latest.release指代最新Bugly NDK版本号，也可以指定明确的版本号，例如3.0
+
+    // RtmTokenBuilder need
+    // https://mvnrepository.com/artifact/commons-codec/commons-codec
+    compile group: 'commons-codec', name: 'commons-codec', version: '1.15'
+
 }

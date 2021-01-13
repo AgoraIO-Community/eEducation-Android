@@ -66,7 +66,7 @@ abstract class EduManager(
             while (iterator.hasNext()) {
                 val element = iterator.next()
                 if (element.name == "login") {
-                    element.invoke(eduManager, options.rtmToken, options.rtmToken, object : EduCallback<Unit> {
+                    element.invoke(eduManager, options.userUuid, options.rtmToken, object : EduCallback<Unit> {
                         override fun onSuccess(res: Unit?) {
                             callback.onSuccess(eduManager)
                         }

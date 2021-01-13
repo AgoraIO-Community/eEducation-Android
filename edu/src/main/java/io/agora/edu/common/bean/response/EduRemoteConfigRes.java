@@ -1,32 +1,12 @@
 package io.agora.edu.common.bean.response;
 
 public class EduRemoteConfigRes {
-    private String customerId;
-    private String customerCertificate;
     private Object theme;
     private NetLessConfig netless;
 
-    public EduRemoteConfigRes(String customerId, String customerCertificate, Object theme, NetLessConfig netless) {
-        this.customerId = customerId;
-        this.customerCertificate = customerCertificate;
+    public EduRemoteConfigRes(Object theme, NetLessConfig netless) {
         this.theme = theme;
         this.netless = netless;
-    }
-
-    public String getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
-    }
-
-    public String getCustomerCertificate() {
-        return customerCertificate;
-    }
-
-    public void setCustomerCertificate(String customerCertificate) {
-        this.customerCertificate = customerCertificate;
     }
 
     public Object getTheme() {

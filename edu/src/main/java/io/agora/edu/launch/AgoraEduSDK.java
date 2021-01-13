@@ -120,14 +120,6 @@ public class AgoraEduSDK {
         roomPre.pullRemoteConfig(new EduCallback<EduRemoteConfigRes>() {
             @Override
             public void onSuccess(@Nullable EduRemoteConfigRes res) {
-                if (!TextUtils.isEmpty(res.getCustomerId()) || !TextUtils.isEmpty(res.getCustomerCertificate())) {
-                    config.setCustomerId(res.getCustomerId());
-                    config.setCustomerCer(res.getCustomerCertificate());
-                }
-                /**为OKHttp添加Authorization的header*/
-                String auth = Base64.encodeToString((config.getCustomerId() + ":" + config.getCustomerCer())
-                        .getBytes(Charsets.UTF_8), Base64.DEFAULT).replace("\n", "").trim();
-                RetrofitManager.instance().addHeader("Authorization", CryptoUtil.getAuth(auth));
                 EduRemoteConfigRes.NetLessConfig netLessConfig = res.getNetless();
                 config.setWhiteBoardAppId(netLessConfig.getAppId());
                 /**step-2:check classRoom and init EduManager*/

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,16 +17,30 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTouch;
+import io.agora.edu.common.bean.ResponseBody;
 import io.agora.edu.launch.AgoraEduClassRoom;
 import io.agora.edu.launch.AgoraEduRoleType;
 import io.agora.edu.launch.AgoraEduRoomType;
 import io.agora.edu.launch.AgoraEduSDK;
 import io.agora.edu.launch.AgoraEduLaunchConfig;
 import io.agora.edu.launch.AgoraEduSDKConfig;
+import io.agora.education.fetchtoken.FetchRtmTokenUtil;
+import io.agora.education.fetchtoken.RtmTokenRes;
+import io.agora.education.rtmtoken.RtmTokenBuilder;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 import static io.agora.edu.launch.AgoraEduSDK.REQUEST_CODE_RTC;
 import static io.agora.education.Constants.KEY_SP;
@@ -44,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
     protected CardView card_room_type;
     @BindView(R.id.btn_join)
     protected Button btnJoin;
+
+    private String rtmToken;
 
     @Override
     protected void onCreate(@androidx.annotation.Nullable Bundle savedInstanceState) {
@@ -187,14 +204,53 @@ public class MainActivity extends AppCompatActivity {
         String roomUuid = roomName + roomType;
         int roleType = AgoraEduRoleType.AgoraEduRoleTypeStudent.getValue();
         /*根据userUuid和appId签发的token*/
-        String token = "";
+        rtmToken = "";
 
-        AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(
-                MainActivity.this, userName, userUuid, roomName, roomUuid, roleType, roomType, token);
-        AgoraEduClassRoom classRoom = AgoraEduSDK.launch(agoraEduLaunchConfig, (state) -> {
-            Log.e(TAG, "launch-课堂状态:" + state.name());
-            notifyBtnJoinEnable(true);
+        /**请求rtmToken---上架版本*/
+        FetchRtmTokenUtil.fetchToken(userUuid, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                notifyBtnJoinEnable(true);
+                Log.e(TAG, "fetchToken onFailure:" + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String body = response.body().string();
+                ResponseBody<RtmTokenRes> res = new Gson().fromJson(body, new TypeToken<ResponseBody<RtmTokenRes>>() {
+                }.getType());
+                rtmToken = res.data.getRtmToken();
+                if (res != null && !TextUtils.isEmpty(res.data.getRtmToken())) {
+                    Log.d(TAG, "fetchToken onResponse:" + body);
+                    runOnUiThread(() -> {
+                        AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(
+                                MainActivity.this, userName, userUuid, roomName, roomUuid, roleType, roomType, rtmToken);
+                        AgoraEduClassRoom classRoom = AgoraEduSDK.launch(agoraEduLaunchConfig, (state) -> {
+                            Log.e(TAG, "launch-课堂状态:" + state.name());
+                            notifyBtnJoinEnable(true);
+                        });
+                    });
+                } else {
+                    notifyBtnJoinEnable(true);
+                }
+            }
         });
+
+//        /**本地生成rtmToken---开源版本*/
+//        try {
+//            rtmToken = new RtmTokenBuilder().buildToken(getAppId(), "1560d3b87dd040b1bfe9cb506cbeeaed",
+//                    userUuid, RtmTokenBuilder.Role.Rtm_User, 0);
+//        }
+//        catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(
+//                MainActivity.this, userName, userUuid, roomName, roomUuid, roleType, roomType, rtmToken);
+//        AgoraEduClassRoom classRoom = AgoraEduSDK.launch(agoraEduLaunchConfig, (state) -> {
+//            Log.e(TAG, "launch-课堂状态:" + state.name());
+//            notifyBtnJoinEnable(true);
+//        });
+
 //        new Thread(() -> {
 //            try {
 //                Thread.sleep(10000);

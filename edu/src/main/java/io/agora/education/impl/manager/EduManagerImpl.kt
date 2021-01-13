@@ -86,8 +86,8 @@ internal class EduManagerImpl(
 //                    .toByteArray(Charsets.UTF_8), Base64.DEFAULT).replace("\n", "").trim()
 //            RetrofitManager.instance()!!.addHeader("Authorization", CryptoUtil.getAuth(auth))
 //        }
-        RetrofitManager.instance()!!.addHeader("x-agora-token", CryptoUtil.getAuth(options.rtmToken))
-        RetrofitManager.instance()!!.addHeader("x-agora-uid", CryptoUtil.getAuth(options.userUuid))
+        RetrofitManager.instance()!!.addHeader("x-agora-token", options.rtmToken)
+        RetrofitManager.instance()!!.addHeader("x-agora-uid", options.userUuid)
         RetrofitManager.instance()!!.setLogger(object : HttpLoggingInterceptor.Logger {
             override fun log(message: String) {
                 /**OKHttp的log写入SDK的log文件*/

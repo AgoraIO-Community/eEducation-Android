@@ -200,8 +200,12 @@ public class MainActivity extends AppCompatActivity {
 
         /**本地生成rtmToken---开源版本*/
         try {
-            rtmToken = new RtmTokenBuilder().buildToken(getAppId(), "appCertificate",
-                    userUuid, RtmTokenBuilder.Role.Rtm_User, 0);
+            /**声网 APP Id(声网控制台获取)*/
+            String appId = getAppId();
+            /**声网 APP Certificate(声网控制台获取)*/
+            String appCertificate = "";
+            rtmToken = new RtmTokenBuilder().buildToken(appId, appCertificate, userUuid,
+                    RtmTokenBuilder.Role.Rtm_User, 0);
         }
         catch (Exception e) {
             e.printStackTrace();

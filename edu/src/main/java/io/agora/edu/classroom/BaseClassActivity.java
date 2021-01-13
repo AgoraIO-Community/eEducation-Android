@@ -183,7 +183,6 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         title_view.setTimeState(false, 0);
         /**退出activity之前释放eduRoom资源*/
         mainEduRoom = null;
-        whiteboardFragment.releaseBoard();
         if (eduManager != null) {
             eduManager.setEduManagerEventListener(null);
             eduManager.release();
@@ -608,6 +607,9 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         if (fragmentManager != null && !fragmentManager.isDestroyed()) {
             ConfirmDialog.normal(getString(R.string.confirm_leave_room_content), confirm -> {
                 if (confirm) {
+                    /**退出白板*/
+                    whiteboardFragment.releaseBoard();
+                    /**退出教室*/
                     if (getMainEduRoom() != null) {
                         getMainEduRoom().leave(new EduCallback<Unit>() {
                             @Override
@@ -627,8 +629,12 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         }
     }
 
+    /**课堂结束、被提出时调用*/
     public final void showLeavedDialog(int strId) {
         runOnUiThread(() -> {
+            /**退出白板*/
+            whiteboardFragment.releaseBoard();
+            /**退出教室*/
             if (getMainEduRoom() != null) {
                 getMainEduRoom().leave(new EduCallback<Unit>() {
                     @Override

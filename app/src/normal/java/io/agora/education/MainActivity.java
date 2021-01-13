@@ -198,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
         /*根据userUuid和appId签发的token*/
         rtmToken = "";
 
+
         /**本地生成rtmToken---开源版本*/
         try {
             /**声网 APP Id(声网控制台获取)*/

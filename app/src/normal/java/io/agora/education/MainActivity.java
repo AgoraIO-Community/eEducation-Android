@@ -190,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+
         /**userUuid和roomUuid需用户自己指定，并保证唯一性*/
         int roomType = getClassType(roomTypeStr);
         String userUuid = userName + AgoraEduRoleType.AgoraEduRoleTypeStudent.getValue();

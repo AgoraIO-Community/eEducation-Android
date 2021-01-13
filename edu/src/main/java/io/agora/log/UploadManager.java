@@ -31,7 +31,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import io.agora.base.callback.Callback;
 import io.agora.base.callback.ThrowableCallback;
+import io.agora.base.network.BusinessException;
 import io.agora.base.network.RetrofitManager;
+import io.agora.education.api.base.EduError;
 import io.agora.log.service.LogService;
 import io.agora.log.service.bean.ResponseBody;
 import io.agora.log.service.bean.response.LogParamsRes;
@@ -74,7 +76,7 @@ public class UploadManager {
 
     public static void upload(@NonNull Context context, @NonNull String appId,
                               @NonNull String host, @NonNull String uploadPath,
-                              @NonNull UploadParam param, @Nullable Callback<String> callback) {
+                              @NonNull UploadParam param, @Nullable ThrowableCallback<String> callback) {
         LogService service = RetrofitManager.instance().getService(host, LogService.class);
 //        long timeStamp = System.currentTimeMillis();
 //        String sign = sign(appSecret, param, timeStamp);

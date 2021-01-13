@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 import io.agora.base.callback.ThrowableCallback;
+import io.agora.base.network.BusinessException;
 import io.agora.base.network.RetrofitManager;
 import io.agora.edu.common.api.Base;
 import io.agora.edu.common.api.Chat;
@@ -33,7 +34,12 @@ public class ChatImpl extends Base implements Chat {
                 .enqueue(new RetrofitManager.Callback(0, new ThrowableCallback<ResponseBody<EduChatMsg>>() {
                     @Override
                     public void onFailure(@Nullable Throwable throwable) {
-                        callback.onFailure(EduError.Companion.customMsgError(throwable.getMessage()));
+                        if(throwable instanceof BusinessException) {
+                            BusinessException e = (BusinessException) throwable;
+                            callback.onFailure(new EduError(e.getCode(), e.getMessage()));
+                        } else {
+                            callback.onFailure(EduError.Companion.customMsgError(throwable.getMessage()));
+                        }
                     }
 
                     @Override

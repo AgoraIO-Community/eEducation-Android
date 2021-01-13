@@ -282,7 +282,7 @@ internal class EduRoomImpl(
                         var error = throwable as? BusinessException
                         error = error ?: BusinessException(throwable?.message)
                         joinFailed(httpError(error?.code, error?.message ?: throwable?.message),
-                                callback as EduCallback<EduUser>)
+                                callback)
                     }
                 }))
     }

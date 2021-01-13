@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.agora.base.callback.ThrowableCallback;
+import io.agora.base.network.BusinessException;
 import io.agora.base.network.RetrofitManager;
 import io.agora.edu.common.bean.ResponseBody;
 import io.agora.education.api.EduCallback;
@@ -30,7 +31,12 @@ public class ReplayImpl implements Replay {
 
                     @Override
                     public void onFailure(@Nullable Throwable throwable) {
-                        callback.onFailure(EduError.Companion.customMsgError(throwable.getMessage()));
+                        if(throwable instanceof BusinessException) {
+                            BusinessException e = (BusinessException) throwable;
+                            callback.onFailure(new EduError(e.getCode(), e.getMessage()));
+                        } else {
+                            callback.onFailure(EduError.Companion.customMsgError(throwable.getMessage()));
+                        }
                     }
                 }));
     }
@@ -70,7 +76,12 @@ public class ReplayImpl implements Replay {
 
                     @Override
                     public void onFailure(@Nullable Throwable throwable) {
-                        callback.onFailure(EduError.Companion.customMsgError(throwable.getMessage()));
+                        if(throwable instanceof BusinessException) {
+                            BusinessException e = (BusinessException) throwable;
+                            callback.onFailure(new EduError(e.getCode(), e.getMessage()));
+                        } else {
+                            callback.onFailure(EduError.Companion.customMsgError(throwable.getMessage()));
+                        }
                     }
                 }));
     }

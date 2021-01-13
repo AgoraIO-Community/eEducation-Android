@@ -1,5 +1,4 @@
 #!/bin/zsh
-
 commitMsg=$1
 releaseTag=$2
 if [ -z "$commitMsg" ]

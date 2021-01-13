@@ -14,7 +14,7 @@ if [ -z "$releaseTag" ]
 fi
 # shellcheck disable=SC2006
 echo "-----push code to `git branch --show-current` branch----"
-git commit -a -m commitMsg
+git commit -a -m "$commitMsg"
 # shellcheck disable=SC2181
 if [ $? -eq 0 ]; then
     echo "---git commit success!---"

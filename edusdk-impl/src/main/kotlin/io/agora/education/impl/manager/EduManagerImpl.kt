@@ -81,9 +81,13 @@ internal class EduManagerImpl(
         /*为RteEngine设置eventListener*/
         RteEngineImpl.eventListener = this
         APPID = options.appId
-        val auth = Base64.encodeToString("${options.customerId}:${options.customerCertificate}"
-                .toByteArray(Charsets.UTF_8), Base64.DEFAULT).replace("\n", "").trim()
-        RetrofitManager.instance()!!.addHeader("Authorization", CryptoUtil.getAuth(auth))
+//        if (!TextUtils.isEmpty(options.customerId) && !TextUtils.isEmpty(options.customerCertificate)) {
+//            val auth = Base64.encodeToString("${options.customerId}:${options.customerCertificate}"
+//                    .toByteArray(Charsets.UTF_8), Base64.DEFAULT).replace("\n", "").trim()
+//            RetrofitManager.instance()!!.addHeader("Authorization", CryptoUtil.getAuth(auth))
+//        }
+        RetrofitManager.instance()!!.addHeader("x-agora-token", options.rtmToken)
+        RetrofitManager.instance()!!.addHeader("x-agora-uid", options.userUuid)
         RetrofitManager.instance()!!.setLogger(object : HttpLoggingInterceptor.Logger {
             override fun log(message: String) {
                 /**OKHttp的log写入SDK的log文件*/
@@ -108,43 +112,22 @@ internal class EduManagerImpl(
         return room
     }
 
-    fun login(userUuid: String, callback: EduCallback<Unit>) {
-        logMessage("${TAG}: Calling the login API", LogLevel.INFO)
-        RetrofitManager.instance()!!.getService(API_BASE_URL, RoomService::class.java)
-                .login(APPID, userUuid)
-                .enqueue(RetrofitManager.Callback(0, object : ThrowableCallback<ResponseBody<EduLoginRes>> {
-                    override fun onSuccess(res: ResponseBody<EduLoginRes>?) {
-                        logMessage("${TAG}: Successfully called the login API->${Gson().toJson(res)}", LogLevel.INFO)
-                        val loginRes = res?.data
-                        loginRes?.let {
-                            RteEngineImpl.loginRtm(loginRes.userUuid, loginRes.rtmToken,
-                                    object : RteCallback<Unit> {
-                                        override fun onSuccess(res: Unit?) {
-                                            logMessage("${TAG}: Login to RTM successfully", LogLevel.INFO)
-                                            callback.onSuccess(res)
-                                        }
-
-                                        override fun onFailure(error: RteError) {
-                                            logMessage("${TAG}: Login to RTM failed->code:${error.errorCode}," +
-                                                    "reason:${error.errorDesc}", LogLevel.ERROR)
-                                            callback.onFailure(communicationError(error.errorCode,
-                                                    error.errorDesc))
-                                        }
-                                    })
-                        }
+    fun login(userUuid: String, rtmToken: String, callback: EduCallback<Unit>) {
+        logMessage("${TAG}: Calling the login function to login RTM", LogLevel.INFO)
+        RteEngineImpl.loginRtm(userUuid, rtmToken,
+                object : RteCallback<Unit> {
+                    override fun onSuccess(res: Unit?) {
+                        logMessage("${TAG}: Login to RTM successfully", LogLevel.INFO)
+                        callback.onSuccess(res)
                     }
 
-                    override fun onFailure(throwable: Throwable?) {
-                        var error = throwable as? BusinessException
-                        error = error ?: BusinessException(throwable?.message)
-                        error?.code?.let {
-                            logMessage("${TAG}: Failed to call login interface->code:${error?.code}, reason:${error?.message
-                                    ?: throwable?.message}", LogLevel.ERROR)
-                            callback.onFailure(httpError(error?.code, error?.message
-                                    ?: throwable?.message))
-                        }
+                    override fun onFailure(error: RteError) {
+                        logMessage("${TAG}: Login to RTM failed->code:${error.errorCode}," +
+                                "reason:${error.errorDesc}", LogLevel.ERROR)
+                        callback.onFailure(communicationError(error.errorCode,
+                                error.errorDesc))
                     }
-                }))
+                })
     }
 
     override fun release() {

@@ -81,8 +81,8 @@ import io.agora.edu.common.bean.board.BoardState;
 import io.agora.edu.classroom.bean.channel.Room;
 import io.agora.edu.classroom.bean.channel.User;
 import io.agora.edu.classroom.bean.msg.ChannelMsg;
-import io.agora.record.bean.RecordBean;
-import io.agora.record.bean.RecordMsg;
+import io.agora.edu.record.bean.RecordBean;
+import io.agora.edu.record.bean.RecordMsg;
 import io.agora.edu.classroom.fragment.ChatRoomFragment;
 import io.agora.edu.classroom.fragment.WhiteBoardFragment;
 import io.agora.edu.classroom.widget.TitleView;
@@ -95,7 +95,7 @@ import io.agora.covideo.AgoraCoVideoAction;
 import io.agora.whiteboard.netless.listener.GlobalStateChangeListener;
 import kotlin.Unit;
 
-import static io.agora.edu.BuildConfig.API_BASE_URL;
+import static io.agora.education.api.BuildConfig.API_BASE_URL;
 import static io.agora.edu.classroom.bean.PropertyCauseType.CMD;
 import static io.agora.edu.classroom.bean.PropertyCauseType.RECORDSTATECHANGED;
 import static io.agora.edu.common.bean.board.BoardBean.BOARD;
@@ -104,8 +104,8 @@ import static io.agora.edu.launch.AgoraEduSDK.REASON;
 import static io.agora.edu.launch.AgoraEduSDK.agoraEduLaunchCallback;
 import static io.agora.edu.launch.AgoraEduEvent.AgoraEduEventReady;
 import static io.agora.edu.launch.AgoraEduEvent.AgoraEduEventDestroyed;
-import static io.agora.record.bean.RecordBean.RECORD;
-import static io.agora.record.bean.RecordAction.END;
+import static io.agora.edu.record.bean.RecordBean.RECORD;
+import static io.agora.edu.record.bean.RecordAction.END;
 
 public abstract class BaseClassActivity extends BaseActivity implements EduRoomEventListener, EduUserEventListener,
         EduManagerEventListener, GlobalStateChangeListener, AgoraActionListener {

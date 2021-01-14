@@ -1,7 +1,7 @@
 package io.agora.edu.common.service;
 
 import io.agora.edu.common.bean.ResponseBody;
-import io.agora.education.impl.user.data.request.EduRoomChatMsgReq;
+import io.agora.edu.common.bean.request.RoomChatMsgReq;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
@@ -13,5 +13,5 @@ public interface ChatService {
             @Path("appId") String appId,
             @Path("roomUuid") String roomUuid,
             @Path("userUuid") String fromUuid,
-            @Body EduRoomChatMsgReq req);
+            @Body RoomChatMsgReq req);
 }

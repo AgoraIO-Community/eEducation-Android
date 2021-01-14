@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -18,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 import io.agora.base.PreferenceManager;
 import io.agora.base.ToastManager;
 import io.agora.base.network.RetrofitManager;
-import io.agora.base.util.CryptoUtil;
 import io.agora.edu.classroom.ReplayActivity;
 import io.agora.edu.common.api.RoomPre;
 import io.agora.edu.common.bean.request.RoomPreCheckReq;
@@ -37,7 +35,6 @@ import io.agora.edu.classroom.LargeClassActivity;
 import io.agora.edu.classroom.MediumClassActivity;
 import io.agora.edu.classroom.OneToOneClassActivity;
 import io.agora.edu.classroom.SmallClassActivity;
-import kotlin.text.Charsets;
 
 import static io.agora.edu.classroom.BaseClassActivity.setEduManager;
 

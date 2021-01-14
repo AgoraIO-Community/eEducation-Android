@@ -10,7 +10,9 @@ public class PreferenceManager {
     private static SharedPreferences sharedPreferences;
 
     public static void init(@NonNull Context context) {
-        sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        if(sharedPreferences == null) {
+            sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        }
     }
 
     public static void put(@NonNull String key, @Nullable Object value) {

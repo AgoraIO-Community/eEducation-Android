@@ -1,5 +1,7 @@
 package io.agora.education.impl.user
 
+import android.app.Activity
+import android.content.Context
 import android.text.TextUtils
 import android.util.Log
 import android.view.SurfaceView
@@ -494,7 +496,15 @@ internal open class EduUserImpl(
             surfaceViewList.forEach {
                 val parent = it.parent
                 if (parent != null && parent is ViewGroup) {
-                    parent.removeView(it)
+                    val context = parent.context
+                    if (context != null && context is Activity && !context.isFinishing &&
+                            !context.isDestroyed) {
+                        context.runOnUiThread(object : Runnable {
+                            override fun run() {
+                                parent.removeView(it)
+                            }
+                        })
+                    }
                 }
             }
         }

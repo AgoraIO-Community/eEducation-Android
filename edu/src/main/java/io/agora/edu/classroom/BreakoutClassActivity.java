@@ -69,7 +69,7 @@ import io.agora.edu.common.bean.response.EduRoomInfoRes;
 import kotlin.Unit;
 import io.agora.edu.R2;
 
-import static io.agora.edu.BuildConfig.API_BASE_URL;
+import static io.agora.education.api.BuildConfig.API_BASE_URL;
 import static io.agora.edu.common.bean.board.BoardBean.BOARD;
 
 public class BreakoutClassActivity extends BaseClassActivity implements TabLayout.OnTabSelectedListener {

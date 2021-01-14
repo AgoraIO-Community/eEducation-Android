@@ -10,14 +10,14 @@ import io.agora.base.network.RetrofitManager;
 import io.agora.edu.common.api.Base;
 import io.agora.edu.common.api.Chat;
 import io.agora.edu.common.bean.ResponseBody;
+import io.agora.edu.common.bean.request.RoomChatMsgReq;
 import io.agora.edu.common.service.ChatService;
 import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
 import io.agora.education.api.message.EduChatMsg;
 import io.agora.education.api.message.EduChatMsgType;
-import io.agora.education.impl.user.data.request.EduRoomChatMsgReq;
 
-import static io.agora.edu.BuildConfig.API_BASE_URL;
+import static io.agora.education.api.BuildConfig.API_BASE_URL;
 
 public class ChatImpl extends Base implements Chat {
     private static final String TAG = "ChatImpl";
@@ -28,7 +28,7 @@ public class ChatImpl extends Base implements Chat {
 
     @Override
     public void roomChat(@NotNull String fromUuid, @NotNull String message, EduCallback<EduChatMsg> callback) {
-        EduRoomChatMsgReq req = new EduRoomChatMsgReq(message, EduChatMsgType.Text.getValue());
+        RoomChatMsgReq req = new RoomChatMsgReq(message, EduChatMsgType.Text.getValue());
         RetrofitManager.instance().getService(API_BASE_URL, ChatService.class)
                 .roomChat(appId, roomUuid, fromUuid, req)
                 .enqueue(new RetrofitManager.Callback(0, new ThrowableCallback<ResponseBody<EduChatMsg>>() {

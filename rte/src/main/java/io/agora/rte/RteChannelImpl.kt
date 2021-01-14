@@ -148,6 +148,8 @@ internal class RteChannelImpl(
 
     override fun leave(callback: RteCallback<Unit>) {
         val rtcCode = rtcChannel.leaveChannel()
+        Log.e(TAG, if (rtcCode == OK()) "成功离开RTC频道" else "离开RTC频道失败" +
+                "->code:$rtcCode")
         rtmChannel.leave(object : ResultCallback<Void> {
             override fun onSuccess(p0: Void?) {
                 Log.e(TAG, "成功离开RTM频道")

@@ -47,12 +47,8 @@ abstract class EduManager(
                 callback.onFailure(EduError.parameterError("appId"))
                 return
             }
-            if (TextUtils.isEmpty(options.customerId)) {
-                callback.onFailure(EduError.parameterError("customerId"))
-                return
-            }
-            if (TextUtils.isEmpty(options.customerCertificate)) {
-                callback.onFailure(EduError.parameterError("customerCertificate"))
+            if (TextUtils.isEmpty(options.rtmToken)) {
+                callback.onFailure(EduError.parameterError("rtmToken"))
                 return
             }
             if (TextUtils.isEmpty(options.userUuid)) {
@@ -70,7 +66,7 @@ abstract class EduManager(
             while (iterator.hasNext()) {
                 val element = iterator.next()
                 if (element.name == "login") {
-                    element.invoke(eduManager, options.userUuid, object : EduCallback<Unit> {
+                    element.invoke(eduManager, options.userUuid, options.rtmToken, object : EduCallback<Unit> {
                         override fun onSuccess(res: Unit?) {
                             callback.onSuccess(eduManager)
                         }
@@ -84,7 +80,8 @@ abstract class EduManager(
         }
 
         fun version(): String {
-            return RteEngineImpl.version().plus(".").plus(BuildConfig.SDK_VERSION)
+//            return RteEngineImpl.version().plus(".").plus(BuildConfig.SDK_VERSION)
+            return BuildConfig.SDK_VERSION
         }
     }
 

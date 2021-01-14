@@ -1,4 +1,4 @@
-package io.agora.raisehand
+package io.agora.covideo
 
 interface AgoraCoVideoListener {
 

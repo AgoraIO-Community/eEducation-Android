@@ -5,6 +5,9 @@ ext {
             'minSdkVersion'    : 21,
             'targetSdkVersion' : 29,
     ]
+    buildTypeOptions = [
+            'minifyEnabled': true,
+    ]
     dependencies = [
             'junit:junit'                                     : '4.12',
             'androidx.test.ext:junit'                         : '1.1.1',

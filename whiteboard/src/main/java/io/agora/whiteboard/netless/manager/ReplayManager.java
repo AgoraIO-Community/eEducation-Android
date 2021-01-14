@@ -8,7 +8,6 @@ import com.herewhite.sdk.PlayerEventListener;
 import com.herewhite.sdk.WhiteSdk;
 import com.herewhite.sdk.combinePlayer.NativePlayer;
 import com.herewhite.sdk.combinePlayer.PlayerSyncManager;
-import com.herewhite.sdk.domain.CameraBound;
 import com.herewhite.sdk.domain.PlayerConfiguration;
 import com.herewhite.sdk.domain.PlayerPhase;
 import com.herewhite.sdk.domain.PlayerState;

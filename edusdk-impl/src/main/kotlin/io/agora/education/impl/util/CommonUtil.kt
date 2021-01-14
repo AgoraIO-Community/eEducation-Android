@@ -3,7 +3,7 @@ package io.agora.education.impl.util
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import io.agora.education.api.room.data.RoomType
-import io.agora.education.impl.BuildConfig
+import io.agora.education.api.BuildConfig
 
 internal class CommonUtil {
     companion object {

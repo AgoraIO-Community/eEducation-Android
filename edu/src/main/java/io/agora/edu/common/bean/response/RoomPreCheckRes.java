@@ -3,7 +3,7 @@ package io.agora.edu.common.bean.response;
 public class RoomPreCheckRes {
     /**{@link io.agora.education.api.room.data.EduRoomState}*/
     private int state;
-    /**{@link io.agora.record.bean.RecordState}*/
+    /**{@link io.agora.edu.record.bean.RecordState}*/
     private int recordState;
     /**{@link io.agora.education.api.room.data.EduMuteState}*/
     private int muteChat;

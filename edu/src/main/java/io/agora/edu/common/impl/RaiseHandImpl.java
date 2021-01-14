@@ -16,7 +16,7 @@ import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
 import io.agora.education.api.message.EduMsg;
 
-import static io.agora.edu.BuildConfig.API_BASE_URL;
+import static io.agora.education.api.BuildConfig.API_BASE_URL;
 
 public class RaiseHandImpl extends Base implements RaiseHand {
     private static final String TAG = "RaiseHandImpl";

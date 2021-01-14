@@ -61,6 +61,11 @@
 *;
 }
 
+
+
+
+
+
 #------BaseQuickAdapter混淆文件------
 -keep class com.chad.library.adapter.** {
 *;
@@ -73,9 +78,6 @@
 }
 #------BaseQuickAdapter混淆文件------
 
--keep class io.agora.base.bean.** { *; }
-
--keep class io.agora.base.network.** { *; }
 
 -keep class io.agora.edu.classroom.bean.** { *; }
 
@@ -121,33 +123,4 @@
 -keep class io.agora.edu.common.bean.request.** { *; }
 -keep class io.agora.edu.common.bean.response.** { *; }
 -keep public class io.agora.edu.common.bean.ResponseBody { *; }
-
--keep class io.agora.education.api.base.** { *; }
--keep class io.agora.education.api.board.data.** { *; }
--keep class io.agora.education.api.message.** { *; }
--keep class io.agora.education.api.room.data.** { *; }
--keep class io.agora.education.api.stream.data.** { *; }
--keep class io.agora.education.api.user.data.** { *; }
-
--keep class io.agora.education.impl.board.data.** { *; }
--keep class io.agora.education.impl.cmd.bean.** { *; }
--keep class io.agora.education.impl.room.data.** { *; }
--keep class io.agora.education.impl.stream.data.** { *; }
--keep class io.agora.education.impl.user.data.** { *; }
--keep class io.agora.education.impl.ResponseBody { *; }
-
--keep class io.agora.log.service.bean.** { *; }
--keep class io.agora.log.UploadManager$* {
-        *;
- }
-
--keep public class io.agora.education.impl.manager.EduManagerImpl { *; }
-
--keep class io.agora.record.** { *; }
-
--keep class io.agora.rte.data.** { *; }
-
--keep class io.agora.whiteboard.netless.service.bean.** { *; }
-
-
 

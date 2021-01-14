@@ -1,4 +1,4 @@
-package io.agora.raisehand
+package io.agora.covideo
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -14,16 +14,17 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import com.google.gson.Gson
 import io.agora.base.ToastManager
 import io.agora.education.api.EduCallback
 import io.agora.education.api.base.EduError
 import io.agora.education.api.room.EduRoom
-import io.agora.raisehand.CoVideoActionType.ACCEPT
-import io.agora.raisehand.CoVideoActionType.CANCEL
-import io.agora.raisehand.CoVideoActionType.REJECT
-import io.agora.raisehand.CoVideoState.Applying
-import io.agora.raisehand.CoVideoState.DisCoVideo
+import io.agora.covideo.CoVideoActionType.ACCEPT
+import io.agora.covideo.CoVideoActionType.CANCEL
+import io.agora.covideo.CoVideoActionType.REJECT
+import io.agora.covideo.CoVideoState.Applying
+import io.agora.covideo.CoVideoState.DisCoVideo
+import io.agora.raisehand.R
+import io.agora.raisehand.StudentCoVideoHelper
 
 /**
  * 举手组件布局

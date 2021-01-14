@@ -1,10 +1,10 @@
-package io.agora.raisehand
+package io.agora.covideo
 
 import android.content.Context
 import io.agora.education.api.EduCallback
 import io.agora.education.api.room.EduRoom
-import io.agora.raisehand.CoVideoState.Applying
-import io.agora.raisehand.CoVideoState.CoVideoing
+import io.agora.covideo.CoVideoState.Applying
+import io.agora.covideo.CoVideoState.CoVideoing
 import java.lang.ref.WeakReference
 
 internal abstract class StudentCoVideoSession(

@@ -2,14 +2,18 @@ package io.agora.raisehand
 
 import android.content.Context
 import com.google.gson.Gson
+import io.agora.covideo.CoVideoApplySwitchState
 import io.agora.education.api.EduCallback
 import io.agora.education.api.base.EduError
 import io.agora.education.api.base.EduError.Companion.customMsgError
 import io.agora.education.api.room.EduRoom
 import io.agora.education.api.user.data.EduUserInfo
 import io.agora.education.api.user.data.EduUserRole
-import io.agora.raisehand.CoVideoState.CoVideoing
-import io.agora.raisehand.CoVideoState.DisCoVideo
+import io.agora.covideo.CoVideoState.CoVideoing
+import io.agora.covideo.CoVideoState.DisCoVideo
+import io.agora.covideo.CoVideoSwitchState
+import io.agora.covideo.CoVideoSwitchStateInfo
+import io.agora.covideo.StudentCoVideoSession
 
 internal class StudentCoVideoHelper(
         context: Context,

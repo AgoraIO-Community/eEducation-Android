@@ -20,8 +20,6 @@ import java.util.List;
 import butterknife.BindView;
 import io.agora.base.ToastManager;
 import io.agora.edu.R;
-import io.agora.edu.launch.AgoraEduEvent;
-import io.agora.edu.launch.AgoraEduLaunchCallback;
 import io.agora.edu.launch.AgoraEduSDK;
 import io.agora.edu.launch.AgoraEduReplayConfig;
 import io.agora.education.api.EduCallback;
@@ -34,11 +32,11 @@ import io.agora.edu.base.BaseFragment;
 import io.agora.edu.classroom.BaseClassActivity;
 import io.agora.edu.classroom.adapter.MessageListAdapter;
 import io.agora.edu.classroom.bean.msg.ChannelMsg;
-import io.agora.record.Replay;
-import io.agora.record.ReplayImpl;
-import io.agora.record.bean.RecordMsg;
+import io.agora.edu.record.Replay;
+import io.agora.edu.record.ReplayImpl;
+import io.agora.edu.record.bean.RecordMsg;
 import io.agora.edu.R2;
-import io.agora.record.ReplayRes;
+import io.agora.edu.record.ReplayRes;
 
 public class ChatRoomFragment extends BaseFragment implements OnItemChildClickListener, View.OnKeyListener {
     public static final String TAG = ChatRoomFragment.class.getSimpleName();

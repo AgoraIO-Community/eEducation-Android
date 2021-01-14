@@ -94,8 +94,8 @@ public class RetrofitManager {
                 try {
                     String errorBodyStr = new String(response.errorBody().bytes());
                     ResponseBody errorBody = new Gson().fromJson(errorBodyStr, ResponseBody.class);
-                    if (errorBody == null) {
-                        throwableCallback(new Throwable(response.errorBody().string()));
+                    if(errorBody.msg == null) {
+                        throwableCallback(new BusinessException(response.code(), errorBodyStr));
                     } else {
                         /*兼顾接口返回的错误内容不是期望的结构*/
                         errorBody.msg = errorBody.msg == null ? "" : errorBody.msg;
@@ -111,7 +111,11 @@ public class RetrofitManager {
                     throwableCallback(new Throwable("response body is null"));
                 } else {
                     if (body.code != code) {
-                        throwableCallback(new BusinessException(body.code, body.msg.toString()));
+                        if (body.msg != null) {
+                            throwableCallback(new BusinessException(body.code, body.msg.toString()));
+                        } else {
+                            throwableCallback(new BusinessException(body.code, ""));
+                        }
                     } else {
                         callback.onSuccess(body);
                     }

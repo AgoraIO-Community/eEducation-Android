@@ -1,3 +1,13 @@
+include ':AgoraActionProcess'
+include ':base'
+include ':covideo'
 include ':edu'
+include ':edusdk-api'
+include ':edusdk-impl'
+include ':log'
+include ':rte'
+include ':timeline'
+include ':whiteboard'
+
 include ':app'
 rootProject.name = 'AgoraEducation'

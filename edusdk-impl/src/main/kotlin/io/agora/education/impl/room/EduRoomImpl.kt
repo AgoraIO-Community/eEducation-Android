@@ -217,6 +217,7 @@ internal class EduRoomImpl(
                         /**解析返回的user相关数据*/
                         localUserInfo.userToken = roomEntryRes.user.userToken
                         rtcToken = roomEntryRes.user.rtcToken
+                        /**RTE中的API需要的userToken*/
                         RetrofitManager.instance()!!.addHeader("token", roomEntryRes.user.userToken)
                         localUserInfo.isChatAllowed = roomEntryRes.user.muteChat == EduChatState.Allow.value
                         localUserInfo.userProperties = roomEntryRes.user.userProperties
@@ -281,7 +282,7 @@ internal class EduRoomImpl(
                         var error = throwable as? BusinessException
                         error = error ?: BusinessException(throwable?.message)
                         joinFailed(httpError(error?.code, error?.message ?: throwable?.message),
-                                callback as EduCallback<EduUser>)
+                                callback)
                     }
                 }))
     }
@@ -521,7 +522,6 @@ internal class EduRoomImpl(
             AgoraLog.e("$TAG->Leave eduRoom[${getCurRoomUuid()}] error:${error.msg}")
             callback.onFailure(error)
         } else {
-            AgoraLog.w("$TAG->Leave eduRoom[${getCurRoomUuid()}] success")
             clearData()
             if (!leaveRoom) {
                 AgoraLog.w("$TAG->Ready to leave the RTE channel:${getCurRoomUuid()}")
@@ -541,6 +541,7 @@ internal class EduRoomImpl(
             syncSession.localUser.eventListener = null
             joinCallback = null
             (getCurLocalUser() as EduUserImpl).removeAllSurfaceView()
+            AgoraLog.w("$TAG->Leave eduRoom[${getCurRoomUuid()}] success")
             /*移除掉当前room*/
             val rtn = EduManagerImpl.removeRoom(this)
             AgoraLog.w("$TAG->Remove this eduRoom from eduManager:$rtn")

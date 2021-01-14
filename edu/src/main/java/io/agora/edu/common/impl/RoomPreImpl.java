@@ -20,7 +20,7 @@ import io.agora.education.api.EduCallback;
 import io.agora.education.api.base.EduError;
 import io.agora.education.api.room.data.EduRoomInfo;
 
-import static io.agora.edu.BuildConfig.API_BASE_URL;
+import static io.agora.education.api.BuildConfig.API_BASE_URL;
 
 public class RoomPreImpl extends Base implements RoomPre {
     private static final String TAG = "RoomPreImpl";

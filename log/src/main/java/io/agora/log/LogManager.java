@@ -10,8 +10,6 @@ import com.elvishew.xlog.LogConfiguration;
 import com.elvishew.xlog.LogLevel;
 import com.elvishew.xlog.Logger;
 import com.elvishew.xlog.XLog;
-import com.elvishew.xlog.flattener.Flattener;
-import com.elvishew.xlog.flattener.Flattener2;
 import com.elvishew.xlog.printer.AndroidPrinter;
 import com.elvishew.xlog.printer.file.FilePrinter;
 import com.elvishew.xlog.printer.file.naming.ChangelessFileNameGenerator;
@@ -21,7 +19,6 @@ import java.io.File;
 import static com.elvishew.xlog.LogLevel.DEBUG;
 import static com.elvishew.xlog.LogLevel.ERROR;
 import static com.elvishew.xlog.LogLevel.INFO;
-import static com.elvishew.xlog.LogLevel.VERBOSE;
 import static com.elvishew.xlog.LogLevel.WARN;
 
 public class LogManager {

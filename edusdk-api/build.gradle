@@ -25,9 +25,18 @@ android {
         consumerProguardFiles 'consumer-rules.pro'
 
         /**可配置项*/
-        buildConfigField 'String', 'SDK_VERSION', '"102"'
-        buildConfigField 'String', 'API_BASE_URL', '"http://api-solutions-dev.bj2.agoralab.co"'
+        buildConfigField 'String', 'SDK_VERSION', '"1.0.0"'
+        buildConfigField 'String', 'API_BASE_URL', '"http://api-test.agora.io"'
+//        buildConfigField 'String', 'API_BASE_URL', '"http://api-solutions-dev.bj2.agoralab.co"'
 //        buildConfigField 'String', 'API_BASE_URL', '"https://api.agora.io"'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled safeExtGet('buildTypeOptions', 'minifyEnabled', true)
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'consumer-rules.pro'
+        }
     }
 
     sourceSets {

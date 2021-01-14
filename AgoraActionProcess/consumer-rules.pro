@@ -60,3 +60,11 @@
 -keep class *.R$ {
 *;
 }
+
+#指定混淆规则，否则多个module被混淆后的包名、类名、方法名会发生冲突
+#指定一个混淆类名、成员变量名、方法名的字典。
+-obfuscationdictionary confuse-name-rules.txt
+#指定一个混淆类名的字典，字典的格式与-obfuscationdictionary相同；
+-classobfuscationdictionary confuse-name-rules.txt
+#指定一个混淆包名的字典，字典格式与-obfuscationdictionary相同。
+-packageobfuscationdictionary confuse-name-rules.txt

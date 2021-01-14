@@ -17,4 +17,5 @@
     <string name="join">Join</string>
     <string name="setting">Setting</string>
     <string name="no_enough_permissions">No enough permissions</string>
+    <string name="version" translatable="false">App:v%s   AgoraEduSDK:v%s</string>
 </resources>

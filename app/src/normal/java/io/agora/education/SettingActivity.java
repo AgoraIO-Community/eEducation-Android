@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.TextView;
 
 
 import androidx.annotation.Nullable;
@@ -15,6 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+import io.agora.edu.launch.AgoraEduSDK;
 
 import static io.agora.education.Constants.KEY_SP;
 import static io.agora.education.Constants.POLICYURL;
@@ -24,13 +26,16 @@ public class SettingActivity extends AppCompatActivity {
 
     @BindView(R.id.switch_eye_care)
     protected Switch switch_eye_care;
+    @BindView(R.id.version_TextView)
+    protected TextView versionTextView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
         ButterKnife.bind(this);
-        switch_eye_care.setChecked(PreferenceManager.get(KEY_SP, false));
+        versionTextView.setText(String.format(getString(R.string.version), BuildConfig.VERSION_NAME,
+                AgoraEduSDK.version()));
     }
 
     @OnClick({R.id.iv_back, R.id.layout_policy})

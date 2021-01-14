@@ -52,7 +52,4 @@
     <string name="courseend">课程已经结束</string>
     <string name="noreplaydata">暂无回放数据</string>
 
-    <string name="covideo_accept_interactive">老师接受了你的连麦申请！</string>
-    <string name="covideo_reject_interactive">老师拒绝了你的连麦申请！</string>
-    <string name="covideo_abort_interactive">老师终止了你的连麦！</string>
 </resources>

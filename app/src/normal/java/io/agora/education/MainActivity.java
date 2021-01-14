@@ -207,12 +207,42 @@ public class MainActivity extends AppCompatActivity {
         /*根据userUuid和appId签发的token*/
         rtmToken = "";
 
+//        /**请求rtmToken---上架版本*/
+//        FetchRtmTokenUtil.fetchToken(userUuid, new Callback() {
+//            @Override
+//            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+//                notifyBtnJoinEnable(true);
+//                Log.e(TAG, "fetchToken onFailure:" + e.getMessage());
+//            }
+//
+//            @Override
+//            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+//                String body = response.body().string();
+//                ResponseBody<RtmTokenRes> res = new Gson().fromJson(body, new TypeToken<ResponseBody<RtmTokenRes>>() {
+//                }.getType());
+//                rtmToken = res.data.getRtmToken();
+//                if (res != null && !TextUtils.isEmpty(res.data.getRtmToken())) {
+//                    Log.d(TAG, "fetchToken onResponse:" + body);
+//                    runOnUiThread(() -> {
+//                        AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(
+//                                MainActivity.this, userName, userUuid, roomName, roomUuid, roleType, roomType, rtmToken);
+//                        AgoraEduClassRoom classRoom = AgoraEduSDK.launch(agoraEduLaunchConfig, (state) -> {
+//                            Log.e(TAG, "launch-课堂状态:" + state.name());
+//                            notifyBtnJoinEnable(true);
+//                        });
+//                    });
+//                } else {
+//                    notifyBtnJoinEnable(true);
+//                }
+//            }
+//        });
+
         /**本地生成rtmToken---开源版本*/
         try {
             /**声网 APP Id(声网控制台获取)*/
             String appId = getAppId();
             /**声网 APP Certificate(声网控制台获取)*/
-            String appCertificate = "";
+            String appCertificate = "1560d3b87dd040b1bfe9cb506cbeeaed";
             rtmToken = new RtmTokenBuilder().buildToken(appId, appCertificate, userUuid,
                     RtmTokenBuilder.Role.Rtm_User, 0);
         }

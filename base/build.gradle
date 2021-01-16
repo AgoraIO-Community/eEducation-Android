@@ -26,7 +26,7 @@ android {
         release {
             minifyEnabled safeExtGet('buildTypeOptions', 'minifyEnabled', true)
             shrinkResources false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'consumer-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 

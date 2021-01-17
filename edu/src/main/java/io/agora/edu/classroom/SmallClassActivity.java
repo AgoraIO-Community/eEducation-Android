@@ -47,6 +47,8 @@ import io.agora.edu.classroom.bean.channel.Room;
 import io.agora.edu.R2;
 import io.agora.edu.classroom.fragment.UserListFragment;
 
+import static io.agora.education.impl.Constants.AgoraLog;
+
 public class SmallClassActivity extends BaseClassActivity implements TabLayout.OnTabSelectedListener {
     private static final String TAG = "SmallClassActivity";
 
@@ -265,7 +267,7 @@ public class SmallClassActivity extends BaseClassActivity implements TabLayout.O
             }
         }
         if (notify) {
-            Log.e(TAG, "有远端Camera流添加，刷新视频列表");
+            AgoraLog.e(TAG + ":有远端Camera流添加，刷新视频列表");
         }
         notifyVideoUserList(notify);
     }
@@ -285,7 +287,7 @@ public class SmallClassActivity extends BaseClassActivity implements TabLayout.O
             }
         }
         if (notify) {
-            Log.e(TAG, "有远端Camera流被修改，刷新视频列表");
+            AgoraLog.e(TAG, "有远端Camera流被修改，刷新视频列表");
         }
         notifyVideoUserList(notify);
     }
@@ -305,7 +307,7 @@ public class SmallClassActivity extends BaseClassActivity implements TabLayout.O
             }
         }
         if (notify) {
-            Log.e(TAG, "有远端Camera流被移除，刷新视频列表");
+            AgoraLog.e(TAG + ":有远端Camera流被移除，刷新视频列表");
         }
         notifyVideoUserList(notify);
     }

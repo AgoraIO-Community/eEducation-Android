@@ -135,6 +135,9 @@
 -keep class io.agora.education.impl.stream.data.** { *; }
 -keep class io.agora.education.impl.user.data.** { *; }
 -keep class io.agora.education.impl.ResponseBody { *; }
+-keep class io.agora.education.impl.Constants {
+      public static io.agora.log.LogManager AgoraLog;
+ }
 
 -keep class io.agora.log.service.bean.** { *; }
 -keep class io.agora.log.UploadManager$* {

@@ -6,6 +6,8 @@ import java.lang.ref.WeakReference;
 
 import io.agora.edu.classroom.ReplayActivity;
 
+import static io.agora.education.impl.Constants.AgoraLog;
+
 public class AgoraEduReplay {
     private WeakReference<ReplayActivity> replayActivityWeak;
     private AgoraEduEvent curState = AgoraEduEvent.AgoraEduEventDestroyed;
@@ -29,6 +31,7 @@ public class AgoraEduReplay {
     }
 
     public void destroy() {
+        AgoraLog.i("AgoraEdu: destroy() have be called");
         if (curState != AgoraEduEvent.AgoraEduEventReady) {
             throw new IllegalStateException("curState is not AgoraEduEventReady, destroy() cannot be called");
         }

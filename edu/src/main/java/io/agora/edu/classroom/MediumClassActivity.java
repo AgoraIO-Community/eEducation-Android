@@ -105,6 +105,7 @@ import static io.agora.edu.classroom.bean.group.RoomGroupInfo.USERUUID;
 import static io.agora.edu.classroom.bean.msg.PeerMsg.Cmd.UnMutePeerCMD;
 import static io.agora.edu.classroom.bean.msg.PeerMsg.Cmd.ApplyInviteActionCMD;
 import static io.agora.agoraactionprocess.AgoraActionWaitACK.DISABLE;
+import static io.agora.education.impl.Constants.AgoraLog;
 
 public class MediumClassActivity extends BaseClassActivity implements TabLayout.OnTabSelectedListener,
         AgoraCoVideoListener {
@@ -353,7 +354,7 @@ public class MediumClassActivity extends BaseClassActivity implements TabLayout.
 
                             @Override
                             public void onFailure(@NotNull EduError error) {
-                                Log.e(TAG, "更新本地用户信息至课堂名单中失败->" + error.getMsg());
+                                AgoraLog.e(TAG + ":更新本地用户信息至课堂名单中失败->" + error.getMsg());
                             }
                         });
                     }
@@ -510,7 +511,7 @@ public class MediumClassActivity extends BaseClassActivity implements TabLayout.
                                     it.remove();
                                 }
                                 if (userInfo.getUserUuid().equals("pixel2")) {
-                                    Log.e(TAG, "错误:" + new Gson().toJson(streamInfo));
+                                    AgoraLog.e(TAG + ":错误:" + new Gson().toJson(streamInfo));
                                 }
                             }
                             stageStreamInfosOne.clear();
@@ -564,7 +565,7 @@ public class MediumClassActivity extends BaseClassActivity implements TabLayout.
                                     }
                                 }
                             }
-//                            Log.e(TAG, "错误stageStreamInfosOne:" + new Gson().toJson(stageStreamInfosOne));
+//                            AgoraLog.e(TAG + ":错误stageStreamInfosOne:" + new Gson().toJson(stageStreamInfosOne));
                             /*尝试获取单个上台(举手，邀请)的台上用户*/
                             List<EduStreamInfo> curStageStreams = new ArrayList<>();
                             if (roomGroupInfo.getAllStudent() != null) {
@@ -825,7 +826,7 @@ public class MediumClassActivity extends BaseClassActivity implements TabLayout.
     @Override
     public void onRoomPropertiesChanged(@NotNull EduRoom classRoom, @Nullable Map<String, Object> cause) {
         if (classRoom.equals(getMainEduRoom())) {
-            Log.e(TAG, "收到大房间的roomProperty改变的数据");
+            AgoraLog.e(TAG + ":收到大房间的roomProperty改变的数据");
             initParseBoardInfo(getMainEduRoom());
             Map<String, Object> roomProperties = classRoom.getRoomProperties();
             parseRecordMsg(roomProperties, cause);
@@ -901,7 +902,7 @@ public class MediumClassActivity extends BaseClassActivity implements TabLayout.
 
     @Override
     public void onLocalStreamAdded(@NotNull EduStreamEvent streamEvent) {
-        Log.e(TAG, "错误onLocalStreamAdded:" + new Gson().toJson(streamEvent.getModifiedStream()));
+        AgoraLog.e(TAG + ":错误onLocalStreamAdded:" + new Gson().toJson(streamEvent.getModifiedStream()));
         super.onLocalStreamAdded(streamEvent);
         agoraCoVideoView.onLinkMediaChanged(true);
         roomGroupInfo.membersOnStage(Collections.singletonList(streamEvent));
@@ -1130,7 +1131,7 @@ public class MediumClassActivity extends BaseClassActivity implements TabLayout.
     public void onCoVideoAccepted() {
         /*如果老师打开了举手即上台则学生需要自己发流*/
         if (agoraCoVideoView.isAutoCoVideo()) {
-            Log.e(TAG, "autoCoVideo is enable");
+            AgoraLog.e(TAG + ":autoCoVideo is enable");
             getLocalUser(new EduCallback<EduUser>() {
                 @Override
                 public void onSuccess(@Nullable EduUser localUser) {
@@ -1161,7 +1162,7 @@ public class MediumClassActivity extends BaseClassActivity implements TabLayout.
                                 }
                             });
                         } else {
-                            Log.e(TAG, "curUser is already onstage, do nothing.");
+                            AgoraLog.e(TAG + ":curUser is already onstage, do nothing.");
                         }
                     }
                 }

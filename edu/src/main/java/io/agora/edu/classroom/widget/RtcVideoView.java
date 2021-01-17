@@ -18,6 +18,8 @@ import io.agora.edu.R;
 import io.agora.edu.R2;
 import io.agora.education.api.stream.data.EduStreamInfo;
 
+import static io.agora.education.impl.Constants.AgoraLog;
+
 public class RtcVideoView extends ConstraintLayout {
 
     @BindView(R2.id.tv_name)
@@ -84,7 +86,7 @@ public class RtcVideoView extends ConstraintLayout {
             }
             layout_video.setVisibility(muted ? GONE : VISIBLE);
             layout_place_holder.setVisibility(muted ? VISIBLE : GONE);
-            Log.e("RtcVideoView", "muteVideo：" + muted);
+            AgoraLog.e("RtcVideoView" + ":muteVideo：" + muted);
         });
     }
 
@@ -104,13 +106,13 @@ public class RtcVideoView extends ConstraintLayout {
     public void muteMedia(boolean audioMuted, boolean videoMuted) {
         ((Activity) getContext()).runOnUiThread(() -> {
             ic_audio.setState(audioMuted ? RtcAudioView.State.CLOSED : RtcAudioView.State.OPENED);
-            Log.e("RtcVideoView", "muteAudio：" + audioMuted);
+            AgoraLog.e("RtcVideoView" + ":muteAudio：" + audioMuted);
             if (ic_video != null) {
                 ic_video.setSelected(!videoMuted);
             }
             layout_video.setVisibility(videoMuted ? GONE : VISIBLE);
             layout_place_holder.setVisibility(videoMuted ? VISIBLE : GONE);
-            Log.e("RtcVideoView", "muteVideo：" + videoMuted);
+            AgoraLog.e("RtcVideoView" + ":muteVideo：" + videoMuted);
         });
     }
 

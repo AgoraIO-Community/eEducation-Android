@@ -62,6 +62,7 @@ import static io.agora.edu.classroom.bean.msg.PeerMsg.CoVideoMsg.Type.ACCEPT;
 import static io.agora.edu.classroom.bean.msg.PeerMsg.CoVideoMsg.Type.CANCEL;
 import static io.agora.edu.classroom.bean.msg.PeerMsg.CoVideoMsg.Type.EXIT;
 import static io.agora.edu.classroom.bean.msg.PeerMsg.CoVideoMsg.Type.REJECT;
+import static io.agora.education.impl.Constants.AgoraLog;
 
 import io.agora.edu.R2;
 
@@ -226,12 +227,12 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
             cancelCoVideo(new EduCallback<Boolean>() {
                 @Override
                 public void onSuccess(@Nullable Boolean res) {
-                    Log.e(TAG, res ? "取消举手成功" : "取消举手失败");
+                    AgoraLog.e(TAG, res ? "取消举手成功" : "取消举手失败");
                 }
 
                 @Override
                 public void onFailure(@NotNull EduError error) {
-                    Log.e(TAG, "取消举手失败");
+                    AgoraLog.e(TAG + ":取消举手失败");
                 }
             });
         } else {
@@ -239,12 +240,12 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
             applyCoVideo(new EduCallback<Boolean>() {
                 @Override
                 public void onSuccess(@Nullable Boolean res) {
-                    Log.e(TAG, "举手成功");
+                    AgoraLog.e(TAG + ":举手成功");
                 }
 
                 @Override
                 public void onFailure(@NotNull EduError error) {
-                    Log.e(TAG, "举手失败");
+                    AgoraLog.e(TAG + ":举手失败");
                     ToastManager.showShort(R.string.function_error, error.getType(),
                             error.getMsg());
                 }
@@ -353,7 +354,7 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
 
                                     @Override
                                     public void onFailure(@NotNull EduError error) {
-                                        Log.e(TAG, "举手过程中取消失败");
+                                        AgoraLog.e(TAG + ":举手过程中取消失败");
                                         callback.onFailure(error);
                                     }
                                 });
@@ -399,7 +400,7 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
                     video_student.setViewVisibility(View.GONE);
                     /**正在连麦中时才会记录本地流；申请中取消或被拒绝本地不会记录流*/
                     if (localCoVideoStatus == CoVideoing) {
-                        Log.e(TAG, "连麦过程中被打断");
+                        AgoraLog.e(TAG + ":连麦过程中被打断");
                         /**连麦被打断，停止发流*/
                         LocalStreamInitOptions options = new LocalStreamInitOptions(
                                 getLocalCameraStream().getStreamUuid(), false, false);
@@ -411,7 +412,7 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
                                 user.unPublishStream(res, new EduCallback<Boolean>() {
                                     @Override
                                     public void onSuccess(@Nullable Boolean res) {
-                                        Log.e(TAG, "连麦过程中被打断，停止发流成功");
+                                        AgoraLog.e(TAG + ":连麦过程中被打断，停止发流成功");
                                     }
 
                                     @Override
@@ -599,7 +600,7 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
                                     break;
                             }
                         } else {
-                            Log.e(TAG, "发现有远端连麦流,立即渲染");
+                            AgoraLog.e(TAG + ":发现有远端连麦流,立即渲染");
                             renderStudentStream(streamInfo, video_student.getVideoLayout());
                             curLinkedUser = streamInfo.getPublisher();
                             resetHandState();

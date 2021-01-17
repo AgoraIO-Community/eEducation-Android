@@ -41,6 +41,8 @@ import io.agora.whiteboard.netless.listener.BoardEventListener;
 import io.agora.whiteboard.netless.listener.GlobalStateChangeListener;
 import io.agora.whiteboard.netless.manager.BoardManager;
 
+import static io.agora.education.impl.Constants.AgoraLog;
+
 public class WhiteBoardFragment extends BaseFragment implements RadioGroup.OnCheckedChangeListener,
         PageControlView.PageControlListener, BoardEventListener, CommonCallbacks {
     private static final String TAG = "WhiteBoardFragment";
@@ -124,7 +126,7 @@ public class WhiteBoardFragment extends BaseFragment implements RadioGroup.OnChe
         boardManager.getRoomPhase(new Promise<RoomPhase>() {
             @Override
             public void then(RoomPhase phase) {
-                Log.e(TAG, "then->" + phase.name());
+                AgoraLog.e(TAG + ":then->" + phase.name());
                 if (phase != RoomPhase.connected) {
                     runOnUiThread(() -> pb_loading.setVisibility(View.VISIBLE));
                     RoomParams params = new RoomParams(uuid, boardToken);
@@ -135,7 +137,7 @@ public class WhiteBoardFragment extends BaseFragment implements RadioGroup.OnChe
 
             @Override
             public void catchEx(SDKError t) {
-                Log.e(TAG, "catchEx->" + t.getMessage());
+                AgoraLog.e(TAG + ":catchEx->" + t.getMessage());
                 ToastManager.showShort(t.getMessage());
             }
         });
@@ -234,7 +236,7 @@ public class WhiteBoardFragment extends BaseFragment implements RadioGroup.OnChe
 
     @Override
     public void onJoinSuccess(GlobalState state) {
-        Log.e(TAG, "onJoinSuccess->" + new Gson().toJson(state));
+        AgoraLog.e(TAG + ":onJoinSuccess->" + new Gson().toJson(state));
         if (listener != null) {
             listener.onGlobalStateChanged(state);
         }
@@ -242,7 +244,7 @@ public class WhiteBoardFragment extends BaseFragment implements RadioGroup.OnChe
 
     @Override
     public void onRoomPhaseChanged(RoomPhase phase) {
-        Log.e(TAG, "onRoomPhaseChanged->" + phase.name());
+        AgoraLog.e(TAG + ":onRoomPhaseChanged->" + phase.name());
         pb_loading.setVisibility(phase == RoomPhase.connected ? View.GONE : View.VISIBLE);
     }
 
@@ -255,7 +257,7 @@ public class WhiteBoardFragment extends BaseFragment implements RadioGroup.OnChe
 
     @Override
     public void onSceneStateChanged(SceneState state) {
-        Log.e(TAG, "onSceneStateChanged");
+        AgoraLog.e(TAG + ":onSceneStateChanged");
         page_control_view.setPageIndex(state.getIndex(), state.getScenes().length);
     }
 

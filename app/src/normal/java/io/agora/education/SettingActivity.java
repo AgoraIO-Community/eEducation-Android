@@ -34,6 +34,7 @@ public class SettingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
         ButterKnife.bind(this);
+        switch_eye_care.setChecked(PreferenceManager.get(KEY_SP, false));
         versionTextView.setText(String.format(getString(R.string.version), BuildConfig.VERSION_NAME,
                 AgoraEduSDK.version()));
     }

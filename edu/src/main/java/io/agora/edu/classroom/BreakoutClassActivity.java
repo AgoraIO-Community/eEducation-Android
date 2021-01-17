@@ -71,6 +71,7 @@ import io.agora.edu.R2;
 
 import static io.agora.edu.BuildConfig.API_BASE_URL;
 import static io.agora.edu.common.bean.board.BoardBean.BOARD;
+import static io.agora.education.impl.Constants.AgoraLog;
 
 public class BreakoutClassActivity extends BaseClassActivity implements TabLayout.OnTabSelectedListener {
     private static final String TAG = "BreakoutClassActivity";
@@ -108,7 +109,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
                         Map<String, Object> roomProperties = getMainEduRoom().getRoomProperties();
                         String boardJson = getProperty(roomProperties, BOARD);
                         if (!TextUtils.isEmpty(boardJson)) {
-                            Log.e(TAG, "大班级的白板信息已存在->" + boardJson);
+                            AgoraLog.e(TAG + ":大班级的白板信息已存在->" + boardJson);
                             mainBoardBean = new Gson().fromJson(boardJson, BoardBean.class);
                         }
                         renderTeacherStream();
@@ -133,7 +134,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
                 .enqueue(new RetrofitManager.Callback<>(0, new ThrowableCallback<ResponseBody<EduRoomInfoRes>>() {
                     @Override
                     public void onFailure(@Nullable Throwable throwable) {
-                        Log.e(TAG, "申请小班信息失败:" + throwable.getMessage());
+                        AgoraLog.e(TAG + ":申请小班信息失败:" + throwable.getMessage());
                         getMainEduRoom().leave(new EduCallback<Unit>() {
                             @Override
                             public void onSuccess(@Nullable Unit res) {
@@ -190,7 +191,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
                             runOnUiThread(() -> showFragmentWithJoinSuccess());
                             /**判断大班级中的roomProperties中是否有白板信息，如果没有，发起请求,等待RTM通知*/
                             if (mainBoardBean == null) {
-                                Log.e(TAG, "请求大房间的白板信息");
+                                AgoraLog.e(TAG + ":请求大房间的白板信息");
                                 getLocalUserInfo(new EduCallback<EduUserInfo>() {
                                     @Override
                                     public void onSuccess(@Nullable EduUserInfo userInfo) {
@@ -258,7 +259,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
 
             @Override
             public void onFailure(@NotNull EduError error) {
-                Log.e(TAG, "进入小班失败->code:" + error.getType() + ", reason:" + error.getMsg());
+                AgoraLog.e(TAG + ":进入小班失败->code:" + error.getType() + ", reason:" + error.getMsg());
             }
         });
     }
@@ -559,7 +560,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
 
                 @Override
                 public void onFailure(@NotNull EduError error) {
-                    Log.e(TAG, "leave EduRoom error->code:" + error.getType() + ",reason:" + error.getMsg());
+                    AgoraLog.e(TAG + ":leave EduRoom error->code:" + error.getType() + ",reason:" + error.getMsg());
                 }
             });
         }
@@ -592,7 +593,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
         if (classRoom.equals(subEduRoom)) {
             /**判断大班级中的roomProperties中是否有白板信息，如果没有，发起请求,等待RTM通知*/
             if (mainBoardBean == null) {
-                Log.e(TAG, "请求大房间的白板信息");
+                AgoraLog.e(TAG + ":请求大房间的白板信息");
                 getLocalUserInfo(new EduCallback<EduUserInfo>() {
                     @Override
                     public void onSuccess(@Nullable EduUserInfo userInfo) {
@@ -624,7 +625,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
             Map<String, Object> roomProperties = classRoom.getRoomProperties();
             String boardJson = getProperty(roomProperties, BOARD);
             if (!TextUtils.isEmpty(boardJson)) {
-                Log.e(TAG, "大班级的白板信息已存在->" + boardJson);
+                AgoraLog.e(TAG + ":大班级的白板信息已存在->" + boardJson);
                 mainBoardBean = new Gson().fromJson(boardJson, BoardBean.class);
             }
         }
@@ -691,7 +692,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
                         boolean isGroupMsg = classRoom.equals(subEduRoom);
                         if (isTeacherMsgToMain || isTeacherMsgToSub || isGroupMsg) {
                             chatRoomFragment.addMessage(chatMsg);
-                            Log.e(TAG, "成功添加一条聊天消息");
+                            AgoraLog.e(TAG + ":成功添加一条聊天消息");
                         }
                     }
 
@@ -761,7 +762,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
             }
         }
         if (notify) {
-            Log.e(TAG, "有远端Camera流添加，刷新视频列表");
+            AgoraLog.e(TAG + ":有远端Camera流添加，刷新视频列表");
         }
         notifyVideoUserListForRemote(notify, classRoom);
     }
@@ -784,7 +785,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
             }
         }
         if (notify) {
-            Log.e(TAG, "有远端Camera流被修改，刷新视频列表");
+            AgoraLog.e(TAG + ":有远端Camera流被修改，刷新视频列表");
         }
         notifyVideoUserListForRemote(notify, classRoom);
     }
@@ -807,7 +808,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
             }
         }
         if (notify) {
-            Log.e(TAG, "有远端Camera流被移除，刷新视频列表");
+            AgoraLog.e(TAG + ":有远端Camera流被移除，刷新视频列表");
         }
         notifyVideoUserListForRemote(notify, classRoom);
     }
@@ -822,7 +823,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
                 public void onSuccess(@Nullable EduRoomStatus roomStatus) {
                     switch (event) {
                         case CourseState:
-                            Log.e(TAG, "班级:" + agoraEduLaunchConfig.getRoomUuid() + "内的课堂状态->"
+                            AgoraLog.e(TAG + ":班级:" + agoraEduLaunchConfig.getRoomUuid() + "内的课堂状态->"
                                     + roomStatus.getCourseState());
                             title_view.setTimeState(roomStatus.getCourseState() == EduRoomState.START,
                                     System.currentTimeMillis() - roomStatus.getStartTime());
@@ -846,11 +847,11 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
     public void onRoomPropertiesChanged(@NotNull EduRoom
                                                 classRoom, @Nullable Map<String, Object> cause) {
         if (classRoom.equals(getMainEduRoom())) {
-            Log.e(TAG, "收到大房间的roomProperty改变的数据");
+            AgoraLog.e(TAG + ":收到大房间的roomProperty改变的数据");
             Map<String, Object> roomProperties = classRoom.getRoomProperties();
             String boardJson = getProperty(roomProperties, BOARD);
             if (!TextUtils.isEmpty(boardJson) && mainBoardBean == null) {
-                Log.e(TAG, "首次获取到大房间的白板信息->" + boardJson);
+                AgoraLog.e(TAG + ":首次获取到大房间的白板信息->" + boardJson);
                 /**首次获取到白板信息*/
                 mainBoardBean = new Gson().fromJson(boardJson, BoardBean.class);
                 getLocalUserInfo(new EduCallback<EduUserInfo>() {
@@ -907,7 +908,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
     public void onLocalStreamRemoved(@NotNull EduStreamEvent streamEvent) {
         super.onLocalStreamRemoved(streamEvent);
         /**此回调被调用就说明classroom结束，人员退出；所以此回调可以不处理*/
-        Log.e(TAG, "本地流被移除:" + streamEvent.getModifiedStream().getStreamUuid());
+        AgoraLog.e(TAG + ":本地流被移除:" + streamEvent.getModifiedStream().getStreamUuid());
     }
 
     @Override

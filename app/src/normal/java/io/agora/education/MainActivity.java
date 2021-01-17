@@ -44,6 +44,7 @@ import okhttp3.Response;
 import static io.agora.edu.launch.AgoraEduSDK.REQUEST_CODE_RTC;
 import static io.agora.education.Constants.KEY_SP;
 import static io.agora.education.EduApplication.getAppId;
+import static io.agora.education.impl.Constants.AgoraLog;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 //            int code = data.getIntExtra(CODE, -1);
 //            String reason = data.getStringExtra(REASON);
 //            String msg = String.format(getString(R.string.function_error), code, reason);
-//            Log.e(TAG, msg);
+//            AgoraLog.e(TAG, msg);
 //            ToastManager.showShort(msg);
 //        }
 //    }
@@ -117,12 +118,12 @@ public class MainActivity extends AppCompatActivity {
 //                        "scenario/recording/f488493d1886435f963dfb3d95984fd4/5ff99f6612c83b045ed90495/6b6c425515445a49a26e29aa7a828f33_1235542.m3u8",
 //                        "646/P8Kb7e_DJZVAQw", "4c25df50526f11eb881eb12e7d1eca69", "WHITEcGFydG5lcl9pZD0xTnd5aDBsMW9ZazhaRWNuZG1kaWgwcmJjVWVsQnE1UkpPMVMmc2lnPTcwODlkYzdjNzA2YTFmMjZkZDdlMmEyYWI0YjFhMzQ4MDQ4YzY2N2Y6YWs9MU53eWgwbDFvWWs4WkVjbmRtZGloMHJiY1VlbEJxNVJKTzFTJmNyZWF0ZV90aW1lPTE2MTAxOTIzNTM5OTAmZXhwaXJlX3RpbWU9MTY0MTcyODM1Mzk5MCZub25jZT0xNjEwMTkyMzUzOTkwMDAmcm9sZT1yb29tJnJvb21JZD00YzI1ZGY1MDUyNmYxMWViODgxZWIxMmU3ZDFlY2E2OSZ0ZWFtSWQ9NjQ2");
 //                AgoraEduReplay replay = AgoraEduSDK.replay(config, state -> {
-//                    Log.e(TAG, "replay-课堂状态:" + state.name());
+//                    AgoraLog.e(TAG + ":replay-课堂状态:" + state.name());
 //                });
 //                new Thread(() -> {
 //                    try {
 //                        Thread.sleep(10000);
-//                        Log.e(TAG, "replay-主动自动结束课堂");
+//                        AgoraLog.e(TAG + ":replay-主动自动结束课堂");
 //                        replay.destroy();
 //                    }
 //                    catch (Exception e) {
@@ -210,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
 //            @Override
 //            public void onFailure(@NotNull Call call, @NotNull IOException e) {
 //                notifyBtnJoinEnable(true);
-//                Log.e(TAG, "fetchToken onFailure:" + e.getMessage());
+//                AgoraLog.e(TAG + ":fetchToken onFailure:" + e.getMessage());
 //            }
 //
 //            @Override
@@ -220,12 +221,12 @@ public class MainActivity extends AppCompatActivity {
 //                }.getType());
 //                rtmToken = res.data.getRtmToken();
 //                if (res != null && !TextUtils.isEmpty(res.data.getRtmToken())) {
-//                    Log.d(TAG, "fetchToken onResponse:" + body);
+//                    AgoraLog.d(TAG + ":fetchToken onResponse:" + body);
 //                    runOnUiThread(() -> {
 //                        AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(
 //                                MainActivity.this, userName, userUuid, roomName, roomUuid, roleType, roomType, rtmToken);
 //                        AgoraEduClassRoom classRoom = AgoraEduSDK.launch(agoraEduLaunchConfig, (state) -> {
-//                            Log.e(TAG, "launch-课堂状态:" + state.name());
+//                            AgoraLog.e(TAG + ":launch-课堂状态:" + state.name());
 //                            notifyBtnJoinEnable(true);
 //                        });
 //                    });
@@ -250,13 +251,13 @@ public class MainActivity extends AppCompatActivity {
         AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(this, userName,
                 userUuid, roomName, roomUuid, roleType, roomType, rtmToken);
         AgoraEduClassRoom classRoom = AgoraEduSDK.launch(agoraEduLaunchConfig, (state) -> {
-            Log.e(TAG, "launch-课堂状态:" + state.name());
+            AgoraLog.e(TAG + ":launch-课堂状态:" + state.name());
             notifyBtnJoinEnable(true);
         });
 //        new Thread(() -> {
 //            try {
 //                Thread.sleep(10000);
-//                Log.e(TAG, "launch-主动自动结束课堂");
+//                AgoraLog.e(TAG + ":launch-主动自动结束课堂");
 //                classRoom.destroy();
 //            }
 //            catch (Exception e) {

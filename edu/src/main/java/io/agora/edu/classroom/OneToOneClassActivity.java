@@ -32,6 +32,8 @@ import io.agora.education.api.user.data.EduUserStateChangeType;
 import io.agora.edu.classroom.bean.channel.Room;
 import io.agora.edu.classroom.widget.RtcVideoView;
 
+import static io.agora.education.impl.Constants.AgoraLog;
+
 
 public class OneToOneClassActivity extends BaseClassActivity {
     private static final String TAG = OneToOneClassActivity.class.getSimpleName();
@@ -193,7 +195,7 @@ public class OneToOneClassActivity extends BaseClassActivity {
     public void onRemoteStreamsInitialized(@NotNull List<? extends EduStreamInfo> streams,
                                            @NotNull EduRoom classRoom) {
         super.onRemoteStreamsInitialized(streams, classRoom);
-        Log.e(TAG, "onRemoteStreamsInitialized");
+        AgoraLog.e(TAG + ":onRemoteStreamsInitialized");
         renderTeacherStream();
     }
 
@@ -286,7 +288,7 @@ public class OneToOneClassActivity extends BaseClassActivity {
         EduStreamInfo streamInfo = streamEvent.getModifiedStream();
         renderStream(getMainEduRoom(), streamInfo, video_student.getVideoLayout());
         video_student.muteMedia(streamInfo);
-        Log.e(TAG, "本地流被添加：" + getLocalCameraStream().getHasAudio() + "," + streamInfo.getHasVideo());
+        AgoraLog.e(TAG + ":本地流被添加：" + getLocalCameraStream().getHasAudio() + "," + streamInfo.getHasVideo());
     }
 
     @Override
@@ -294,7 +296,7 @@ public class OneToOneClassActivity extends BaseClassActivity {
         super.onLocalStreamUpdated(streamEvent);
         EduStreamInfo streamInfo = streamEvent.getModifiedStream();
         video_student.muteMedia(streamInfo);
-        Log.e(TAG, "本地流被修改：" + streamInfo.getHasAudio() + "," + streamInfo.getHasVideo());
+        AgoraLog.e(TAG + ":本地流被修改：" + streamInfo.getHasAudio() + "," + streamInfo.getHasVideo());
     }
 
     @Override
@@ -304,7 +306,7 @@ public class OneToOneClassActivity extends BaseClassActivity {
         EduStreamInfo streamInfo = streamEvent.getModifiedStream();
         renderStream(getMainEduRoom(), streamInfo, null);
         video_student.muteMedia(true, true);
-        Log.e(TAG, "本地流被移除");
+        AgoraLog.e(TAG + ":本地流被移除");
     }
 
     @Override

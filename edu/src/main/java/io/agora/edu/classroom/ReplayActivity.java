@@ -22,6 +22,7 @@ import static io.agora.edu.launch.AgoraEduSDK.WHITEBOARD_END_TIME;
 import static io.agora.edu.launch.AgoraEduSDK.WHITEBOARD_ID;
 import static io.agora.edu.launch.AgoraEduSDK.WHITEBOARD_START_TIME;
 import static io.agora.edu.launch.AgoraEduSDK.WHITEBOARD_TOKEN;
+import static io.agora.education.impl.Constants.AgoraLog;
 
 public class ReplayActivity extends BaseActivity {
     private static final String TAG = "ReplayActivity";
@@ -49,7 +50,7 @@ public class ReplayActivity extends BaseActivity {
         if (!url.startsWith("http")) {
             url = BuildConfig.REPLAY_BASE_URL.concat("/").concat(url);
         }
-        Log.e(TAG, "回放链接:" + url);
+        AgoraLog.e(TAG + ":回放链接:" + url);
         startTime = intent.getLongExtra(WHITEBOARD_START_TIME, 0);
         endTime = intent.getLongExtra(WHITEBOARD_END_TIME, 0);
         boardId = intent.getStringExtra(WHITEBOARD_ID);

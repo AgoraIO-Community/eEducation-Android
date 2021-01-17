@@ -104,6 +104,7 @@ import static io.agora.edu.launch.AgoraEduSDK.REASON;
 import static io.agora.edu.launch.AgoraEduSDK.agoraEduLaunchCallback;
 import static io.agora.edu.launch.AgoraEduEvent.AgoraEduEventReady;
 import static io.agora.edu.launch.AgoraEduEvent.AgoraEduEventDestroyed;
+import static io.agora.education.impl.Constants.AgoraLog;
 import static io.agora.record.bean.RecordBean.RECORD;
 import static io.agora.record.bean.RecordAction.END;
 
@@ -142,7 +143,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e(TAG, "onCreate");
+        AgoraLog.e(TAG + ":onCreate");
     }
 
     @Override
@@ -351,7 +352,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
     protected void joinFailed(int code, String reason) {
         String msg = "join classRoom failed->code:" + code + ",reason:" + reason;
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-        Log.e(TAG, msg);
+        AgoraLog.e(TAG, msg);
         agoraEduLaunchCallback.onCallback(AgoraEduEventDestroyed);
         /*回传错误信息*/
         Intent intent = getIntent().putExtra(CODE, code).putExtra(REASON, reason);
@@ -619,7 +620,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
 
                             @Override
                             public void onFailure(@NotNull EduError error) {
-                                Log.e(TAG, "leave EduRoom error->code:" + error.getType() + ",reason:" + error.getMsg());
+                                AgoraLog.e(TAG + ":leave EduRoom error->code:" + error.getType() + ",reason:" + error.getMsg());
                                 BaseClassActivity.super.finish();
                             }
                         });
@@ -643,7 +644,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
 
                     @Override
                     public void onFailure(@NotNull EduError error) {
-                        Log.e(TAG, "leave EduRoom error->code:" + error.getType() + ",reason:" + error.getMsg());
+                        AgoraLog.e(TAG + ":leave EduRoom error->code:" + error.getType() + ",reason:" + error.getMsg());
                     }
                 });
             }
@@ -963,7 +964,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
                 } else {
                     mainBoardBean = new Gson().fromJson(boardJson, BoardBean.class);
                     BoardInfo info = mainBoardBean.getInfo();
-                    Log.e(TAG, "白板信息已存在->" + boardJson);
+                    AgoraLog.e(TAG + ":白板信息已存在->" + boardJson);
                     runOnUiThread(() -> whiteboardFragment.initBoardWithRoomToken(info.getBoardId(),
                             info.getBoardToken(), userInfo.getUserUuid()));
                 }
@@ -1006,7 +1007,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         if (actionProcessManager != null) {
             actionConfigs = actionProcessManager.parseConfigInfo(room.getRoomProperties());
         } else {
-            Log.e(TAG, "actionProcessManager is null!");
+            AgoraLog.e(TAG + ":actionProcessManager is null!");
         }
     }
 
@@ -1018,18 +1019,18 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
 
     @Override
     public void onRemoteUsersJoined(@NotNull List<? extends EduUserInfo> users, @NotNull EduRoom classRoom) {
-        Log.e(TAG, "收到远端用户加入的回调");
+        AgoraLog.e(TAG + ":收到远端用户加入的回调");
     }
 
     @Override
     public void onRemoteUserLeft(@NotNull EduUserEvent userEvent, @NotNull EduRoom classRoom) {
-        Log.e(TAG, "收到远端用户离开的回调");
+        AgoraLog.e(TAG + ":收到远端用户离开的回调");
     }
 
     @Override
     public void onRemoteUserUpdated(@NotNull EduUserEvent userEvent, @NotNull EduUserStateChangeType type,
                                     @NotNull EduRoom classRoom) {
-        Log.e(TAG, "收到远端用户修改的回调");
+        AgoraLog.e(TAG + ":收到远端用户修改的回调");
     }
 
     @Override
@@ -1047,7 +1048,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
             public void onSuccess(@Nullable EduUser user) {
                 chatMsg.isMe = chatMsg.getFromUser().equals(user.getUserInfo());
                 chatRoomFragment.addMessage(chatMsg);
-                Log.e(TAG, "成功添加一条聊天消息");
+                AgoraLog.e(TAG + ":成功添加一条聊天消息");
             }
 
             @Override
@@ -1059,12 +1060,12 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
 
     @Override
     public void onRemoteStreamsInitialized(@NotNull List<? extends EduStreamInfo> streams, @NotNull EduRoom classRoom) {
-        Log.e(TAG, "onRemoteStreamsInitialized");
+        AgoraLog.e(TAG + ":onRemoteStreamsInitialized");
     }
 
     @Override
     public void onRemoteStreamsAdded(@NotNull List<EduStreamEvent> streamEvents, @NotNull EduRoom classRoom) {
-        Log.e(TAG, "收到添加远端流的回调");
+        AgoraLog.e(TAG + ":收到添加远端流的回调");
         Iterator<EduStreamEvent> iterator = streamEvents.iterator();
         while (iterator.hasNext()) {
             EduStreamEvent streamEvent = iterator.next();
@@ -1088,7 +1089,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
     @Override
     public void onRemoteStreamUpdated(@NotNull List<EduStreamEvent> streamEvents,
                                       @NotNull EduRoom classRoom) {
-        Log.e(TAG, "收到修改远端流的回调");
+        AgoraLog.e(TAG + ":收到修改远端流的回调");
         Iterator<EduStreamEvent> iterator = streamEvents.iterator();
         while (iterator.hasNext()) {
             EduStreamEvent streamEvent = iterator.next();
@@ -1110,7 +1111,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
 
     @Override
     public void onRemoteStreamsRemoved(@NotNull List<EduStreamEvent> streamEvents, @NotNull EduRoom classRoom) {
-        Log.e(TAG, "收到移除远端流的回调");
+        AgoraLog.e(TAG + ":收到移除远端流的回调");
         for (EduStreamEvent streamEvent : streamEvents) {
             EduStreamInfo streamInfo = streamEvent.getModifiedStream();
             if (streamInfo.getPublisher().getRole() == EduUserRole.TEACHER
@@ -1158,14 +1159,14 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
 
     @Override
     public void onRoomPropertiesChanged(@NotNull EduRoom classRoom, @Nullable Map<String, Object> cause) {
-        Log.e(TAG, "收到roomProperty改变的数据");
+        AgoraLog.e(TAG + ":收到roomProperty改变的数据");
         Map<String, Object> roomProperties = classRoom.getRoomProperties();
         String boardJson = getProperty(roomProperties, BOARD);
         getLocalUserInfo(new EduCallback<EduUserInfo>() {
             @Override
             public void onSuccess(@Nullable EduUserInfo userInfo) {
                 if (mainBoardBean == null) {
-                    Log.e(TAG, "首次获取到白板信息->" + boardJson);
+                    AgoraLog.e(TAG + ":首次获取到白板信息->" + boardJson);
                     /**首次获取到白板信息*/
                     mainBoardBean = new Gson().fromJson(boardJson, BoardBean.class);
                     runOnUiThread(() -> {
@@ -1216,7 +1217,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
 
     @Override
     public void onNetworkQualityChanged(@NotNull NetworkQuality quality, @NotNull EduUserInfo user, @NotNull EduRoom classRoom) {
-//        Log.e(TAG, "onNetworkQualityChanged->" + quality.getValue());
+//        AgoraLog.e(TAG + ":onNetworkQualityChanged->" + quality.getValue());
         title_view.setNetworkQuality(quality);
     }
 
@@ -1225,7 +1226,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         classRoom.getRoomInfo(new EduCallback<EduRoomInfo>() {
             @Override
             public void onSuccess(@Nullable EduRoomInfo roomInfo) {
-                Log.e(TAG, "onNetworkQualityChanged->" + state.getValue() + ",room:"
+                AgoraLog.e(TAG + ":onNetworkQualityChanged->" + state.getValue() + ",room:"
                         + roomInfo.getRoomUuid());
             }
 
@@ -1245,11 +1246,11 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
 
     @Override
     public void onLocalStreamAdded(@NotNull EduStreamEvent streamEvent) {
-        Log.e(TAG, "收到添加本地流的回调");
+        AgoraLog.e(TAG + ":收到添加本地流的回调");
         switch (streamEvent.getModifiedStream().getVideoSourceType()) {
             case CAMERA:
                 localCameraStream = streamEvent.getModifiedStream();
-                Log.e(TAG, "收到添加本地Camera流的回调");
+                AgoraLog.e(TAG + ":收到添加本地Camera流的回调");
                 break;
             case SCREEN:
                 localScreenStream = streamEvent.getModifiedStream();
@@ -1261,7 +1262,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
 
     @Override
     public void onLocalStreamUpdated(@NotNull EduStreamEvent streamEvent) {
-        Log.e(TAG, "收到更新本地流的回调");
+        AgoraLog.e(TAG + ":收到更新本地流的回调");
         switch (streamEvent.getModifiedStream().getVideoSourceType()) {
             case CAMERA:
                 localCameraStream = streamEvent.getModifiedStream();
@@ -1276,7 +1277,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
 
     @Override
     public void onLocalStreamRemoved(@NotNull EduStreamEvent streamEvent) {
-        Log.e(TAG, "收到移除本地流的回调");
+        AgoraLog.e(TAG + ":收到移除本地流的回调");
         switch (streamEvent.getModifiedStream().getVideoSourceType()) {
             case CAMERA:
                 localCameraStream = null;

@@ -180,9 +180,9 @@ internal class CMDDispatch(private val eduRoom: EduRoom) {
                         item.userUuid == eduRoom.getCurLocalUser().userInfo.userUuid
                     }!!.type)
                 }
-                validOfflineUsers?.let {
-                    AgoraLog.i("$TAG->onRemoteUsersLeft:${Gson().toJson(it)}")
-                    cmdCallbackManager.onRemoteUsersLeft(it, eduRoom)
+                if(validOfflineUsers.size > 0) {
+                    AgoraLog.i("$TAG->onRemoteUsersLeft:${Gson().toJson(validOfflineUsers)}")
+                    cmdCallbackManager.onRemoteUsersLeft(validOfflineUsers, eduRoom)
                 }
                 if (validRemovedStreams.size > 0) {
                     AgoraLog.i("$TAG->onRemoteStreamsRemoved:${Gson().toJson(validRemovedStreams)}")

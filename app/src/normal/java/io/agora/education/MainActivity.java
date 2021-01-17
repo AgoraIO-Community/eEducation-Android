@@ -72,8 +72,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        int eyeProtect = PreferenceManager.get(KEY_SP, false) ? 1 : 0;
-        AgoraEduSDK.setConfig(new AgoraEduSDKConfig(getAppId(), eyeProtect));
+        int eyeCare = PreferenceManager.get(KEY_SP, false) ? 1 : 0;
+        AgoraEduSDK.setConfig(new AgoraEduSDKConfig(getAppId(), eyeCare));
     }
 
     @Override
@@ -241,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
             /**声网 APP Id(声网控制台获取)*/
             String appId = getAppId();
             /**声网 APP Certificate(声网控制台获取)*/
-            String appCertificate = "1560d3b87dd040b1bfe9cb506cbeeaed";
+            String appCertificate = "";
             rtmToken = new RtmTokenBuilder().buildToken(appId, appCertificate, userUuid,
                     RtmTokenBuilder.Role.Rtm_User, 0);
         }

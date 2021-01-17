@@ -5,11 +5,11 @@ import org.jetbrains.annotations.NotNull;
 public class AgoraEduSDKConfig {
     @NotNull
     private String appId;
-    private int openEyeCare;
+    private int eyeCare;
 
-    public AgoraEduSDKConfig(@NotNull String appId, int openEyeCare) {
+    public AgoraEduSDKConfig(@NotNull String appId, int eyeCare) {
         this.appId = appId;
-        this.openEyeCare = openEyeCare;
+        this.eyeCare = eyeCare;
     }
 
     @NotNull
@@ -21,11 +21,11 @@ public class AgoraEduSDKConfig {
         this.appId = appId;
     }
 
-    public int getOpenEyeCare() {
-        return openEyeCare;
+    public int getEyeCare() {
+        return eyeCare;
     }
 
-    public void setOpenEyeCare(int openEyeCare) {
-        this.openEyeCare = openEyeCare;
+    public void setEyeCare(int eyeCare) {
+        this.eyeCare = eyeCare;
     }
 }

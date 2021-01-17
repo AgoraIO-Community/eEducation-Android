@@ -240,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
             /**声网 APP Id(声网控制台获取)*/
             String appId = getAppId();
             /**声网 APP Certificate(声网控制台获取)*/
-            String appCertificate = "";
+            String appCertificate = "1560d3b87dd040b1bfe9cb506cbeeaed";
             rtmToken = new RtmTokenBuilder().buildToken(appId, appCertificate, userUuid,
                     RtmTokenBuilder.Role.Rtm_User, 0);
         }

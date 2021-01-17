@@ -14,7 +14,9 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+
 import io.agora.edu.R2;
+
 import java.util.List;
 
 import butterknife.BindView;
@@ -31,7 +33,7 @@ public class UserListAdapter extends BaseQuickAdapter<EduStreamInfo, UserListAda
     private List<String> grantedUuids = new ArrayList<>();
 
     public void setGrantedUuids(List<String> grantedUuids) {
-        if (grantedUuids != null && this.grantedUuids.equals(grantedUuids)) {
+        if (grantedUuids != null && !this.grantedUuids.equals(grantedUuids)) {
             this.grantedUuids = grantedUuids;
             notifyDataSetChanged();
         }

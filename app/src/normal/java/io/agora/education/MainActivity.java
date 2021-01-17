@@ -44,7 +44,6 @@ import okhttp3.Response;
 import static io.agora.edu.launch.AgoraEduSDK.REQUEST_CODE_RTC;
 import static io.agora.education.Constants.KEY_SP;
 import static io.agora.education.EduApplication.getAppId;
-import static io.agora.education.impl.Constants.AgoraLog;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -251,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
         AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(this, userName,
                 userUuid, roomName, roomUuid, roleType, roomType, rtmToken);
         AgoraEduClassRoom classRoom = AgoraEduSDK.launch(agoraEduLaunchConfig, (state) -> {
-            AgoraLog.e(TAG + ":launch-课堂状态:" + state.name());
+            Log.e(TAG, ":launch-课堂状态:" + state.name());
             notifyBtnJoinEnable(true);
         });
 //        new Thread(() -> {

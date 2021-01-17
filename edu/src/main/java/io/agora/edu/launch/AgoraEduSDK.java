@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -36,7 +37,6 @@ import io.agora.edu.classroom.OneToOneClassActivity;
 import io.agora.edu.classroom.SmallClassActivity;
 
 import static io.agora.edu.classroom.BaseClassActivity.setEduManager;
-import static io.agora.education.impl.Constants.AgoraLog;
 
 public class AgoraEduSDK {
     private static final String TAG = "EduLaunch";
@@ -45,7 +45,7 @@ public class AgoraEduSDK {
     public static final int REQUEST_CODE_RTE = 909;
     public static final String CODE = "code";
     public static final String REASON = "reason";
-    public static AgoraEduLaunchCallback agoraEduLaunchCallback = state -> AgoraLog.e(TAG + ":This is the default null implementation!");
+    public static AgoraEduLaunchCallback agoraEduLaunchCallback = state -> Log.e(TAG, ":This is the default null implementation!");
     private static RoomPre roomPre;
     private static AgoraEduSDKConfig agoraEduSDKConfig;
     private static final AgoraEduClassRoom classRoom = new AgoraEduClassRoom();
@@ -53,26 +53,26 @@ public class AgoraEduSDK {
     private static ActivityLifecycleListener classRoomListener = new ActivityLifecycleListener() {
         @Override
         public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-            AgoraLog.i(TAG + ":classRoomListener->onActivityCreated");
+            Log.i(TAG, ":classRoomListener->onActivityCreated");
             classRoom.add(activity);
         }
 
         @Override
         public void onActivityDestroyed(@NonNull Activity activity) {
-            AgoraLog.i(TAG + ":classRoomListener->onActivityDestroyed");
+            Log.i(TAG, ":classRoomListener->onActivityDestroyed");
             classRoom.updateState(AgoraEduEvent.AgoraEduEventDestroyed);
         }
     };
     private static ActivityLifecycleListener replayListener = new ActivityLifecycleListener() {
         @Override
         public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-            AgoraLog.i(TAG + ":replayListener->onActivityDestroyed");
+            Log.i(TAG, ":replayListener->onActivityDestroyed");
             replay.add(activity);
         }
 
         @Override
         public void onActivityDestroyed(@NonNull Activity activity) {
-            AgoraLog.i(TAG + ":replayListener->onActivityDestroyed");
+            Log.i(TAG, ":replayListener->onActivityDestroyed");
             replay.updateState(AgoraEduEvent.AgoraEduEventDestroyed);
             agoraEduLaunchCallback.onCallback(AgoraEduEvent.AgoraEduEventDestroyed);
         }
@@ -106,7 +106,7 @@ public class AgoraEduSDK {
 
         /**step-0:get agoraEduSDKConfig and to configure*/
         if (agoraEduSDKConfig == null) {
-            AgoraLog.e(TAG + ":agoraEduSDKConfig is null!");
+            Log.e(TAG, ":agoraEduSDKConfig is null!");
             return null;
         }
         config.setAppId(agoraEduSDKConfig.getAppId());
@@ -150,7 +150,7 @@ public class AgoraEduSDK {
                         @Override
                         public void onSuccess(@Nullable EduManager res) {
                             if (res != null) {
-                                AgoraLog.e(TAG + ":初始化EduManager成功");
+                                Log.e(TAG, ":初始化EduManager成功");
                                 setEduManager(res);
                                 Intent intent = createIntent(config);
                                 ((Activity) config.getContext()).startActivityForResult(intent, REQUEST_CODE_RTE);
@@ -197,7 +197,7 @@ public class AgoraEduSDK {
 
     private static void errorTips(Context context, String msg) {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-        AgoraLog.e(TAG, msg);
+        Log.e(TAG, msg);
         agoraEduLaunchCallback.onCallback(AgoraEduEvent.AgoraEduEventDestroyed);
     }
 

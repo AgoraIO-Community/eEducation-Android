@@ -253,7 +253,6 @@ public class MainActivity extends AppCompatActivity {
             Log.e(TAG, "launch-课堂状态:" + state.name());
             notifyBtnJoinEnable(true);
         });
-
 //        new Thread(() -> {
 //            try {
 //                Thread.sleep(10000);

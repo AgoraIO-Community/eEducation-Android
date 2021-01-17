@@ -82,7 +82,7 @@ public class OneToOneClassActivity extends BaseClassActivity {
     @Override
     protected void initView() {
         super.initView();
-        video_teacher.init(R.layout.layout_video_one2one_class, true);
+        video_teacher.init(R.layout.layout_video_one2one_class, false);
         video_student.init(R.layout.layout_video_one2one_class, true);
         video_student.setOnClickAudioListener(v -> OneToOneClassActivity.this.muteLocalAudio(!video_student.isAudioMuted()));
         video_student.setOnClickVideoListener(v -> OneToOneClassActivity.this.muteLocalVideo(!video_student.isVideoMuted()));

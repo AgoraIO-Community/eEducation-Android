@@ -72,15 +72,21 @@ public class UserListAdapter extends BaseQuickAdapter<EduStreamInfo, UserListAda
         EduBaseUserInfo userInfo = streamInfo.getPublisher();
         viewHolder.tv_name.setText(userInfo.getUserName());
         viewHolder.iv_btn_grant_board.setSelected(grantedUuids.contains(userInfo.getUserUuid()));
+
+        boolean isLocal = userInfo.getUserUuid().equals(localUserUuid);
+        if (isLocal) {
+            viewHolder.iv_btn_mute_audio.setImageResource(R.drawable.ic_audio_green);
+            viewHolder.iv_btn_mute_video.setImageResource(R.drawable.ic_video_green);
+            viewHolder.iv_btn_mute_audio.setClickable(true);
+            viewHolder.iv_btn_mute_video.setClickable(true);
+        } else {
+            viewHolder.iv_btn_mute_audio.setImageResource(R.drawable.ic_audio_gray);
+            viewHolder.iv_btn_mute_video.setImageResource(R.drawable.ic_video_gray);
+            viewHolder.iv_btn_mute_audio.setClickable(false);
+            viewHolder.iv_btn_mute_video.setClickable(false);
+        }
         viewHolder.iv_btn_mute_audio.setSelected(streamInfo.getHasAudio());
         viewHolder.iv_btn_mute_video.setSelected(streamInfo.getHasVideo());
-        boolean isLocal = userInfo.getUserUuid().equals(localUserUuid);
-        viewHolder.iv_btn_mute_audio.setEnabled(isLocal);
-        viewHolder.iv_btn_mute_video.setEnabled(isLocal);
-        if (!isLocal) {
-            viewHolder.iv_btn_mute_audio.setAlpha(0.5f);
-            viewHolder.iv_btn_mute_video.setAlpha(0.5f);
-        }
     }
 
 

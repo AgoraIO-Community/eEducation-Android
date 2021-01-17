@@ -17,23 +17,23 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/iv_btn_mute_audio"
+        android:id="@+id/iv_btn_mute_video"
         android:layout_width="@dimen/dp_30"
         android:layout_height="@dimen/dp_30"
-        android:layout_marginStart="@dimen/dp_14"
+        android:src="@drawable/ic_video_gray"
         android:layout_marginEnd="@dimen/dp_11"
-        android:src="@drawable/ic_speaker"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/iv_btn_mute_video"
+        android:id="@+id/iv_btn_mute_audio"
         android:layout_width="@dimen/dp_30"
         android:layout_height="@dimen/dp_30"
-        android:src="@drawable/ic_camera"
+        android:src="@drawable/ic_audio_gray"
+        android:layout_marginEnd="@dimen/dp_11"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/iv_btn_mute_audio"
+        app:layout_constraintEnd_toStartOf="@id/iv_btn_mute_video"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -41,10 +41,11 @@
         android:layout_width="@dimen/dp_30"
         android:layout_height="@dimen/dp_30"
         android:clickable="false"
+        android:layout_marginEnd="@dimen/dp_11"
         android:src="@drawable/ic_board"
         android:state_selected="false"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/iv_btn_mute_video"
+        app:layout_constraintEnd_toStartOf="@id/iv_btn_mute_audio"
         app:layout_constraintTop_toTopOf="parent" />
 
     <View

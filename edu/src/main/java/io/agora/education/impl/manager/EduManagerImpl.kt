@@ -2,7 +2,6 @@ package io.agora.education.impl.manager
 
 import android.os.Build
 import android.text.TextUtils
-import android.util.Base64
 import com.google.gson.Gson
 import io.agora.education.impl.Constants.Companion.APPID
 import io.agora.education.impl.Constants.Companion.AgoraLog
@@ -10,7 +9,7 @@ import io.agora.education.impl.Constants.Companion.LOGS_DIR_NAME
 import io.agora.base.callback.ThrowableCallback
 import io.agora.base.network.BusinessException
 import io.agora.edu.BuildConfig
-import io.agora.edu.BuildConfig.API_BASE_URL
+import io.agora.edu.BuildConfig.LOG_OSS_CALLBACK_HOST
 import io.agora.education.api.EduCallback
 import io.agora.education.api.base.EduError
 import io.agora.education.api.base.EduError.Companion.communicationError
@@ -22,14 +21,10 @@ import io.agora.education.api.manager.EduManagerOptions
 import io.agora.education.api.room.EduRoom
 import io.agora.education.api.room.data.*
 import io.agora.education.api.statistics.AgoraError
-import io.agora.education.api.util.CryptoUtil
-import io.agora.education.impl.ResponseBody
 import io.agora.education.impl.network.RetrofitManager
 import io.agora.education.impl.room.EduRoomImpl
 import io.agora.education.impl.room.data.EduRoomInfoImpl
 import io.agora.education.impl.room.data.RtmConnectState
-import io.agora.education.impl.room.data.response.EduLoginRes
-import io.agora.education.impl.room.network.RoomService
 import io.agora.education.impl.util.Convert
 import io.agora.education.impl.util.UnCatchExceptionHandler
 import io.agora.log.LogManager
@@ -158,7 +153,7 @@ internal class EduManagerImpl(
         val uploadParam = UploadManager.UploadParam(BuildConfig.VERSION_NAME, Build.DEVICE,
                 Build.VERSION.SDK, "ZIP", "Android", null)
         logMessage("${TAG}: Call the uploadDebugItem function to upload logs，parameter->${Gson().toJson(uploadParam)}", LogLevel.INFO)
-        UploadManager.upload(options.context, APPID, API_BASE_URL, options.logFileDir!!, uploadParam,
+        UploadManager.upload(options.context, APPID, LOG_OSS_CALLBACK_HOST, options.logFileDir!!, uploadParam,
                 object : ThrowableCallback<String> {
                     override fun onSuccess(res: String?) {
                         res?.let {

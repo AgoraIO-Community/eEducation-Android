@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -152,8 +151,8 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
             eduManager.setEduManagerEventListener(this);
         }
         agoraEduLaunchConfig = getIntent().getParcelableExtra(LAUNCHCONFIG);
-        whiteboardFragment.setWhiteBoardAppId(agoraEduLaunchConfig.getWhiteBoardAppId());
-        chatRoomFragment.setAppId(agoraEduLaunchConfig.getAppId(), agoraEduLaunchConfig.getWhiteBoardAppId());
+        whiteboardFragment.setWhiteBoardAppId(agoraEduLaunchConfig.whiteBoardAppId);
+        chatRoomFragment.setAppId(agoraEduLaunchConfig.appId, agoraEduLaunchConfig.whiteBoardAppId);
         RoomCreateOptions createOptions = new RoomCreateOptions(agoraEduLaunchConfig.getRoomUuid(),
                 agoraEduLaunchConfig.getRoomName(), agoraEduLaunchConfig.getRoomType());
         try {
@@ -162,7 +161,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
         catch (NullPointerException e) {
             e.printStackTrace();
         }
-        chat = new ChatImpl(agoraEduLaunchConfig.getAppId(), agoraEduLaunchConfig.getRoomUuid());
+        chat = new ChatImpl(agoraEduLaunchConfig.appId, agoraEduLaunchConfig.getRoomUuid());
     }
 
     @Override
@@ -174,7 +173,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
 
     @Override
     protected void onStart() {
-        EyeProtection.setNeedShow(agoraEduLaunchConfig.getOpenEyeCare() == 1);
+        EyeProtection.setNeedShow(agoraEduLaunchConfig.getEyeCare() == 1);
         super.onStart();
     }
 
@@ -959,7 +958,7 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
             @Override
             public void onSuccess(@Nullable EduUserInfo userInfo) {
                 if (TextUtils.isEmpty(boardJson) && mainBoardBean == null) {
-                    requestBoardInfo(((EduLocalUserInfo) userInfo).getUserToken(), agoraEduLaunchConfig.getAppId(),
+                    requestBoardInfo(((EduLocalUserInfo) userInfo).getUserToken(), agoraEduLaunchConfig.appId,
                             agoraEduLaunchConfig.getRoomUuid());
                 } else {
                     mainBoardBean = new Gson().fromJson(boardJson, BoardBean.class);
@@ -986,9 +985,8 @@ public abstract class BaseClassActivity extends BaseActivity implements EduRoomE
             public void onSuccess(@Nullable EduUser localUser) {
                 if (localUser != null) {
                     EduLocalUserInfo localUserInfo = localUser.getUserInfo();
-                    AgoraActionProcessConfig config = new AgoraActionProcessConfig(agoraEduLaunchConfig.getAppId(),
-                            agoraEduLaunchConfig.getRoomUuid(), localUserInfo.getUserToken(), agoraEduLaunchConfig.getCustomerId(),
-                            agoraEduLaunchConfig.getCustomerCer(), API_BASE_URL);
+                    AgoraActionProcessConfig config = new AgoraActionProcessConfig(agoraEduLaunchConfig.appId,
+                            agoraEduLaunchConfig.getRoomUuid(), localUserInfo.getUserToken(), API_BASE_URL);
                     actionProcessManager = new AgoraActionProcessManager(config, BaseClassActivity.this);
                 }
             }

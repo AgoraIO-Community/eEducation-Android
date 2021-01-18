@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import io.agora.base.ToastManager;
@@ -124,28 +125,31 @@ public class ChatRoomFragment extends BaseFragment implements OnItemChildClickLi
                         @Override
                         public void onSuccess(@Nullable List<ReplayRes.RecordDetail> res) {
                             if (res != null && res.size() > 0) {
-                                /*find latest record*/
-                                long max = 0;
-                                ReplayRes.RecordDetail recordDetail = null;
-                                for (ReplayRes.RecordDetail detail : res) {
-                                    if (detail.startTime > max) {
-                                        max = detail.startTime;
-                                        recordDetail = detail;
+                                try {
+                                    /*find latest record*/
+                                    long max = 0;
+                                    ReplayRes.RecordDetail recordDetail = null;
+                                    for (ReplayRes.RecordDetail detail : res) {
+                                        if (detail.startTime > max) {
+                                            max = detail.startTime;
+                                            recordDetail = detail;
+                                        }
                                     }
-                                }
-                                if (recordDetail.isFinished()) {
-                                    String url = recordDetail.url;
-                                    if (!TextUtils.isEmpty(url)) {
-                                        AgoraEduReplayConfig config = new AgoraEduReplayConfig(
-                                                ChatRoomFragment.this.getContext(),
-                                                recordDetail.startTime, recordDetail.endTime, url,
-                                                whiteBoardAppId, recordDetail.boardId,
-                                                recordDetail.boardToken);
-                                        AgoraEduSDK.replay(config, state -> {
-                                        });
+                                    if (recordDetail.isFinished()) {
+                                        String url = recordDetail.url;
+                                        if (!TextUtils.isEmpty(url)) {
+                                            AgoraEduReplayConfig config = new AgoraEduReplayConfig(
+                                                    recordDetail.startTime, recordDetail.endTime, url,
+                                                    whiteBoardAppId, recordDetail.boardId,
+                                                    recordDetail.boardToken, null);
+                                            AgoraEduSDK.replay(requireContext(), config, state -> {
+                                            });
+                                        }
+                                    } else {
+                                        ToastManager.showShort(R.string.wait_record);
                                     }
-                                } else {
-                                    ToastManager.showShort(R.string.wait_record);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
                             } else {
                                 ToastManager.showShort(R.string.noreplaydata);

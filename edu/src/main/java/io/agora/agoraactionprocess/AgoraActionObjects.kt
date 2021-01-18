@@ -17,8 +17,6 @@ class AgoraActionProcessConfig(
         val appId: String,
         val roomUuid: String,
         val userToken: String,
-        val customerId: String,
-        val customerCertificate: String,
         val baseUrl: String
 )
 

@@ -18,4 +18,9 @@ public enum AgoraEduRoomType {
    private AgoraEduRoomType(int value) {
       this.value = value;
    }
+
+   public static final boolean isValid(int type) {
+      return type == AgoraEduRoomType1V1.getValue() || type == AgoraEduRoomTypeSmall.getValue() ||
+              type == AgoraEduRoomTypeBig.getValue();
+   }
 }

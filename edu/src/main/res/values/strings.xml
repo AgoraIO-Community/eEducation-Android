@@ -58,4 +58,6 @@
     <string name="covideo_accept_interactive">Teacher accept your interactive request!</string>
     <string name="covideo_reject_interactive">Teacher reject your interactive request!</string>
     <string name="covideo_abort_interactive">Teacher abort your interactive video!</string>
+
+    <string name="parametererrpr">parameter error:%s</string>
 </resources>

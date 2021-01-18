@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import io.agora.base.PreferenceManager;
 import io.agora.base.ToastManager;
 import io.agora.base.network.RetrofitManager;
+import io.agora.edu.R;
 import io.agora.edu.classroom.ReplayActivity;
 import io.agora.edu.common.api.RoomPre;
 import io.agora.edu.common.bean.request.RoomPreCheckReq;
@@ -82,27 +83,46 @@ public class AgoraEduSDK {
         return EduManager.Companion.version();
     }
 
-    public static void setConfig(AgoraEduSDKConfig agoraEduSDKConfig) {
+    public static void setConfig(@NotNull AgoraEduSDKConfig agoraEduSDKConfig) {
         AgoraEduSDK.agoraEduSDKConfig = agoraEduSDKConfig;
     }
 
-    public static AgoraEduClassRoom launch(@NotNull AgoraEduLaunchConfig config,
+    public static AgoraEduClassRoom launch(@NotNull Context context, @NotNull AgoraEduLaunchConfig config,
                                            @NotNull AgoraEduLaunchCallback callback)
-            throws IllegalStateException {
+            throws Exception {
         if (!classRoom.isReady()) {
-            throw new IllegalStateException("curState is not AgoraEduEventDestroyed, launch() cannot be called");
+            String msg = "curState is not AgoraEduEventDestroyed, launch() cannot be called";
+            errorTips(context, msg);
         }
 
-//        ((Application) config.getContext().getApplicationContext()).unregisterActivityLifecycleCallbacks(replayListener);
-        ((Application) config.getContext().getApplicationContext()).unregisterActivityLifecycleCallbacks(classRoomListener);
-        ((Application) config.getContext().getApplicationContext()).registerActivityLifecycleCallbacks(classRoomListener);
+        if(agoraEduSDKConfig.getEyeCare() != 0 && agoraEduSDKConfig.getEyeCare() != 1) {
+            String msg = String.format(context.getString(R.string.parametererrpr), "The value of " +
+                    "AgoraEduSDKConfig.eyeCare is not expected, it must be 0 or 1!");
+            errorTips(context, msg);
+        }
+
+        if(!AgoraEduRoleType.isValid(config.getRoleType())) {
+            String msg = String.format(context.getString(R.string.parametererrpr), "The value of " +
+                    "AgoraEduLaunchConfig.roleType is not expected, it must be 2!");
+            errorTips(context, msg);
+        }
+
+        if(!AgoraEduRoomType.isValid(config.getRoomType())) {
+            String msg = String.format(context.getString(R.string.parametererrpr), "The value of " +
+                    "AgoraEduLaunchConfig.roomType is not expected, it must be 0 or 1 or 2!");
+            errorTips(context, msg);
+        }
+
+
+        ((Application) context.getApplicationContext()).unregisterActivityLifecycleCallbacks(classRoomListener);
+        ((Application) context.getApplicationContext()).registerActivityLifecycleCallbacks(classRoomListener);
 
         agoraEduLaunchCallback = state -> {
             callback.onCallback(state);
             classRoom.updateState(state);
         };
-        ToastManager.init(config.getContext().getApplicationContext());
-        PreferenceManager.init(config.getContext().getApplicationContext());
+        ToastManager.init(context.getApplicationContext());
+        PreferenceManager.init(context.getApplicationContext());
 
         /**step-0:get agoraEduSDKConfig and to configure*/
         if (agoraEduSDKConfig == null) {
@@ -110,95 +130,101 @@ public class AgoraEduSDK {
             return null;
         }
         config.setAppId(agoraEduSDKConfig.getAppId());
-        config.setOpenEyeCare(agoraEduSDKConfig.getEyeCare());
-        if (!TextUtils.isEmpty(config.getToken())) {
-            RetrofitManager.instance().addHeader("x-agora-token", config.getToken());
+        config.setEyeCare(agoraEduSDKConfig.getEyeCare());
+        if (!TextUtils.isEmpty(config.getRtmToken())) {
+            RetrofitManager.instance().addHeader("x-agora-token", config.getRtmToken());
             RetrofitManager.instance().addHeader("x-agora-uid", config.getUserUuid());
         }
 
         /**step-1:pull remote config*/
-        roomPre = new RoomPreImpl(config.getAppId(), config.getRoomUuid());
+        roomPre = new RoomPreImpl(config.appId, config.getRoomUuid());
         roomPre.pullRemoteConfig(new EduCallback<EduRemoteConfigRes>() {
             @Override
             public void onSuccess(@Nullable EduRemoteConfigRes res) {
                 EduRemoteConfigRes.NetLessConfig netLessConfig = res.getNetless();
-                config.setWhiteBoardAppId(netLessConfig.getAppId());
+                config.whiteBoardAppId = netLessConfig.getAppId();
                 /**step-2:check classRoom and init EduManager*/
-                checkAndInit(config);
+                checkAndInit(context, config);
             }
 
             @Override
             public void onFailure(@NotNull EduError error) {
                 String msg = "pullRemoteConfig failed->code:" + error.getType() + ",msg:" + error.getMsg();
-                errorTips(config.getContext(), msg);
+                callbackError(context, msg);
             }
         });
 
         return classRoom;
     }
 
-    private static void checkAndInit(@NotNull AgoraEduLaunchConfig config) {
+    private static void checkAndInit(@NotNull Context context, @NotNull AgoraEduLaunchConfig config) {
         RoomPreCheckReq req = new RoomPreCheckReq(config.getRoomName(), config.getRoomType());
         roomPre.preCheckClassRoom(config.getUserUuid(), req, new EduCallback<RoomPreCheckRes>() {
             @Override
             public void onSuccess(@Nullable RoomPreCheckRes res) {
                 if (res.getState() != EduRoomState.END.getValue()) {
-                    EduManagerOptions options = new EduManagerOptions(config.getContext(), config.getAppId(),
-                            config.getToken(), config.getUserUuid(), config.getUserName());
-                    options.setLogFileDir(config.getContext().getCacheDir().getAbsolutePath());
+                    EduManagerOptions options = new EduManagerOptions(context, config.appId,
+                            config.getRtmToken(), config.getUserUuid(), config.getUserName());
+                    options.setLogFileDir(context.getCacheDir().getAbsolutePath());
                     EduManager.init(options, new EduCallback<EduManager>() {
                         @Override
                         public void onSuccess(@Nullable EduManager res) {
                             if (res != null) {
                                 Log.e(TAG, ":初始化EduManager成功");
                                 setEduManager(res);
-                                Intent intent = createIntent(config);
-                                ((Activity) config.getContext()).startActivityForResult(intent, REQUEST_CODE_RTE);
+                                Intent intent = createIntent(context, config);
+                                ((Activity) context).startActivityForResult(intent, REQUEST_CODE_RTE);
                             }
                         }
 
                         @Override
                         public void onFailure(@NotNull EduError error) {
                             String msg = "初始化EduManager失败->code:" + error.getType() + ",reason:" + error.getMsg();
-                            errorTips(config.getContext(), msg);
+                            callbackError(context, msg);
                         }
                     });
                 } else {
                     String msg = "Room is End!";
-                    errorTips(config.getContext(), msg);
+                    callbackError(context, msg);
                 }
             }
 
             @Override
             public void onFailure(@NotNull EduError error) {
                 String msg = "preCheckClassRoom failed->code:" + error.getType() + ",msg:" + error.getMsg();
-                errorTips(config.getContext(), msg);
+                callbackError(context, msg);
             }
         });
     }
 
-    private static Intent createIntent(AgoraEduLaunchConfig config) {
+    private static Intent createIntent(@NotNull Context context, @NotNull AgoraEduLaunchConfig config) {
         Intent intent = new Intent();
         int roomType = config.getRoomType();
         if (roomType == RoomType.ONE_ON_ONE.getValue()) {
-            intent.setClass(config.getContext(), OneToOneClassActivity.class);
+            intent.setClass(context, OneToOneClassActivity.class);
         } else if (roomType == RoomType.SMALL_CLASS.getValue()) {
-            intent.setClass(config.getContext(), SmallClassActivity.class);
+            intent.setClass(context, SmallClassActivity.class);
         } else if (roomType == RoomType.LARGE_CLASS.getValue()) {
-            intent.setClass(config.getContext(), LargeClassActivity.class);
+            intent.setClass(context, LargeClassActivity.class);
         } else if (roomType == RoomType.BREAKOUT_CLASS.getValue()) {
-            intent.setClass(config.getContext(), BreakoutClassActivity.class);
+            intent.setClass(context, BreakoutClassActivity.class);
         } else if (roomType == RoomType.MEDIUM_CLASS.getValue()) {
-            intent.setClass(config.getContext(), MediumClassActivity.class);
+            intent.setClass(context, MediumClassActivity.class);
         }
         intent.putExtra(BaseClassActivity.LAUNCHCONFIG, config);
         return intent;
     }
 
-    private static void errorTips(Context context, String msg) {
+    private static void callbackError(Context context, String msg) {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
         Log.e(TAG, msg);
         agoraEduLaunchCallback.onCallback(AgoraEduEvent.AgoraEduEventDestroyed);
+    }
+
+    private static void errorTips(Context context, String msg) throws Exception {
+        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+        Log.e(TAG, msg);
+        throw new Exception(msg);
     }
 
 
@@ -209,28 +235,27 @@ public class AgoraEduSDK {
     public static final String WHITEBOARD_ID = "whiteboardId";
     public static final String WHITEBOARD_TOKEN = "whiteboardToken";
 
-    public static AgoraEduReplay replay(AgoraEduReplayConfig config, @NotNull AgoraEduLaunchCallback callback)
+    public static AgoraEduReplay replay(@NotNull Context context, @NotNull AgoraEduReplayConfig config, @NotNull AgoraEduLaunchCallback callback)
             throws IllegalStateException {
         if (!replay.isReady()) {
             throw new IllegalStateException("curState is not AgoraEduEventDestroyed, replay() cannot be called");
         }
 
-        ((Application) config.getContext().getApplicationContext()).unregisterActivityLifecycleCallbacks(replayListener);
-//        ((Application) config.getContext().getApplicationContext()).unregisterActivityLifecycleCallbacks(classRoomListener);
-        ((Application) config.getContext().getApplicationContext()).registerActivityLifecycleCallbacks(replayListener);
+        ((Application) context.getApplicationContext()).unregisterActivityLifecycleCallbacks(replayListener);
+        ((Application) context.getApplicationContext()).registerActivityLifecycleCallbacks(replayListener);
 
         agoraEduLaunchCallback = callback;
-        ToastManager.init(config.getContext().getApplicationContext());
-        PreferenceManager.init(config.getContext().getApplicationContext());
+        ToastManager.init(context.getApplicationContext());
+        PreferenceManager.init(context.getApplicationContext());
 
-        Intent intent = new Intent(config.getContext(), ReplayActivity.class);
+        Intent intent = new Intent(context, ReplayActivity.class);
         intent.putExtra(WHITEBOARD_APP_ID, config.getWhiteBoardAppId());
         intent.putExtra(WHITEBOARD_START_TIME, config.getBeginTime());
         intent.putExtra(WHITEBOARD_END_TIME, config.getEndTime());
         intent.putExtra(VIDEO_URL, config.getVideoUrl());
         intent.putExtra(WHITEBOARD_ID, config.getWhiteBoardId());
         intent.putExtra(WHITEBOARD_TOKEN, config.getWhiteBoardToken());
-        config.getContext().startActivity(intent);
+        context.startActivity(intent);
         replay.updateState(AgoraEduEvent.AgoraEduEventReady);
         agoraEduLaunchCallback.onCallback(AgoraEduEvent.AgoraEduEventReady);
         return replay;

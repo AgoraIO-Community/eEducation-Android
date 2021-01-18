@@ -130,7 +130,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
     private void allocateGroup(String roomUuid, EduCallback<EduRoomInfo> callback) {
         AllocateGroupReq req = new AllocateGroupReq();
         RetrofitManager.instance().getService(API_BASE_URL, RoomPreService.class)
-                .allocateGroup(agoraEduLaunchConfig.getAppId(), roomUuid, req)
+                .allocateGroup(agoraEduLaunchConfig.appId, roomUuid, req)
                 .enqueue(new RetrofitManager.Callback<>(0, new ThrowableCallback<ResponseBody<EduRoomInfoRes>>() {
                     @Override
                     public void onFailure(@Nullable Throwable throwable) {
@@ -196,7 +196,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
                                     @Override
                                     public void onSuccess(@Nullable EduUserInfo userInfo) {
                                         requestBoardInfo(((EduLocalUserInfo) userInfo).getUserToken(),
-                                                agoraEduLaunchConfig.getAppId(), agoraEduLaunchConfig.getRoomUuid());
+                                                agoraEduLaunchConfig.appId, agoraEduLaunchConfig.getRoomUuid());
                                     }
 
                                     @Override
@@ -598,7 +598,7 @@ public class BreakoutClassActivity extends BaseClassActivity implements TabLayou
                     @Override
                     public void onSuccess(@Nullable EduUserInfo userInfo) {
                         requestBoardInfo(((EduLocalUserInfo) userInfo).getUserToken(),
-                                agoraEduLaunchConfig.getAppId(), agoraEduLaunchConfig.getRoomUuid());
+                                agoraEduLaunchConfig.appId, agoraEduLaunchConfig.getRoomUuid());
                     }
 
                     @Override

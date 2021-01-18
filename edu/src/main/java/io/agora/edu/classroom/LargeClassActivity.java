@@ -120,8 +120,9 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
     @Override
     protected void initData() {
         super.initData();
-        raiseHand = new RaiseHandImpl(agoraEduLaunchConfig.getAppId(), agoraEduLaunchConfig.getRoomUuid());
-        joinRoomAsStudent(getMainEduRoom(), agoraEduLaunchConfig.getUserName(), agoraEduLaunchConfig.getUserUuid(), true, false, true,
+        raiseHand = new RaiseHandImpl(agoraEduLaunchConfig.appId, agoraEduLaunchConfig.getRoomUuid());
+        joinRoomAsStudent(getMainEduRoom(), agoraEduLaunchConfig.getUserName(),
+                agoraEduLaunchConfig.getUserUuid(), true, false, true,
                 new EduCallback<EduStudent>() {
                     @Override
                     public void onSuccess(@Nullable EduStudent res) {

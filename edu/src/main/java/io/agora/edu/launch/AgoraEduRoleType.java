@@ -16,4 +16,8 @@ public enum AgoraEduRoleType {
    private AgoraEduRoleType(int value) {
       this.value = value;
    }
+
+   public static final boolean isValid(int type) {
+      return type == AgoraEduRoleTypeStudent.value;
+   }
 }

@@ -29,6 +29,8 @@ import butterknife.OnClick;
 import butterknife.OnTouch;
 import io.agora.edu.common.bean.ResponseBody;
 import io.agora.edu.launch.AgoraEduClassRoom;
+import io.agora.edu.launch.AgoraEduReplay;
+import io.agora.edu.launch.AgoraEduReplayConfig;
 import io.agora.edu.launch.AgoraEduRoleType;
 import io.agora.edu.launch.AgoraEduRoomType;
 import io.agora.edu.launch.AgoraEduSDK;
@@ -113,16 +115,17 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, SettingActivity.class));
                 break;
             case R.id.btn_join:
-//                AgoraEduReplayConfig config = new AgoraEduReplayConfig(this, 1610194790798L, 1610194828584L,
+//                AgoraEduReplayConfig config = new AgoraEduReplayConfig(1610194790798L, 1610194828584L,
 //                        "scenario/recording/f488493d1886435f963dfb3d95984fd4/5ff99f6612c83b045ed90495/6b6c425515445a49a26e29aa7a828f33_1235542.m3u8",
-//                        "646/P8Kb7e_DJZVAQw", "4c25df50526f11eb881eb12e7d1eca69", "WHITEcGFydG5lcl9pZD0xTnd5aDBsMW9ZazhaRWNuZG1kaWgwcmJjVWVsQnE1UkpPMVMmc2lnPTcwODlkYzdjNzA2YTFmMjZkZDdlMmEyYWI0YjFhMzQ4MDQ4YzY2N2Y6YWs9MU53eWgwbDFvWWs4WkVjbmRtZGloMHJiY1VlbEJxNVJKTzFTJmNyZWF0ZV90aW1lPTE2MTAxOTIzNTM5OTAmZXhwaXJlX3RpbWU9MTY0MTcyODM1Mzk5MCZub25jZT0xNjEwMTkyMzUzOTkwMDAmcm9sZT1yb29tJnJvb21JZD00YzI1ZGY1MDUyNmYxMWViODgxZWIxMmU3ZDFlY2E2OSZ0ZWFtSWQ9NjQ2");
-//                AgoraEduReplay replay = AgoraEduSDK.replay(config, state -> {
-//                    AgoraLog.e(TAG + ":replay-课堂状态:" + state.name());
+//                        "", "", "",
+//                        "");
+//                AgoraEduReplay replay = AgoraEduSDK.replay(this, config, state -> {
+//                    Log.e(TAG, ":replay-课堂状态:" + state.name());
 //                });
 //                new Thread(() -> {
 //                    try {
 //                        Thread.sleep(10000);
-//                        AgoraLog.e(TAG + ":replay-主动自动结束课堂");
+//                        Log.e(TAG, ":replay-主动自动结束课堂");
 //                        replay.destroy();
 //                    }
 //                    catch (Exception e) {
@@ -205,36 +208,6 @@ public class MainActivity extends AppCompatActivity {
         /*根据userUuid和appId签发的token*/
         rtmToken = "";
 
-//        /**请求rtmToken---上架版本*/
-//        FetchRtmTokenUtil.fetchToken(userUuid, new Callback() {
-//            @Override
-//            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-//                notifyBtnJoinEnable(true);
-//                AgoraLog.e(TAG + ":fetchToken onFailure:" + e.getMessage());
-//            }
-//
-//            @Override
-//            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-//                String body = response.body().string();
-//                ResponseBody<RtmTokenRes> res = new Gson().fromJson(body, new TypeToken<ResponseBody<RtmTokenRes>>() {
-//                }.getType());
-//                rtmToken = res.data.getRtmToken();
-//                if (res != null && !TextUtils.isEmpty(res.data.getRtmToken())) {
-//                    AgoraLog.d(TAG + ":fetchToken onResponse:" + body);
-//                    runOnUiThread(() -> {
-//                        AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(
-//                                MainActivity.this, userName, userUuid, roomName, roomUuid, roleType, roomType, rtmToken);
-//                        AgoraEduClassRoom classRoom = AgoraEduSDK.launch(agoraEduLaunchConfig, (state) -> {
-//                            AgoraLog.e(TAG + ":launch-课堂状态:" + state.name());
-//                            notifyBtnJoinEnable(true);
-//                        });
-//                    });
-//                } else {
-//                    notifyBtnJoinEnable(true);
-//                }
-//            }
-//        });
-
         /**本地生成rtmToken---开源版本*/
         try {
             /**声网 APP Id(声网控制台获取)*/
@@ -243,26 +216,27 @@ public class MainActivity extends AppCompatActivity {
             String appCertificate = "";
             rtmToken = new RtmTokenBuilder().buildToken(appId, appCertificate, userUuid,
                     RtmTokenBuilder.Role.Rtm_User, 0);
+
+            AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(userName, userUuid,
+                    roomName, roomUuid, roleType, -1, rtmToken);
+            AgoraEduClassRoom classRoom = AgoraEduSDK.launch(this, agoraEduLaunchConfig, (state) -> {
+                Log.e(TAG, ":launch-课堂状态:" + state.name());
+                notifyBtnJoinEnable(true);
+            });
+//            new Thread(() -> {
+//                try {
+//                    Thread.sleep(10000);
+//                    Log.e(TAG, ":launch-主动自动结束课堂");
+//                    classRoom.destroy();
+//                }
+//                catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }).start();
         }
         catch (Exception e) {
             e.printStackTrace();
         }
-        AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(this, userName,
-                userUuid, roomName, roomUuid, roleType, roomType, rtmToken);
-        AgoraEduClassRoom classRoom = AgoraEduSDK.launch(agoraEduLaunchConfig, (state) -> {
-            Log.e(TAG, ":launch-课堂状态:" + state.name());
-            notifyBtnJoinEnable(true);
-        });
-//        new Thread(() -> {
-//            try {
-//                Thread.sleep(10000);
-//                AgoraLog.e(TAG + ":launch-主动自动结束课堂");
-//                classRoom.destroy();
-//            }
-//            catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }).start();
     }
 
     private int getClassType(String roomTypeStr) {

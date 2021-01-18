@@ -9,13 +9,24 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="张三"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:maxLines="1"
+        android:text="nihaoyaasdfasdfasfsdfasdfsdf"
         android:textColor="@color/black"
         android:textSize="@dimen/sp_18"
+        android:ellipsize="end"
+        android:maxEms="25"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/iv_btn_mute_video"
+        android:layout_marginEnd="@dimen/dp_10"
+        android:gravity="center_vertical|start|left"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMaxTextSize="@dimen/sp_18"
+        android:autoSizeMinTextSize="@dimen/sp_10"
+        android:autoSizeStepGranularity="1sp"/>
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/iv_btn_mute_audio"

@@ -173,7 +173,8 @@ public class AgoraEduSDK {
                                 Log.e(TAG, ":初始化EduManager成功");
                                 setEduManager(res);
                                 Intent intent = createIntent(context, config);
-                                ((Activity) context).startActivityForResult(intent, REQUEST_CODE_RTE);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                context.startActivity(intent);
                             }
                         }
 

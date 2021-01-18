@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 //                        "scenario/recording/f488493d1886435f963dfb3d95984fd4/5ff99f6612c83b045ed90495/6b6c425515445a49a26e29aa7a828f33_1235542.m3u8",
 //                        "", "", "",
 //                        "");
-//                AgoraEduReplay replay = AgoraEduSDK.replay(this, config, state -> {
+//                AgoraEduReplay replay = AgoraEduSDK.replay(getApplicationContext(), config, state -> {
 //                    Log.e(TAG, ":replay-课堂状态:" + state.name());
 //                });
 //                new Thread(() -> {
@@ -218,8 +218,9 @@ public class MainActivity extends AppCompatActivity {
                     RtmTokenBuilder.Role.Rtm_User, 0);
 
             AgoraEduLaunchConfig agoraEduLaunchConfig = new AgoraEduLaunchConfig(userName, userUuid,
-                    roomName, roomUuid, roleType, -1, rtmToken);
-            AgoraEduClassRoom classRoom = AgoraEduSDK.launch(this, agoraEduLaunchConfig, (state) -> {
+                    roomName, roomUuid, roleType, roomType, rtmToken);
+            AgoraEduClassRoom classRoom = AgoraEduSDK.launch(getApplicationContext(), agoraEduLaunchConfig,
+                    (state) -> {
                 Log.e(TAG, ":launch-课堂状态:" + state.name());
                 notifyBtnJoinEnable(true);
             });

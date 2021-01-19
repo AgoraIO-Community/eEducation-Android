@@ -221,9 +221,9 @@ public class MainActivity extends AppCompatActivity {
                     roomName, roomUuid, roleType, roomType, rtmToken);
             AgoraEduClassRoom classRoom = AgoraEduSDK.launch(getApplicationContext(), agoraEduLaunchConfig,
                     (state) -> {
-                Log.e(TAG, ":launch-课堂状态:" + state.name());
-                notifyBtnJoinEnable(true);
-            });
+                        Log.e(TAG, ":launch-课堂状态:" + state.name());
+                        notifyBtnJoinEnable(true);
+                    });
 //            new Thread(() -> {
 //                try {
 //                    Thread.sleep(10000);

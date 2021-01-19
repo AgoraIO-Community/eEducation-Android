@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="there_is_no_teacher_disable_covideo">There is no teacher in this classroom, cannot apply coVideo.</string>
-    <string name="covideo_accept_interactive">Teacher accept your interactive request!</string>
-    <string name="covideo_reject_interactive">Teacher reject your interactive request!</string>
-    <string name="covideo_abort_interactive">Teacher abort your interactive video!</string>
-</resources>
